@@ -29,10 +29,7 @@ void main() {
     }
     di.sl.registerLazySingleton<UpdateRepository>(() => mockRepository);
     di.sl.registerLazySingleton(
-      () => CheckForUpdate(
-        repository: mockRepository,
-        currentVersion: '1.0.0',
-      ),
+      () => CheckForUpdate(repository: mockRepository, currentVersion: '1.0.0'),
     );
   });
 
@@ -48,9 +45,7 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -68,9 +63,7 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -86,9 +79,7 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -105,9 +96,7 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -123,9 +112,7 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -141,9 +128,7 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -168,9 +153,7 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -193,9 +176,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: const MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -219,9 +200,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: const MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -232,9 +211,9 @@ void main() {
     });
 
     testWidgets('should show error state with retry', (tester) async {
-      when(() => mockRepository.getLatestRelease()).thenAnswer(
-        (_) async => const Left(UpdateFailure('Network error')),
-      );
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Left(UpdateFailure('Network error')));
 
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -242,9 +221,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: const MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -257,8 +234,9 @@ void main() {
 
     testWidgets('should show checking state', (tester) async {
       final completer = Completer<Either<Failure, AppRelease>>();
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) => completer.future);
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) => completer.future);
 
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -266,9 +244,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(
-            home: Scaffold(body: SettingsScreen()),
-          ),
+          child: const MaterialApp(home: Scaffold(body: SettingsScreen())),
         ),
       );
 
@@ -277,9 +253,11 @@ void main() {
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      completer.complete(const Right(
-        AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
-      ));
+      completer.complete(
+        const Right(
+          AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
+        ),
+      );
       await tester.pumpAndSettle();
     });
   });

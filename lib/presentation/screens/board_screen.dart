@@ -111,9 +111,7 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
                   loadMoreError: state.loadMoreError,
                   scrollController: _scrollController,
                   onPostTap: (post) {
-                    context.push(
-                      '/post?url=${Uri.encodeComponent(post.url)}',
-                    );
+                    context.push('/post?url=${Uri.encodeComponent(post.url)}');
                   },
                   onRetry: () {
                     ref.read(boardPostsProvider.notifier).fetchNextPage();

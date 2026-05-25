@@ -58,10 +58,7 @@ class SettingsScreen extends ConsumerWidget {
                 final version = snapshot.hasData
                     ? 'v${snapshot.data!.version}'
                     : 'v1.1.0';
-                return SettingsTile(
-                  title: '버전',
-                  subtitle: version,
-                );
+                return SettingsTile(title: '버전', subtitle: version);
               },
             ),
             UpdateBanner(
@@ -71,7 +68,8 @@ class SettingsScreen extends ConsumerWidget {
                 ref.read(updateProvider.notifier).checkForUpdate();
               },
               onUpdate: () {
-                final url = updateState.release?.downloadUrl ??
+                final url =
+                    updateState.release?.downloadUrl ??
                     updateState.release?.htmlUrl;
                 if (url != null && url.isNotEmpty) {
                   _openUpdateUrl(url);

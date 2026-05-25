@@ -1,6 +1,7 @@
-.PHONY: check analyze test coverage e2e smoke fix clean
+.PHONY: check analyze test coverage e2e smoke fix format clean
 
 check:
+	dart format --set-exit-if-changed .
 	flutter analyze --no-fatal-infos --no-fatal-warnings
 	flutter test
 
@@ -20,8 +21,12 @@ e2e:
 smoke:
 	flutter test integration_test/app_smoke_test.dart
 
+format:
+	dart format .
+
 fix:
 	dart fix --apply
+	dart format .
 
 clean:
 	flutter clean

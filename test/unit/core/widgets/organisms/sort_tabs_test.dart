@@ -9,10 +9,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SortTabs(
-              currentSort: SortOption.all,
-              onChanged: (_) {},
-            ),
+            body: SortTabs(currentSort: SortOption.all, onChanged: (_) {}),
           ),
         ),
       );
@@ -29,10 +26,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SortTabs(
-              currentSort: SortOption.all,
-              onChanged: (_) {},
-            ),
+            body: SortTabs(currentSort: SortOption.all, onChanged: (_) {}),
           ),
         ),
       );
@@ -44,21 +38,14 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SortTabs(
-              currentSort: SortOption.week,
-              onChanged: (_) {},
-            ),
+            body: SortTabs(currentSort: SortOption.week, onChanged: (_) {}),
           ),
         ),
       );
 
       final chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip));
-      final weekChip = chips.firstWhere(
-        (c) => (c.label as Text).data == '주간',
-      );
-      final allChip = chips.firstWhere(
-        (c) => (c.label as Text).data == '전체',
-      );
+      final weekChip = chips.firstWhere((c) => (c.label as Text).data == '주간');
+      final allChip = chips.firstWhere((c) => (c.label as Text).data == '전체');
 
       expect(weekChip.selected, true);
       expect(allChip.selected, false);
@@ -119,10 +106,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SortTabs(
-              currentSort: SortOption.all,
-              onChanged: (_) {},
-            ),
+            body: SortTabs(currentSort: SortOption.all, onChanged: (_) {}),
           ),
         ),
       );
@@ -137,38 +121,26 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SortTabs(
-              currentSort: SortOption.all,
-              onChanged: (_) {},
-            ),
+            body: SortTabs(currentSort: SortOption.all, onChanged: (_) {}),
           ),
         ),
       );
 
       var chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip));
-      var allChip = chips.firstWhere(
-        (c) => (c.label as Text).data == '전체',
-      );
+      var allChip = chips.firstWhere((c) => (c.label as Text).data == '전체');
       expect(allChip.selected, true);
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SortTabs(
-              currentSort: SortOption.month,
-              onChanged: (_) {},
-            ),
+            body: SortTabs(currentSort: SortOption.month, onChanged: (_) {}),
           ),
         ),
       );
 
       chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip));
-      allChip = chips.firstWhere(
-        (c) => (c.label as Text).data == '전체',
-      );
-      final monthChip = chips.firstWhere(
-        (c) => (c.label as Text).data == '월간',
-      );
+      allChip = chips.firstWhere((c) => (c.label as Text).data == '전체');
+      final monthChip = chips.firstWhere((c) => (c.label as Text).data == '월간');
 
       expect(allChip.selected, false);
       expect(monthChip.selected, true);

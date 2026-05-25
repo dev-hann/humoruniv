@@ -6,17 +6,11 @@ import 'package:humoruniv/domain/usecases/check_for_update.dart';
 enum UpdateCheckStatus { idle, checking, available, upToDate, error }
 
 class UpdateState {
-  const UpdateState({
-    this.status = UpdateCheckStatus.idle,
-    this.release,
-  });
+  const UpdateState({this.status = UpdateCheckStatus.idle, this.release});
   final UpdateCheckStatus status;
   final AppRelease? release;
 
-  UpdateState copyWith({
-    UpdateCheckStatus? status,
-    AppRelease? release,
-  }) =>
+  UpdateState copyWith({UpdateCheckStatus? status, AppRelease? release}) =>
       UpdateState(
         status: status ?? this.status,
         release: release ?? this.release,

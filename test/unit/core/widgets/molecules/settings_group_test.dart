@@ -9,10 +9,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SettingsGroup(
-              title: '화면 설정',
-              children: [SizedBox()],
-            ),
+            body: SettingsGroup(title: '화면 설정', children: [SizedBox()]),
           ),
         ),
       );
@@ -44,9 +41,7 @@ void main() {
     testWidgets('should display title', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: SettingsTile(title: '다크 모드'),
-          ),
+          home: Scaffold(body: SettingsTile(title: '다크 모드')),
         ),
       );
 
@@ -57,10 +52,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SettingsTile(
-              title: '다크 모드',
-              leading: Icon(Icons.dark_mode),
-            ),
+            body: SettingsTile(title: '다크 모드', leading: Icon(Icons.dark_mode)),
           ),
         ),
       );
@@ -68,7 +60,9 @@ void main() {
       expect(find.byIcon(Icons.dark_mode), findsOneWidget);
     });
 
-    testWidgets('should display trailing switch and handle tap', (tester) async {
+    testWidgets('should display trailing switch and handle tap', (
+      tester,
+    ) async {
       var switchValue = false;
       await tester.pumpWidget(
         MaterialApp(
@@ -92,10 +86,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SettingsTile(
-              title: '읽은 기록',
-              onTap: () => tapped = true,
-            ),
+            body: SettingsTile(title: '읽은 기록', onTap: () => tapped = true),
           ),
         ),
       );
@@ -108,10 +99,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SettingsTile(
-              title: '버전',
-              subtitle: 'v1.0.0',
-            ),
+            body: SettingsTile(title: '버전', subtitle: 'v1.0.0'),
           ),
         ),
       );

@@ -18,6 +18,7 @@ import 'package:mocktail/mocktail.dart';
 import 'helpers/package_info_helper.dart';
 
 class MockPostRepository extends Mock implements PostRepository {}
+
 class MockUpdateRepository extends Mock implements UpdateRepository {}
 
 void main() {
@@ -53,18 +54,11 @@ void main() {
     }
     di.sl.registerLazySingleton<PostRepository>(() => mockPostRepo);
     di.sl.registerLazySingleton(() => GetBestPosts(repository: mockPostRepo));
-    di.sl.registerLazySingleton(
-      () => GetPostDetail(repository: mockPostRepo),
-    );
-    di.sl.registerLazySingleton(
-      () => GetBoardPosts(repository: mockPostRepo),
-    );
+    di.sl.registerLazySingleton(() => GetPostDetail(repository: mockPostRepo));
+    di.sl.registerLazySingleton(() => GetBoardPosts(repository: mockPostRepo));
     di.sl.registerLazySingleton<UpdateRepository>(() => mockUpdateRepo);
     di.sl.registerLazySingleton(
-      () => CheckForUpdate(
-        repository: mockUpdateRepo,
-        currentVersion: '1.1.0',
-      ),
+      () => CheckForUpdate(repository: mockUpdateRepo, currentVersion: '1.1.0'),
     );
   });
 
@@ -74,12 +68,9 @@ void main() {
     when(
       () => mockPostRepo.getBestPosts(),
     ).thenAnswer((_) async => const Right([]));
-    when(
-      () => mockPostRepo.getBoardPosts(any(), any(), any()),
-    ).thenAnswer(
-      (_) async => const Right(
-        BoardListResult(posts: [], currentPage: 0, totalPage: 0),
-      ),
+    when(() => mockPostRepo.getBoardPosts(any(), any(), any())).thenAnswer(
+      (_) async =>
+          const Right(BoardListResult(posts: [], currentPage: 0, totalPage: 0)),
     );
     when(() => mockUpdateRepo.getLatestRelease()).thenAnswer(
       (_) async => const Right(

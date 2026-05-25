@@ -8,9 +8,7 @@ void main() {
     testWidgets('should show check button when idle', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: UpdateBanner(status: UpdateCheckStatus.idle),
-          ),
+          home: Scaffold(body: UpdateBanner(status: UpdateCheckStatus.idle)),
         ),
       );
 
@@ -60,9 +58,7 @@ void main() {
     testWidgets('should show error text when error', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: UpdateBanner(status: UpdateCheckStatus.error),
-          ),
+          home: Scaffold(body: UpdateBanner(status: UpdateCheckStatus.error)),
         ),
       );
 
@@ -73,9 +69,7 @@ void main() {
     testWidgets('should show error_outline icon when error', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: UpdateBanner(status: UpdateCheckStatus.error),
-          ),
+          home: Scaffold(body: UpdateBanner(status: UpdateCheckStatus.error)),
         ),
       );
 
@@ -130,7 +124,9 @@ void main() {
       expect(checked, true);
     });
 
-    testWidgets('should call onUpdate when update button tapped', (tester) async {
+    testWidgets('should call onUpdate when update button tapped', (
+      tester,
+    ) async {
       var updated = false;
       await tester.pumpWidget(
         MaterialApp(

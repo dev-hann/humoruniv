@@ -29,25 +29,30 @@ void main() {
   ''';
 
   group('GitHubRemoteDsImpl', () {
-    test('should return JSON string when fetchLatestRelease succeeds', () async {
-      when(() => mockDio.get<String>(any(), options: any(named: 'options')))
-          .thenAnswer(
-        (_) async => Response<String>(
-          data: validJson,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+    test(
+      'should return JSON string when fetchLatestRelease succeeds',
+      () async {
+        when(
+          () => mockDio.get<String>(any(), options: any(named: 'options')),
+        ).thenAnswer(
+          (_) async => Response<String>(
+            data: validJson,
+            statusCode: 200,
+            requestOptions: RequestOptions(),
+          ),
+        );
 
-      final result = await remoteDs.fetchLatestRelease();
+        final result = await remoteDs.fetchLatestRelease();
 
-      expect(result, isNotNull);
-      expect(result, contains('v1.2.0'));
-    });
+        expect(result, isNotNull);
+        expect(result, contains('v1.2.0'));
+      },
+    );
 
     test('should call GitHub API with correct URL', () async {
-      when(() => mockDio.get<String>(any(), options: any(named: 'options')))
-          .thenAnswer(
+      when(
+        () => mockDio.get<String>(any(), options: any(named: 'options')),
+      ).thenAnswer(
         (_) async => Response<String>(
           data: validJson,
           statusCode: 200,
@@ -57,28 +62,28 @@ void main() {
 
       await remoteDs.fetchLatestRelease();
 
-      verify(() => mockDio.get<String>(any(), options: any(named: 'options')))
-          .called(1);
+      verify(
+        () => mockDio.get<String>(any(), options: any(named: 'options')),
+      ).called(1);
     });
 
     test('should throw Exception when Dio throws DioException', () async {
-      when(() => mockDio.get<String>(any(), options: any(named: 'options')))
-          .thenThrow(
+      when(
+        () => mockDio.get<String>(any(), options: any(named: 'options')),
+      ).thenThrow(
         DioException(
           requestOptions: RequestOptions(),
           type: DioExceptionType.connectionError,
         ),
       );
 
-      expect(
-        () => remoteDs.fetchLatestRelease(),
-        throwsA(isA<Exception>()),
-      );
+      expect(() => remoteDs.fetchLatestRelease(), throwsA(isA<Exception>()));
     });
 
     test('should throw Exception when response data is null', () async {
-      when(() => mockDio.get<String>(any(), options: any(named: 'options')))
-          .thenAnswer(
+      when(
+        () => mockDio.get<String>(any(), options: any(named: 'options')),
+      ).thenAnswer(
         (_) async => Response<String>(
           data: null,
           statusCode: 200,
@@ -86,29 +91,21 @@ void main() {
         ),
       );
 
-      expect(
-        () => remoteDs.fetchLatestRelease(),
-        throwsA(isA<Exception>()),
-      );
+      expect(() => remoteDs.fetchLatestRelease(), throwsA(isA<Exception>()));
     });
 
     test('should throw Exception on 404 response', () async {
-      when(() => mockDio.get<String>(any(), options: any(named: 'options')))
-          .thenThrow(
+      when(
+        () => mockDio.get<String>(any(), options: any(named: 'options')),
+      ).thenThrow(
         DioException(
           requestOptions: RequestOptions(),
-          response: Response(
-            statusCode: 404,
-            requestOptions: RequestOptions(),
-          ),
+          response: Response(statusCode: 404, requestOptions: RequestOptions()),
           type: DioExceptionType.badResponse,
         ),
       );
 
-      expect(
-        () => remoteDs.fetchLatestRelease(),
-        throwsA(isA<Exception>()),
-      );
+      expect(() => remoteDs.fetchLatestRelease(), throwsA(isA<Exception>()));
     });
   });
 }

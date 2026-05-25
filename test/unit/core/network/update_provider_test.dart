@@ -26,10 +26,7 @@ void main() {
     }
     di.sl.registerLazySingleton<UpdateRepository>(() => mockRepository);
     di.sl.registerLazySingleton(
-      () => CheckForUpdate(
-        repository: mockRepository,
-        currentVersion: '1.0.0',
-      ),
+      () => CheckForUpdate(repository: mockRepository, currentVersion: '1.0.0'),
     );
   });
 
@@ -108,9 +105,9 @@ void main() {
         version: '1.2.0',
         htmlUrl: 'https://example.com',
       );
-      when(() => mockRepository.getLatestRelease()).thenAnswer(
-        (_) async => const Right(release),
-      );
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -127,9 +124,9 @@ void main() {
         version: '1.0.0',
         htmlUrl: 'https://example.com',
       );
-      when(() => mockRepository.getLatestRelease()).thenAnswer(
-        (_) async => const Right(release),
-      );
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -141,9 +138,9 @@ void main() {
     });
 
     test('should emit error on failure', () async {
-      when(() => mockRepository.getLatestRelease()).thenAnswer(
-        (_) async => const Left(UpdateFailure('Network error')),
-      );
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Left(UpdateFailure('Network error')));
 
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -161,9 +158,9 @@ void main() {
         htmlUrl: 'https://example.com',
         downloadUrl: 'https://example.com/app.apk',
       );
-      when(() => mockRepository.getLatestRelease()).thenAnswer(
-        (_) async => const Right(release),
-      );
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -178,8 +175,9 @@ void main() {
 
     test('should emit checking while in progress', () async {
       final completer = Completer<Either<Failure, AppRelease>>();
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) => completer.future);
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) => completer.future);
 
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -189,9 +187,11 @@ void main() {
       final state = container.read(updateProvider);
       expect(state.status, UpdateCheckStatus.checking);
 
-      completer.complete(const Right(
-        AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
-      ));
+      completer.complete(
+        const Right(
+          AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
+        ),
+      );
       await container.read(updateProvider.notifier).stream.first;
     });
   });

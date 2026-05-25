@@ -5,7 +5,10 @@ import 'package:humoruniv/domain/entities/update_check_result.dart';
 void main() {
   group('UpdateCheckResult', () {
     test('should store type and release', () {
-      const release = AppRelease(version: '1.2.0', htmlUrl: 'https://example.com');
+      const release = AppRelease(
+        version: '1.2.0',
+        htmlUrl: 'https://example.com',
+      );
       const result = UpdateCheckResult(
         type: UpdateStatusType.updateAvailable,
         release: release,
@@ -16,7 +19,10 @@ void main() {
     });
 
     test('isUpdateAvailable returns true when type is updateAvailable', () {
-      const release = AppRelease(version: '1.2.0', htmlUrl: 'https://example.com');
+      const release = AppRelease(
+        version: '1.2.0',
+        htmlUrl: 'https://example.com',
+      );
       const result = UpdateCheckResult(
         type: UpdateStatusType.updateAvailable,
         release: release,
@@ -26,7 +32,10 @@ void main() {
     });
 
     test('isUpdateAvailable returns false when type is upToDate', () {
-      const release = AppRelease(version: '1.0.0', htmlUrl: 'https://example.com');
+      const release = AppRelease(
+        version: '1.0.0',
+        htmlUrl: 'https://example.com',
+      );
       const result = UpdateCheckResult(
         type: UpdateStatusType.upToDate,
         release: release,

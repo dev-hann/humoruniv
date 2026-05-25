@@ -30,19 +30,17 @@ void main() {
           htmlUrl: 'https://github.com/dev-hann/humoruniv/releases/tag/v1.2.0',
           downloadUrl: 'https://example.com/app.apk',
         );
-        when(() => mockRepository.getLatestRelease())
-            .thenAnswer((_) async => const Right(release));
+        when(
+          () => mockRepository.getLatestRelease(),
+        ).thenAnswer((_) async => const Right(release));
 
         final result = await useCase();
 
         expect(result.isRight(), true);
-        result.fold(
-          (_) => fail('Should be Right'),
-          (status) {
-            expect(status.isUpdateAvailable, true);
-            expect(status.release.version, '1.2.0');
-          },
-        );
+        result.fold((_) => fail('Should be Right'), (status) {
+          expect(status.isUpdateAvailable, true);
+          expect(status.release.version, '1.2.0');
+        });
       },
     );
 
@@ -51,8 +49,9 @@ void main() {
         version: '1.0.0',
         htmlUrl: 'https://github.com/dev-hann/humoruniv/releases/tag/v1.0.0',
       );
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) async => const Right(release));
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final result = await useCase();
 
@@ -68,8 +67,9 @@ void main() {
         version: '0.9.0',
         htmlUrl: 'https://github.com/dev-hann/humoruniv/releases/tag/v0.9.0',
       );
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) async => const Right(release));
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final result = await useCase();
 
@@ -82,8 +82,9 @@ void main() {
 
     test('should return failure when repository fails', () async {
       const failure = UpdateFailure('Network error');
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) async => const Left(failure));
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Left(failure));
 
       final result = await useCase();
 
@@ -103,8 +104,9 @@ void main() {
         version: '1.0.2',
         htmlUrl: 'https://example.com',
       );
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) async => const Right(release));
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final result = await useCase();
 
@@ -123,8 +125,9 @@ void main() {
         version: '2.0.0',
         htmlUrl: 'https://example.com',
       );
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) async => const Right(release));
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final result = await useCase();
 
@@ -143,8 +146,9 @@ void main() {
         version: '1.2',
         htmlUrl: 'https://example.com',
       );
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) async => const Right(release));
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final result = await useCase();
 
@@ -159,12 +163,10 @@ void main() {
         repository: mockRepository,
         currentVersion: '1.0.0',
       );
-      const release = AppRelease(
-        version: '2',
-        htmlUrl: 'https://example.com',
-      );
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) async => const Right(release));
+      const release = AppRelease(version: '2', htmlUrl: 'https://example.com');
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final result = await useCase();
 
@@ -183,8 +185,9 @@ void main() {
         version: '1.0.1',
         htmlUrl: 'https://example.com',
       );
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) async => const Right(release));
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final result = await useCase();
 
@@ -201,19 +204,17 @@ void main() {
         downloadUrl: 'https://example.com/app.apk',
         releaseNotes: 'Bug fixes',
       );
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) async => const Right(release));
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final result = await useCase();
 
-      result.fold(
-        (_) => fail('Should be Right'),
-        (status) {
-          expect(status.release.htmlUrl, 'https://example.com/v1.2.0');
-          expect(status.release.downloadUrl, 'https://example.com/app.apk');
-          expect(status.release.releaseNotes, 'Bug fixes');
-        },
-      );
+      result.fold((_) => fail('Should be Right'), (status) {
+        expect(status.release.htmlUrl, 'https://example.com/v1.2.0');
+        expect(status.release.downloadUrl, 'https://example.com/app.apk');
+        expect(status.release.releaseNotes, 'Bug fixes');
+      });
     });
 
     test('should set correct UpdateStatusType on result', () async {
@@ -221,20 +222,15 @@ void main() {
         version: '1.2.0',
         htmlUrl: 'https://example.com',
       );
-      when(() => mockRepository.getLatestRelease())
-          .thenAnswer((_) async => const Right(release));
+      when(
+        () => mockRepository.getLatestRelease(),
+      ).thenAnswer((_) async => const Right(release));
 
       final result = await useCase();
 
-      result.fold(
-        (_) => fail('Should be Right'),
-        (status) {
-          expect(
-            status.type,
-            UpdateStatusType.updateAvailable,
-          );
-        },
-      );
+      result.fold((_) => fail('Should be Right'), (status) {
+        expect(status.type, UpdateStatusType.updateAvailable);
+      });
     });
 
     test('should expose currentVersion', () {

@@ -4,10 +4,7 @@ import 'package:humoruniv/presentation/screens/post_detail_screen.dart';
 
 final appRouter = GoRouter(
   routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const MainTabsScreen(),
-    ),
+    GoRoute(path: '/', builder: (context, state) => const MainTabsScreen()),
     GoRoute(
       path: '/post',
       builder: (context, state) {

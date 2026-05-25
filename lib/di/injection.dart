@@ -37,9 +37,7 @@ Future<void> configureDependencies() async {
     () => GetBoardPosts(repository: sl<PostRepository>()),
   );
 
-  sl.registerLazySingleton<GitHubRemoteDs>(
-    GitHubRemoteDsImpl.new,
-  );
+  sl.registerLazySingleton<GitHubRemoteDs>(GitHubRemoteDsImpl.new);
 
   sl.registerLazySingleton<UpdateRepository>(
     () => UpdateRepositoryImpl(remoteDs: sl<GitHubRemoteDs>()),

@@ -14,20 +14,17 @@ class CheckForUpdate {
   Future<Either<Failure, UpdateCheckResult>> call() async {
     final result = await repository.getLatestRelease();
 
-    return result.fold(
-      (failure) => Left(failure),
-      (release) {
-        final isNewer = _isNewerVersion(release.version, currentVersion);
-        return Right(
-          UpdateCheckResult(
-            type: isNewer
-                ? UpdateStatusType.updateAvailable
-                : UpdateStatusType.upToDate,
-            release: release,
-          ),
-        );
-      },
-    );
+    return result.fold((failure) => Left(failure), (release) {
+      final isNewer = _isNewerVersion(release.version, currentVersion);
+      return Right(
+        UpdateCheckResult(
+          type: isNewer
+              ? UpdateStatusType.updateAvailable
+              : UpdateStatusType.upToDate,
+          release: release,
+        ),
+      );
+    });
   }
 
   bool _isNewerVersion(String remote, String current) {

@@ -25,18 +25,9 @@ class DarkModeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return SegmentedButton<ThemeModeOption>(
       segments: const [
-        ButtonSegment(
-          value: ThemeModeOption.system,
-          label: Text('시스템'),
-        ),
-        ButtonSegment(
-          value: ThemeModeOption.light,
-          label: Text('라이트'),
-        ),
-        ButtonSegment(
-          value: ThemeModeOption.dark,
-          label: Text('다크'),
-        ),
+        ButtonSegment(value: ThemeModeOption.system, label: Text('시스템')),
+        ButtonSegment(value: ThemeModeOption.light, label: Text('라이트')),
+        ButtonSegment(value: ThemeModeOption.dark, label: Text('다크')),
       ],
       selected: {_currentOption()},
       onSelectionChanged: (selected) {

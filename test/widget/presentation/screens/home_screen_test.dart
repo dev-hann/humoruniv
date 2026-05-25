@@ -51,9 +51,7 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(
-          home: Scaffold(body: HomeScreen()),
-        ),
+        child: MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
     await tester.pumpAndSettle();
@@ -71,9 +69,7 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(
-          home: Scaffold(body: HomeScreen()),
-        ),
+        child: MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
 
@@ -89,9 +85,7 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(
-          home: Scaffold(body: HomeScreen()),
-        ),
+        child: MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
     await tester.pumpAndSettle();
@@ -106,9 +100,7 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(
-          home: Scaffold(body: HomeScreen()),
-        ),
+        child: MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
     await tester.pumpAndSettle();
@@ -125,9 +117,7 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(
-          home: Scaffold(body: HomeScreen()),
-        ),
+        child: MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
     await tester.pumpAndSettle();
@@ -150,9 +140,7 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(
-          home: Scaffold(body: HomeScreen()),
-        ),
+        child: MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
     await tester.pumpAndSettle();

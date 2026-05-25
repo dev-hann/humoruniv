@@ -36,10 +36,7 @@ void main() {
     });
 
     test('should preserve all fields during conversion', () {
-      const dto = AppReleaseDto(
-        version: '',
-        htmlUrl: '',
-      );
+      const dto = AppReleaseDto(version: '', htmlUrl: '');
 
       final entity = dto.toEntity();
 

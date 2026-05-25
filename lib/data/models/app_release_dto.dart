@@ -13,9 +13,9 @@ class AppReleaseDto {
   final String? releaseNotes;
 
   AppRelease toEntity() => AppRelease(
-        version: version,
-        htmlUrl: htmlUrl,
-        downloadUrl: downloadUrl,
-        releaseNotes: releaseNotes,
-      );
+    version: version,
+    htmlUrl: htmlUrl,
+    downloadUrl: downloadUrl,
+    releaseNotes: releaseNotes,
+  );
 }

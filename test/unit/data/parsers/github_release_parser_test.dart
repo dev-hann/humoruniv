@@ -119,10 +119,7 @@ void main() {
       final result = GitHubReleaseParser.parse(json);
 
       expect(result, isNotNull);
-      expect(
-        result!.downloadUrl,
-        'https://example.com/arm64.apk',
-      );
+      expect(result!.downloadUrl, 'https://example.com/arm64.apk');
     });
 
     test('should return null when tag_name is empty', () {

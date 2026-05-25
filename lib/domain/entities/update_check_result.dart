@@ -6,10 +6,7 @@ enum UpdateStatusType { upToDate, updateAvailable }
 
 @immutable
 class UpdateCheckResult {
-  const UpdateCheckResult({
-    required this.type,
-    required this.release,
-  });
+  const UpdateCheckResult({required this.type, required this.release});
   final UpdateStatusType type;
   final AppRelease release;
 

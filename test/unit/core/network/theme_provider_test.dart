@@ -17,7 +17,9 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      container.read(themeProvider.notifier).setThemeMode(ThemeModeOption.light);
+      container
+          .read(themeProvider.notifier)
+          .setThemeMode(ThemeModeOption.light);
 
       expect(container.read(themeProvider), ThemeMode.light);
     });
@@ -36,7 +38,9 @@ void main() {
       addTearDown(container.dispose);
 
       container.read(themeProvider.notifier).setThemeMode(ThemeModeOption.dark);
-      container.read(themeProvider.notifier).setThemeMode(ThemeModeOption.system);
+      container
+          .read(themeProvider.notifier)
+          .setThemeMode(ThemeModeOption.system);
 
       expect(container.read(themeProvider), ThemeMode.system);
     });

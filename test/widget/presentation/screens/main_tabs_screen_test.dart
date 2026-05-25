@@ -16,6 +16,7 @@ import 'package:humoruniv/presentation/screens/main_tabs_screen.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockPostRepository extends Mock implements PostRepository {}
+
 class MockUpdateRepository extends Mock implements UpdateRepository {}
 
 void main() {
@@ -49,31 +50,23 @@ void main() {
     }
     di.sl.registerLazySingleton<PostRepository>(() => mockPostRepo);
     di.sl.registerLazySingleton(() => GetBestPosts(repository: mockPostRepo));
-    di.sl.registerLazySingleton(
-      () => GetPostDetail(repository: mockPostRepo),
-    );
-    di.sl.registerLazySingleton(
-      () => GetBoardPosts(repository: mockPostRepo),
-    );
+    di.sl.registerLazySingleton(() => GetPostDetail(repository: mockPostRepo));
+    di.sl.registerLazySingleton(() => GetBoardPosts(repository: mockPostRepo));
     di.sl.registerLazySingleton<UpdateRepository>(() => mockUpdateRepo);
     di.sl.registerLazySingleton(
-      () => CheckForUpdate(
-        repository: mockUpdateRepo,
-        currentVersion: '1.0.0',
-      ),
+      () => CheckForUpdate(repository: mockUpdateRepo, currentVersion: '1.0.0'),
     );
   });
 
   tearDown(di.sl.reset);
 
   void setupMocks() {
-    when(() => mockPostRepo.getBestPosts()).thenAnswer(
-      (_) async => const Right([]),
-    );
+    when(
+      () => mockPostRepo.getBestPosts(),
+    ).thenAnswer((_) async => const Right([]));
     when(() => mockPostRepo.getBoardPosts(any(), any(), any())).thenAnswer(
-      (_) async => const Right(
-        BoardListResult(posts: [], currentPage: 0, totalPage: 0),
-      ),
+      (_) async =>
+          const Right(BoardListResult(posts: [], currentPage: 0, totalPage: 0)),
     );
     when(() => mockUpdateRepo.getLatestRelease()).thenAnswer(
       (_) async => const Right(
@@ -87,9 +80,7 @@ void main() {
       setupMocks();
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: MainTabsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: MainTabsScreen())),
       );
       await tester.pumpAndSettle();
 
@@ -103,9 +94,7 @@ void main() {
       setupMocks();
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: MainTabsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: MainTabsScreen())),
       );
       await tester.pumpAndSettle();
 
@@ -116,9 +105,7 @@ void main() {
       setupMocks();
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: MainTabsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: MainTabsScreen())),
       );
       await tester.pumpAndSettle();
 
@@ -128,15 +115,11 @@ void main() {
       expect(find.text('웃긴자료'), findsOneWidget);
     });
 
-    testWidgets('should show search placeholder on search tab', (
-      tester,
-    ) async {
+    testWidgets('should show search placeholder on search tab', (tester) async {
       setupMocks();
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: MainTabsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: MainTabsScreen())),
       );
       await tester.pumpAndSettle();
 
@@ -144,19 +127,14 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('검색'), findsWidgets);
-      expect(
-        find.text('검색 기능이 곧 추가됩니다'),
-        findsOneWidget,
-      );
+      expect(find.text('검색 기능이 곧 추가됩니다'), findsOneWidget);
     });
 
     testWidgets('should switch to settings tab on tap', (tester) async {
       setupMocks();
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: MainTabsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: MainTabsScreen())),
       );
       await tester.pumpAndSettle();
 
@@ -172,24 +150,18 @@ void main() {
       setupMocks();
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: MainTabsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: MainTabsScreen())),
       );
       await tester.pumpAndSettle();
 
       expect(find.byType(IndexedStack), findsOneWidget);
     });
 
-    testWidgets('should show 검색 AppBar title on search tab', (
-      tester,
-    ) async {
+    testWidgets('should show 검색 AppBar title on search tab', (tester) async {
       setupMocks();
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: MainTabsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: MainTabsScreen())),
       );
       await tester.pumpAndSettle();
 
@@ -201,15 +173,11 @@ void main() {
       expect(title, '검색');
     });
 
-    testWidgets('should show 설정 AppBar title on settings tab', (
-      tester,
-    ) async {
+    testWidgets('should show 설정 AppBar title on settings tab', (tester) async {
       setupMocks();
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: MainTabsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: MainTabsScreen())),
       );
       await tester.pumpAndSettle();
 
@@ -227,9 +195,7 @@ void main() {
       setupMocks();
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: MainTabsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: MainTabsScreen())),
       );
       await tester.pumpAndSettle();
 

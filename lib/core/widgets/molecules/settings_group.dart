@@ -3,11 +3,7 @@ import 'package:humoruniv/core/themes/app_radius.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 
 class SettingsGroup extends StatelessWidget {
-  const SettingsGroup({
-    required this.title,
-    required this.children,
-    super.key,
-  });
+  const SettingsGroup({required this.title, required this.children, super.key});
   final String title;
   final List<Widget> children;
 
@@ -26,19 +22,14 @@ class SettingsGroup extends StatelessWidget {
               left: AppSpacing.p4,
               bottom: AppSpacing.p8,
             ),
-            child: Text(
-              title,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
+            child: Text(title, style: Theme.of(context).textTheme.titleSmall),
           ),
           DecoratedBox(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainer,
               borderRadius: AppRadius.borderRadiusLg,
             ),
-            child: Column(
-              children: _buildChildrenWithDividers(),
-            ),
+            child: Column(children: _buildChildrenWithDividers()),
           ),
         ],
       ),
@@ -49,9 +40,7 @@ class SettingsGroup extends StatelessWidget {
     final result = <Widget>[];
     for (var i = 0; i < children.length; i++) {
       if (i > 0) {
-        result.add(
-          const Divider(height: 1, indent: AppSpacing.p16),
-        );
+        result.add(const Divider(height: 1, indent: AppSpacing.p16));
       }
       result.add(children[i]);
     }

@@ -8,9 +8,7 @@ void main() {
     testWidgets('should display three segments', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: DarkModeSelector(currentMode: ThemeMode.system),
-          ),
+          home: Scaffold(body: DarkModeSelector(currentMode: ThemeMode.system)),
         ),
       );
 
@@ -19,12 +17,12 @@ void main() {
       expect(find.text('다크'), findsOneWidget);
     });
 
-    testWidgets('should highlight system segment when system mode', (tester) async {
+    testWidgets('should highlight system segment when system mode', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: DarkModeSelector(currentMode: ThemeMode.system),
-          ),
+          home: Scaffold(body: DarkModeSelector(currentMode: ThemeMode.system)),
         ),
       );
 
@@ -38,9 +36,7 @@ void main() {
     testWidgets('should highlight dark segment when dark mode', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: DarkModeSelector(currentMode: ThemeMode.dark),
-          ),
+          home: Scaffold(body: DarkModeSelector(currentMode: ThemeMode.dark)),
         ),
       );
 

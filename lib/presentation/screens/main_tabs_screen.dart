@@ -16,12 +16,7 @@ class MainTabsScreen extends StatefulWidget {
 class _MainTabsScreenState extends State<MainTabsScreen> {
   int _currentIndex = 0;
 
-  static const _titles = [
-    '웃긴자료 베스트',
-    '웃긴자료',
-    '검색',
-    '설정',
-  ];
+  static const _titles = ['웃긴자료 베스트', '웃긴자료', '검색', '설정'];
 
   void _onTabChanged(int index) {
     setState(() => _currentIndex = index);
