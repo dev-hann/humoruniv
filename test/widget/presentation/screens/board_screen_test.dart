@@ -79,7 +79,9 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(home: BoardScreen(table: 'pds')),
+        child: MaterialApp(
+          home: Scaffold(body: BoardScreen(table: 'pds')),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -96,7 +98,9 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(home: BoardScreen(table: 'pds')),
+        child: MaterialApp(
+          home: Scaffold(body: BoardScreen(table: 'pds')),
+        ),
       ),
     );
     await tester.pump();
@@ -113,7 +117,9 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(home: BoardScreen(table: 'pds')),
+        child: MaterialApp(
+          home: Scaffold(body: BoardScreen(table: 'pds')),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -133,7 +139,9 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(home: BoardScreen(table: 'pds')),
+        child: MaterialApp(
+          home: Scaffold(body: BoardScreen(table: 'pds')),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -157,7 +165,9 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(home: BoardScreen(table: 'pds')),
+        child: MaterialApp(
+          home: Scaffold(body: BoardScreen(table: 'pds')),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -175,7 +185,9 @@ void main() {
 
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(home: BoardScreen(table: 'pds')),
+        child: MaterialApp(
+          home: Scaffold(body: BoardScreen(table: 'pds')),
+        ),
       ),
     );
     await tester.pumpAndSettle();

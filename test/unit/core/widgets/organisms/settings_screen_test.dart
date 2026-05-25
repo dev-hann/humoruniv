@@ -44,7 +44,9 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(home: SettingsScreen()),
+          child: MaterialApp(
+            home: Scaffold(body: SettingsScreen()),
+          ),
         ),
       );
 
@@ -62,7 +64,9 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(home: SettingsScreen()),
+          child: MaterialApp(
+            home: Scaffold(body: SettingsScreen()),
+          ),
         ),
       );
 
@@ -78,7 +82,9 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(home: SettingsScreen()),
+          child: MaterialApp(
+            home: Scaffold(body: SettingsScreen()),
+          ),
         ),
       );
 
@@ -95,7 +101,9 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(home: SettingsScreen()),
+          child: MaterialApp(
+            home: Scaffold(body: SettingsScreen()),
+          ),
         ),
       );
 
@@ -111,7 +119,9 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(home: SettingsScreen()),
+          child: MaterialApp(
+            home: Scaffold(body: SettingsScreen()),
+          ),
         ),
       );
 
@@ -127,7 +137,9 @@ void main() {
 
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(home: SettingsScreen()),
+          child: MaterialApp(
+            home: Scaffold(body: SettingsScreen()),
+          ),
         ),
       );
 

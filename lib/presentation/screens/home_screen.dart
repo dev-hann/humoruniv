@@ -15,34 +15,25 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final postsAsync = ref.watch(bestPostsProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('웃긴자료 베스트'),
-        actions: [
-          TextButton(
-            onPressed: () => context.push('/board/pds'),
-            child: const Text('웃긴자료'),
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          ref.invalidate(bestPostsProvider);
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.invalidate(bestPostsProvider);
+      },
+      child: postsAsync.when(
+        loading: () => const SkeletonPostList(),
+        error: (e, st) {
+          debugPrint('HOME ERROR: $e\n$st');
+          return ListView(
+            children: const [
+              SizedBox(
+                height: 300,
+                child: Center(child: Text('게시글을 불러올 수 없습니다.')),
+              ),
+            ],
+          );
         },
-        child: postsAsync.when(
-          loading: () => const SkeletonPostList(),
-          error: (e, st) {
-            debugPrint('HOME ERROR: $e\n$st');
-            return ListView(
-              children: const [
-                SizedBox(
-                  height: 300,
-                  child: Center(child: Text('게시글을 불러올 수 없습니다.')),
-                ),
-              ],
-            );
-          },
-          data: (Either<Failure, List<Post>> result) => result.fold(
+        data: (Either<Failure, List<Post>> result) {
+          return result.fold(
             (failure) {
               debugPrint('HOME FAILURE: ${failure.message}');
               return ListView(
@@ -76,8 +67,8 @@ class HomeScreen extends ConsumerWidget {
                       );
                     },
                   ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

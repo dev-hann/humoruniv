@@ -50,7 +50,11 @@ void main() {
     ).thenAnswer((_) async => Right(posts));
 
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: HomeScreen())),
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: HomeScreen()),
+        ),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -66,7 +70,11 @@ void main() {
     ).thenAnswer((_) async => const Right([]));
 
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: HomeScreen())),
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: HomeScreen()),
+        ),
+      ),
     );
 
     expect(find.byType(SkeletonPostList), findsOneWidget);
@@ -80,7 +88,11 @@ void main() {
     ).thenAnswer((_) async => const Left(ServerFailure('Network error')));
 
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: HomeScreen())),
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: HomeScreen()),
+        ),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -93,7 +105,11 @@ void main() {
     ).thenAnswer((_) async => const Right([]));
 
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: HomeScreen())),
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: HomeScreen()),
+        ),
+      ),
     );
     await tester.pumpAndSettle();
 

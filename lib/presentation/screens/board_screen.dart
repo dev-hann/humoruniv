@@ -66,67 +66,64 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
   Widget build(BuildContext context) {
     final postsAsync = ref.watch(boardPostsProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('웃긴자료')),
-      body: Column(
-        children: [
-          SortTabs(currentSort: _currentSort, onChanged: _changeSort),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: _refresh,
-              child: postsAsync.when(
-                loading: () => const SkeletonPostList(),
-                error: (_, __) => ListView(
-                  children: [
-                    SizedBox(
-                      height: 300,
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text('게시글을 불러올 수 없습니다.'),
-                            TextButton(
-                              onPressed: _refresh,
-                              child: const Text('다시 시도'),
-                            ),
-                          ],
-                        ),
+    return Column(
+      children: [
+        SortTabs(currentSort: _currentSort, onChanged: _changeSort),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: _refresh,
+            child: postsAsync.when(
+              loading: () => const SkeletonPostList(),
+              error: (_, __) => ListView(
+                children: [
+                  SizedBox(
+                    height: 300,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('게시글을 불러올 수 없습니다.'),
+                          TextButton(
+                            onPressed: _refresh,
+                            child: const Text('다시 시도'),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-                data: (state) {
-                  if (state.posts.isEmpty) {
-                    return ListView(
-                      children: const [
-                        SizedBox(
-                          height: 300,
-                          child: Center(child: Text('게시글이 없습니다.')),
-                        ),
-                      ],
-                    );
-                  }
-                  return _InfinitePostList(
-                    posts: state.posts,
-                    hasMore: state.hasMore,
-                    isLoadingMore: state.isLoadingMore,
-                    loadMoreError: state.loadMoreError,
-                    scrollController: _scrollController,
-                    onPostTap: (post) {
-                      context.push(
-                        '/post?url=${Uri.encodeComponent(post.url)}',
-                      );
-                    },
-                    onRetry: () {
-                      ref.read(boardPostsProvider.notifier).fetchNextPage();
-                    },
-                  );
-                },
+                  ),
+                ],
               ),
+              data: (state) {
+                if (state.posts.isEmpty) {
+                  return ListView(
+                    children: const [
+                      SizedBox(
+                        height: 300,
+                        child: Center(child: Text('게시글이 없습니다.')),
+                      ),
+                    ],
+                  );
+                }
+                return _InfinitePostList(
+                  posts: state.posts,
+                  hasMore: state.hasMore,
+                  isLoadingMore: state.isLoadingMore,
+                  loadMoreError: state.loadMoreError,
+                  scrollController: _scrollController,
+                  onPostTap: (post) {
+                    context.push(
+                      '/post?url=${Uri.encodeComponent(post.url)}',
+                    );
+                  },
+                  onRetry: () {
+                    ref.read(boardPostsProvider.notifier).fetchNextPage();
+                  },
+                );
+              },
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
