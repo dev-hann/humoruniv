@@ -67,6 +67,50 @@ void main() {
       );
 
       expect(find.text('확인 실패'), findsOneWidget);
+      expect(find.text('다시 시도'), findsOneWidget);
+    });
+
+    testWidgets('should show error_outline icon when error', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: UpdateBanner(status: UpdateCheckStatus.error),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.error_outline), findsOneWidget);
+    });
+
+    testWidgets('should show check_circle icon when up to date', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: UpdateBanner(status: UpdateCheckStatus.upToDate),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    });
+
+    testWidgets('should call onCheck when error state tapped', (tester) async {
+      var checked = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: UpdateBanner(
+              status: UpdateCheckStatus.error,
+              onCheck: () => checked = true,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(InkWell));
+      expect(checked, true);
     });
 
     testWidgets('should call onCheck when check button tapped', (tester) async {

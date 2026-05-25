@@ -15,6 +15,8 @@ import 'package:humoruniv/main.dart';
 import 'package:humoruniv/presentation/screens/main_tabs_screen.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'helpers/package_info_helper.dart';
+
 class MockPostRepository extends Mock implements PostRepository {}
 class MockUpdateRepository extends Mock implements UpdateRepository {}
 
@@ -22,14 +24,15 @@ void main() {
   late MockPostRepository mockPostRepo;
   late MockUpdateRepository mockUpdateRepo;
 
-  setUpAll(() {
+  setUpAll(() async {
+    await setupPackageInfoMock();
     registerFallbackValue(SortOption.all);
   });
 
-  setUp(() {
+  setUp(() async {
     mockPostRepo = MockPostRepository();
     mockUpdateRepo = MockUpdateRepository();
-    di.configureDependencies();
+    await di.configureDependencies();
     if (di.sl.isRegistered<PostRepository>()) {
       di.sl.unregister<PostRepository>();
     }
@@ -60,7 +63,7 @@ void main() {
     di.sl.registerLazySingleton(
       () => CheckForUpdate(
         repository: mockUpdateRepo,
-        currentVersion: '1.0.0',
+        currentVersion: '1.1.0',
       ),
     );
   });
@@ -80,7 +83,7 @@ void main() {
     );
     when(() => mockUpdateRepo.getLatestRelease()).thenAnswer(
       (_) async => const Right(
-        AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
+        AppRelease(version: '1.1.0', htmlUrl: 'https://example.com'),
       ),
     );
 

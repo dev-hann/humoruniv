@@ -12,10 +12,11 @@ import 'package:humoruniv/domain/usecases/check_for_update.dart';
 import 'package:humoruniv/domain/usecases/get_best_posts.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 import 'package:humoruniv/domain/usecases/get_post_detail.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 final sl = GetIt.instance;
 
-void configureDependencies() {
+Future<void> configureDependencies() async {
   sl.registerLazySingleton<HtmlClientImpl>(HtmlClientImpl.new);
 
   sl.registerLazySingleton<HumorunivRemoteDs>(
@@ -44,10 +45,11 @@ void configureDependencies() {
     () => UpdateRepositoryImpl(remoteDs: sl<GitHubRemoteDs>()),
   );
 
+  final packageInfo = await PackageInfo.fromPlatform();
   sl.registerLazySingleton(
     () => CheckForUpdate(
       repository: sl<UpdateRepository>(),
-      currentVersion: '1.0.0',
+      currentVersion: packageInfo.version,
     ),
   );
 }

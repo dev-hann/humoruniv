@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/domain/entities/app_release.dart';
+import 'package:humoruniv/domain/entities/update_check_result.dart';
 import 'package:humoruniv/domain/repositories/update_repository.dart';
 import 'package:humoruniv/domain/usecases/check_for_update.dart';
 import 'package:mocktail/mocktail.dart';
@@ -131,6 +132,118 @@ void main() {
         (_) => fail('Should be Right'),
         (status) => expect(status.isUpdateAvailable, true),
       );
+    });
+
+    test('should handle short remote version with 2 parts', () async {
+      final useCase = CheckForUpdate(
+        repository: mockRepository,
+        currentVersion: '1.0.0',
+      );
+      const release = AppRelease(
+        version: '1.2',
+        htmlUrl: 'https://example.com',
+      );
+      when(() => mockRepository.getLatestRelease())
+          .thenAnswer((_) async => const Right(release));
+
+      final result = await useCase();
+
+      result.fold(
+        (_) => fail('Should be Right'),
+        (status) => expect(status.isUpdateAvailable, true),
+      );
+    });
+
+    test('should handle short remote version with 1 part', () async {
+      final useCase = CheckForUpdate(
+        repository: mockRepository,
+        currentVersion: '1.0.0',
+      );
+      const release = AppRelease(
+        version: '2',
+        htmlUrl: 'https://example.com',
+      );
+      when(() => mockRepository.getLatestRelease())
+          .thenAnswer((_) async => const Right(release));
+
+      final result = await useCase();
+
+      result.fold(
+        (_) => fail('Should be Right'),
+        (status) => expect(status.isUpdateAvailable, true),
+      );
+    });
+
+    test('should handle short current version with 1 part', () async {
+      final useCase = CheckForUpdate(
+        repository: mockRepository,
+        currentVersion: '1',
+      );
+      const release = AppRelease(
+        version: '1.0.1',
+        htmlUrl: 'https://example.com',
+      );
+      when(() => mockRepository.getLatestRelease())
+          .thenAnswer((_) async => const Right(release));
+
+      final result = await useCase();
+
+      result.fold(
+        (_) => fail('Should be Right'),
+        (status) => expect(status.isUpdateAvailable, true),
+      );
+    });
+
+    test('should preserve release fields through result', () async {
+      const release = AppRelease(
+        version: '1.2.0',
+        htmlUrl: 'https://example.com/v1.2.0',
+        downloadUrl: 'https://example.com/app.apk',
+        releaseNotes: 'Bug fixes',
+      );
+      when(() => mockRepository.getLatestRelease())
+          .thenAnswer((_) async => const Right(release));
+
+      final result = await useCase();
+
+      result.fold(
+        (_) => fail('Should be Right'),
+        (status) {
+          expect(status.release.htmlUrl, 'https://example.com/v1.2.0');
+          expect(status.release.downloadUrl, 'https://example.com/app.apk');
+          expect(status.release.releaseNotes, 'Bug fixes');
+        },
+      );
+    });
+
+    test('should set correct UpdateStatusType on result', () async {
+      const release = AppRelease(
+        version: '1.2.0',
+        htmlUrl: 'https://example.com',
+      );
+      when(() => mockRepository.getLatestRelease())
+          .thenAnswer((_) async => const Right(release));
+
+      final result = await useCase();
+
+      result.fold(
+        (_) => fail('Should be Right'),
+        (status) {
+          expect(
+            status.type,
+            UpdateStatusType.updateAvailable,
+          );
+        },
+      );
+    });
+
+    test('should expose currentVersion', () {
+      final useCase = CheckForUpdate(
+        repository: mockRepository,
+        currentVersion: '2.5.3',
+      );
+
+      expect(useCase.currentVersion, '2.5.3');
     });
   });
 }

@@ -7,6 +7,8 @@ import 'package:humoruniv/core/widgets/molecules/update_banner.dart';
 import 'package:humoruniv/presentation/providers/nsfw_provider.dart';
 import 'package:humoruniv/presentation/providers/theme_provider.dart';
 import 'package:humoruniv/presentation/providers/update_provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -50,9 +52,17 @@ class SettingsScreen extends ConsumerWidget {
         SettingsGroup(
           title: '앱 정보',
           children: [
-            const SettingsTile(
-              title: '버전',
-              subtitle: 'v1.0.0',
+            FutureBuilder<PackageInfo>(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, snapshot) {
+                final version = snapshot.hasData
+                    ? 'v${snapshot.data!.version}'
+                    : 'v1.1.0';
+                return SettingsTile(
+                  title: '버전',
+                  subtitle: version,
+                );
+              },
             ),
             UpdateBanner(
               status: updateState.status,
@@ -74,5 +84,10 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _openUpdateUrl(String url) {}
+  Future<void> _openUpdateUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 }

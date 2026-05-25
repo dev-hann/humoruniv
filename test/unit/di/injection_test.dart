@@ -12,48 +12,54 @@ import 'package:humoruniv/domain/usecases/get_best_posts.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 import 'package:humoruniv/domain/usecases/get_post_detail.dart';
 
+import '../../helpers/package_info_helper.dart';
+
 void main() {
+  setUpAll(() async {
+    await setupPackageInfoMock();
+  });
+
   tearDown(di.sl.reset);
 
   group('configureDependencies', () {
-    test('should register HtmlClientImpl', () {
-      di.configureDependencies();
+    test('should register HtmlClientImpl', () async {
+      await di.configureDependencies();
 
       expect(di.sl.isRegistered<HtmlClientImpl>(), isTrue);
     });
 
-    test('should register HumorunivRemoteDs', () {
-      di.configureDependencies();
+    test('should register HumorunivRemoteDs', () async {
+      await di.configureDependencies();
 
       expect(di.sl.isRegistered<HumorunivRemoteDs>(), isTrue);
     });
 
-    test('should register PostRepository', () {
-      di.configureDependencies();
+    test('should register PostRepository', () async {
+      await di.configureDependencies();
 
       expect(di.sl.isRegistered<PostRepository>(), isTrue);
     });
 
-    test('should register GetBestPosts use case', () {
-      di.configureDependencies();
+    test('should register GetBestPosts use case', () async {
+      await di.configureDependencies();
 
       expect(di.sl.isRegistered<GetBestPosts>(), isTrue);
     });
 
-    test('should register GetPostDetail use case', () {
-      di.configureDependencies();
+    test('should register GetPostDetail use case', () async {
+      await di.configureDependencies();
 
       expect(di.sl.isRegistered<GetPostDetail>(), isTrue);
     });
 
-    test('should register GetBoardPosts use case', () {
-      di.configureDependencies();
+    test('should register GetBoardPosts use case', () async {
+      await di.configureDependencies();
 
       expect(di.sl.isRegistered<GetBoardPosts>(), isTrue);
     });
 
-    test('should resolve all dependencies without throwing', () {
-      di.configureDependencies();
+    test('should resolve all dependencies without throwing', () async {
+      await di.configureDependencies();
 
       expect(() => di.sl<HtmlClientImpl>(), returnsNormally);
       expect(() => di.sl<HumorunivRemoteDs>(), returnsNormally);
@@ -66,18 +72,26 @@ void main() {
       expect(() => di.sl<CheckForUpdate>(), returnsNormally);
     });
 
-    test('PostRepository should be PostRepositoryImpl', () {
-      di.configureDependencies();
+    test('PostRepository should be PostRepositoryImpl', () async {
+      await di.configureDependencies();
 
       final repo = di.sl<PostRepository>();
       expect(repo, isA<PostRepositoryImpl>());
     });
 
-    test('UpdateRepository should be UpdateRepositoryImpl', () {
-      di.configureDependencies();
+    test('UpdateRepository should be UpdateRepositoryImpl', () async {
+      await di.configureDependencies();
 
       final repo = di.sl<UpdateRepository>();
       expect(repo, isA<UpdateRepositoryImpl>());
+    });
+
+    test('CheckForUpdate should read version from PackageInfo', () async {
+      await di.configureDependencies();
+
+      final useCase = di.sl<CheckForUpdate>();
+      expect(useCase.currentVersion, isNotEmpty);
+      expect(useCase.currentVersion, equals('1.1.0'));
     });
   });
 }

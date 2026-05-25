@@ -180,5 +180,68 @@ void main() {
 
       expect(find.byType(IndexedStack), findsOneWidget);
     });
+
+    testWidgets('should show 검색 AppBar title on search tab', (
+      tester,
+    ) async {
+      setupMocks();
+
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: MainTabsScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('검색'));
+      await tester.pumpAndSettle();
+
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      final title = (appBar.title as Text).data;
+      expect(title, '검색');
+    });
+
+    testWidgets('should show 설정 AppBar title on settings tab', (
+      tester,
+    ) async {
+      setupMocks();
+
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: MainTabsScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('설정'));
+      await tester.pumpAndSettle();
+
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      final title = (appBar.title as Text).data;
+      expect(title, '설정');
+    });
+
+    testWidgets('should restore 홈 title when returning to home tab', (
+      tester,
+    ) async {
+      setupMocks();
+
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: MainTabsScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('설정'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('홈'));
+      await tester.pumpAndSettle();
+
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      final title = (appBar.title as Text).data;
+      expect(title, '웃긴자료 베스트');
+    });
   });
 }

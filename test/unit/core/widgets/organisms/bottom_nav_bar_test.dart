@@ -40,5 +40,47 @@ void main() {
 
       expect(find.byType(NavigationBar), findsOneWidget);
     });
+
+    testWidgets('should call onTap with 0 when 홈 tapped', (tester) async {
+      var tappedIndex = -1;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: BottomNavBar(currentIndex: 1, onTap: (i) => tappedIndex = i),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('홈'));
+      expect(tappedIndex, 0);
+    });
+
+    testWidgets('should call onTap with 2 when 검색 tapped', (tester) async {
+      var tappedIndex = -1;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: BottomNavBar(currentIndex: 0, onTap: (i) => tappedIndex = i),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('검색'));
+      expect(tappedIndex, 2);
+    });
+
+    testWidgets('should call onTap with 3 when 설정 tapped', (tester) async {
+      var tappedIndex = -1;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: BottomNavBar(currentIndex: 0, onTap: (i) => tappedIndex = i),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('설정'));
+      expect(tappedIndex, 3);
+    });
   });
 }

@@ -5,8 +5,9 @@ import 'package:humoruniv/core/themes/app_theme.dart';
 import 'package:humoruniv/di/injection.dart';
 import 'package:humoruniv/routes/app_router.dart';
 
-void main() {
-  configureDependencies();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await configureDependencies();
   runApp(const ProviderScope(child: HumorUnivApp()));
 }
 

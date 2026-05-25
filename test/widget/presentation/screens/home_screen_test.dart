@@ -115,4 +115,49 @@ void main() {
 
     expect(find.text('게시글이 없습니다.'), findsOneWidget);
   });
+
+  testWidgets('should show error message when Either-Left failure', (
+    tester,
+  ) async {
+    when(
+      () => mockRepository.getBestPosts(),
+    ).thenAnswer((_) async => const Left(ServerFailure('Server error')));
+
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: HomeScreen()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('게시글을 불러올 수 없습니다.'), findsOneWidget);
+  });
+
+  testWidgets('should render PostCard for each post', (tester) async {
+    final posts = [
+      const Post(
+        id: 1,
+        title: 'Tappable Post',
+        recommendCount: 10,
+        url: '/board/read.html?table=pds&number=1',
+      ),
+    ];
+    when(
+      () => mockRepository.getBestPosts(),
+    ).thenAnswer((_) async => Right(posts));
+
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: HomeScreen()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tappable Post'), findsOneWidget);
+    expect(find.byType(InkWell), findsWidgets);
+  });
 }

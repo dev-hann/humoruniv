@@ -194,4 +194,86 @@ void main() {
 
     expect(find.text('게시글이 없습니다.'), findsOneWidget);
   });
+
+  testWidgets('should display all 6 sort labels', (tester) async {
+    const result = BoardListResult(posts: [], currentPage: 0, totalPage: 1);
+    when(
+      () => mockRepository.getBoardPosts(any(), any(), any()),
+    ).thenAnswer((_) async => const Right(result));
+
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: BoardScreen(table: 'pds')),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('전체'), findsOneWidget);
+    expect(find.text('일간'), findsOneWidget);
+    expect(find.text('주간'), findsOneWidget);
+    expect(find.text('월간'), findsOneWidget);
+    expect(find.text('연간'), findsOneWidget);
+    expect(find.text('추천500'), findsOneWidget);
+  });
+
+  testWidgets('should show retry button on error', (tester) async {
+    when(
+      () => mockRepository.getBoardPosts(any(), any(), any()),
+    ).thenAnswer((_) async => const Left(ServerFailure('Error')));
+
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: BoardScreen(table: 'pds')),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('다시 시도'), findsOneWidget);
+  });
+
+  testWidgets('should show loading indicator when isLoadingMore', (
+    tester,
+  ) async {
+    const result = BoardListResult(
+      posts: testPosts,
+      currentPage: 0,
+      totalPage: 5,
+    );
+    when(
+      () => mockRepository.getBoardPosts('pds', 0, SortOption.all),
+    ).thenAnswer((_) async => const Right(result));
+
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: BoardScreen(table: 'pds')),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ChoiceChip), findsNWidgets(6));
+  });
+
+  testWidgets('should wrap content in RefreshIndicator', (tester) async {
+    when(() => mockRepository.getBoardPosts(any(), any(), any())).thenAnswer(
+      (_) async =>
+          const Right(BoardListResult(posts: [], currentPage: 0, totalPage: 1)),
+    );
+
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: BoardScreen(table: 'pds')),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(RefreshIndicator), findsOneWidget);
+  });
 }

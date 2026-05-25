@@ -36,6 +36,82 @@ void main() {
 
   tearDown(di.sl.reset);
 
+  group('BoardPostsState', () {
+    test('copyWith updates posts only', () {
+      const state = BoardPostsState(currentPage: 2, totalPage: 5);
+      final copied = state.copyWith(posts: []);
+
+      expect(copied.posts, isEmpty);
+      expect(copied.currentPage, 2);
+      expect(copied.totalPage, 5);
+    });
+
+    test('copyWith clears loadMoreError', () {
+      const state = BoardPostsState(loadMoreError: ServerFailure('err'));
+      final copied = state.copyWith();
+
+      expect(copied.loadMoreError, isNull);
+    });
+
+    test('hasMore is false when on last page', () {
+      const state = BoardPostsState(currentPage: 4, totalPage: 5);
+
+      expect(state.hasMore, isFalse);
+    });
+
+    test('hasMore is false with zero pages', () {
+      const state = BoardPostsState(currentPage: 0, totalPage: 0);
+
+      expect(state.hasMore, isFalse);
+    });
+
+    test('default state has expected values', () {
+      const state = BoardPostsState();
+
+      expect(state.posts, isEmpty);
+      expect(state.currentPage, 0);
+      expect(state.totalPage, 0);
+      expect(state.isLoadingMore, isFalse);
+      expect(state.loadMoreError, isNull);
+    });
+  });
+
+  group('BoardPostsParams', () {
+    test('equal when table and sort match', () {
+      const a = BoardPostsParams(table: 'pds', sort: SortOption.all);
+      const b = BoardPostsParams(table: 'pds', sort: SortOption.all);
+
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('not equal when table differs', () {
+      const a = BoardPostsParams(table: 'pds', sort: SortOption.all);
+      const b = BoardPostsParams(table: 'joke', sort: SortOption.all);
+
+      expect(a, isNot(equals(b)));
+    });
+
+    test('not equal when sort differs', () {
+      const a = BoardPostsParams(table: 'pds', sort: SortOption.all);
+      const b = BoardPostsParams(table: 'pds', sort: SortOption.day);
+
+      expect(a, isNot(equals(b)));
+    });
+  });
+
+  group('boardPostsParamsProvider', () {
+    test('default value is pds with SortOption.all', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final params = container.read(boardPostsParamsProvider);
+
+      expect(params.table, 'pds');
+      expect(params.sort, SortOption.all);
+    });
+  });
+
   test('should load initial page with posts', () async {
     const result = BoardListResult(
       posts: [
