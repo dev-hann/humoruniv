@@ -1,0 +1,67 @@
+import 'package:meta/meta.dart';
+
+import 'package:humoruniv/domain/entities/comment.dart';
+import 'package:humoruniv/domain/entities/content_block.dart';
+
+@immutable
+class PostDetail {
+  final int id;
+  final String title;
+  final String author;
+  final DateTime date;
+  final String contentHtml;
+  final List<ContentBlock> contentBlocks;
+  final List<String> imageUrls;
+  final int recommendCount;
+  final int notRecommendCount;
+  final int viewCount;
+  final int commentCount;
+  final List<Comment> comments;
+  final bool isNsfw;
+
+  const PostDetail({
+    required this.id,
+    required this.title,
+    required this.author,
+    required this.date,
+    required this.contentHtml,
+    required this.contentBlocks,
+    required this.imageUrls,
+    required this.recommendCount,
+    required this.notRecommendCount,
+    required this.viewCount,
+    required this.commentCount,
+    required this.comments,
+    this.isNsfw = false,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PostDetail &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          author == other.author &&
+          date == other.date &&
+          contentHtml == other.contentHtml &&
+          recommendCount == other.recommendCount &&
+          notRecommendCount == other.notRecommendCount &&
+          viewCount == other.viewCount &&
+          commentCount == other.commentCount &&
+          isNsfw == other.isNsfw;
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        title,
+        author,
+        date,
+        contentHtml,
+        recommendCount,
+        notRecommendCount,
+        viewCount,
+        commentCount,
+        isNsfw,
+      );
+}

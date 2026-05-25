@@ -1,0 +1,57 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/material.dart';
+
+import 'package:humoruniv/core/themes/app_schemes.dart';
+import 'package:humoruniv/core/themes/app_typography.dart';
+
+abstract final class AppTheme {
+  static ThemeData light() {
+    final base = FlexThemeData.light(
+      colors: AppSchemes.orange.light,
+      useMaterial3: true,
+      surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+      blendLevel: 7,
+      subThemesData: const FlexSubThemesData(
+        blendOnLevel: 10,
+        blendOnColors: false,
+        useTextTheme: true,
+        useM2StyleDividerInM3: true,
+        alignedDropdown: true,
+        useInputDecoratorThemeInDialogs: true,
+      ),
+      visualDensity: FlexColorScheme.comfortablePlatformDensity,
+      fontFamily: null,
+    );
+
+    return _applyTypography(base);
+  }
+
+  static ThemeData dark() {
+    final base = FlexThemeData.dark(
+      colors: AppSchemes.orange.dark,
+      useMaterial3: true,
+      surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+      blendLevel: 13,
+      subThemesData: const FlexSubThemesData(
+        blendOnLevel: 20,
+        useTextTheme: true,
+        useM2StyleDividerInM3: true,
+        alignedDropdown: true,
+        useInputDecoratorThemeInDialogs: true,
+      ),
+      visualDensity: FlexColorScheme.comfortablePlatformDensity,
+      fontFamily: null,
+    );
+
+    return _applyTypography(base);
+  }
+
+  static ThemeData _applyTypography(ThemeData base) {
+    return base.copyWith(
+      textTheme: AppTypography.build(
+        onSurface: base.colorScheme.onSurface,
+        onSurfaceVariant: base.colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+}

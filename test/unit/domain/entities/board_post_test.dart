@@ -1,0 +1,205 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:humoruniv/domain/entities/board_list_result.dart';
+import 'package:humoruniv/domain/entities/board_post.dart';
+import 'package:humoruniv/domain/entities/sort_option.dart';
+
+void main() {
+  group('BoardPost', () {
+    test('should create with all required fields', () {
+      const post = BoardPost(
+        id: 100,
+        title: '테스트 게시글',
+        url: '/board/read.html?table=pds&number=100',
+        author: '작성자',
+        date: '2026-05-15',
+        recommendCount: 42,
+        notRecommendCount: 1,
+        commentCount: 10,
+        viewCount: 500,
+        thumbnailUrl: 'https://img.jpg',
+      );
+
+      expect(post.id, 100);
+      expect(post.title, '테스트 게시글');
+      expect(post.url, '/board/read.html?table=pds&number=100');
+      expect(post.author, '작성자');
+      expect(post.date, '2026-05-15');
+      expect(post.recommendCount, 42);
+      expect(post.notRecommendCount, 1);
+      expect(post.commentCount, 10);
+      expect(post.viewCount, 500);
+      expect(post.thumbnailUrl, 'https://img.jpg');
+    });
+
+    test('should support value equality when all fields match', () {
+      const a = BoardPost(
+        id: 1,
+        title: 't',
+        url: 'u',
+        author: 'a',
+        date: 'd',
+        recommendCount: 0,
+        notRecommendCount: 0,
+        commentCount: 0,
+        viewCount: 0,
+        thumbnailUrl: '',
+      );
+      const b = BoardPost(
+        id: 1,
+        title: 't',
+        url: 'u',
+        author: 'a',
+        date: 'd',
+        recommendCount: 0,
+        notRecommendCount: 0,
+        commentCount: 0,
+        viewCount: 0,
+        thumbnailUrl: '',
+      );
+
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('should not be equal when id differs', () {
+      const a = BoardPost(
+        id: 1,
+        title: 't',
+        url: 'u',
+        author: 'a',
+        date: 'd',
+        recommendCount: 0,
+        notRecommendCount: 0,
+        commentCount: 0,
+        viewCount: 0,
+        thumbnailUrl: '',
+      );
+      const b = BoardPost(
+        id: 2,
+        title: 't',
+        url: 'u',
+        author: 'a',
+        date: 'd',
+        recommendCount: 0,
+        notRecommendCount: 0,
+        commentCount: 0,
+        viewCount: 0,
+        thumbnailUrl: '',
+      );
+
+      expect(a, isNot(equals(b)));
+    });
+
+    test('should not be equal when thumbnailUrl differs', () {
+      const a = BoardPost(
+        id: 1,
+        title: 't',
+        url: 'u',
+        author: 'a',
+        date: 'd',
+        recommendCount: 0,
+        notRecommendCount: 0,
+        commentCount: 0,
+        viewCount: 0,
+        thumbnailUrl: 'thumb1',
+      );
+      const b = BoardPost(
+        id: 1,
+        title: 't',
+        url: 'u',
+        author: 'a',
+        date: 'd',
+        recommendCount: 0,
+        notRecommendCount: 0,
+        commentCount: 0,
+        viewCount: 0,
+        thumbnailUrl: 'thumb2',
+      );
+
+      expect(a, isNot(equals(b)));
+    });
+
+    test('should handle empty thumbnailUrl', () {
+      const post = BoardPost(
+        id: 1,
+        title: 't',
+        url: 'u',
+        author: 'a',
+        date: 'd',
+        recommendCount: 0,
+        notRecommendCount: 0,
+        commentCount: 0,
+        viewCount: 0,
+        thumbnailUrl: '',
+      );
+
+      expect(post.thumbnailUrl, isEmpty);
+    });
+
+    test('should not be equal to non-BoardPost', () {
+      const a = BoardPost(
+        id: 1,
+        title: 't',
+        url: 'u',
+        author: 'a',
+        date: 'd',
+        recommendCount: 0,
+        notRecommendCount: 0,
+        commentCount: 0,
+        viewCount: 0,
+        thumbnailUrl: '',
+      );
+
+      expect(a, isNot(equals('not a post')));
+    });
+  });
+
+  group('SortOption', () {
+    test('should have 6 values', () {
+      expect(SortOption.values, hasLength(6));
+    });
+
+    test('should have correct label', () {
+      expect(SortOption.all.label, '전체');
+      expect(SortOption.day.label, '일간');
+      expect(SortOption.week.label, '주간');
+      expect(SortOption.month.label, '월간');
+      expect(SortOption.year.label, '연간');
+      expect(SortOption.recommend500.label, '추천500');
+    });
+
+    test('should have correct value for API', () {
+      expect(SortOption.all.value, '');
+      expect(SortOption.day.value, 'day');
+      expect(SortOption.recommend500.value, 'better');
+    });
+  });
+
+  group('BoardListResult', () {
+    test('should create with posts, currentPage, totalPage', () {
+      const result = BoardListResult(
+        posts: [],
+        currentPage: 0,
+        totalPage: 5,
+      );
+
+      expect(result.posts, isEmpty);
+      expect(result.currentPage, 0);
+      expect(result.totalPage, 5);
+    });
+
+    test('should support value equality', () {
+      const a = BoardListResult(posts: [], currentPage: 0, totalPage: 5);
+      const b = BoardListResult(posts: [], currentPage: 0, totalPage: 5);
+
+      expect(a, equals(b));
+    });
+
+    test('should not be equal when currentPage differs', () {
+      const a = BoardListResult(posts: [], currentPage: 0, totalPage: 5);
+      const b = BoardListResult(posts: [], currentPage: 1, totalPage: 5);
+
+      expect(a, isNot(equals(b)));
+    });
+  });
+}

@@ -1,0 +1,19 @@
+import 'package:dartz/dartz.dart';
+import 'package:humoruniv/core/errors/failures.dart';
+import 'package:humoruniv/domain/entities/board_list_result.dart';
+import 'package:humoruniv/domain/entities/sort_option.dart';
+import 'package:humoruniv/domain/repositories/post_repository.dart';
+
+class GetBoardPosts {
+  final PostRepository repository;
+
+  const GetBoardPosts({required this.repository});
+
+  Future<Either<Failure, BoardListResult>> call(
+    String table,
+    int page,
+    SortOption sort,
+  ) {
+    return repository.getBoardPosts(table, page, sort);
+  }
+}

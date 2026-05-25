@@ -1,0 +1,22 @@
+{
+  "name": "humoruniv-app",
+  "version": "1.0.0",
+  "description": "An unofficial Flutter mobile app for [humoruniv.com](https://m.humoruniv.com), a Korean humor community since 1998.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
