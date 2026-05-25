@@ -1,0 +1,16 @@
+MSG="$(cat "$1")"
+PATTERN="^(feat|fix|refactor|test|docs|chore|style|ci|build|perf)(\(.+\))?: .{1,100}"
+
+if ! echo "$MSG" | grep -qE "$PATTERN"; then
+  echo "ERROR: Invalid commit message format."
+  echo ""
+  echo "Expected: <type>(<scope>): <description>"
+  echo ""
+  echo "Types: feat, fix, refactor, test, docs, chore, style, ci, build, perf"
+  echo ""
+  echo "Examples:"
+  echo "  feat: add board list parser"
+  echo "  fix(parser): fix EUC-KR decoding edge case"
+  echo "  refactor: extract common parser utility"
+  exit 1
+fi

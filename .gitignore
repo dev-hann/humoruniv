@@ -39,6 +39,11 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
+# Android signing
+android/key.properties
+**/*.keystore
+**/*.jks
+
 # Node
 node_modules/
 
