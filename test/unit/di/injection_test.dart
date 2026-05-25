@@ -51,12 +51,12 @@ void main() {
     test('should resolve all dependencies without throwing', () {
       di.configureDependencies();
 
-      expect(di.sl, returnsNormally);
-      expect(di.sl, returnsNormally);
-      expect(di.sl, returnsNormally);
-      expect(di.sl, returnsNormally);
-      expect(di.sl, returnsNormally);
-      expect(di.sl, returnsNormally);
+      expect(() => di.sl<HtmlClientImpl>(), returnsNormally);
+      expect(() => di.sl<HumorunivRemoteDs>(), returnsNormally);
+      expect(() => di.sl<PostRepository>(), returnsNormally);
+      expect(() => di.sl<GetBestPosts>(), returnsNormally);
+      expect(() => di.sl<GetPostDetail>(), returnsNormally);
+      expect(() => di.sl<GetBoardPosts>(), returnsNormally);
     });
 
     test('PostRepository should be PostRepositoryImpl', () {
