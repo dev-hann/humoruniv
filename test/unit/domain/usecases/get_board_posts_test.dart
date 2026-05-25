@@ -39,24 +39,23 @@ void main() {
       currentPage: 0,
       totalPage: 3,
     );
-    when(() => mockRepo.getBoardPosts('pds', 0, SortOption.all))
-        .thenAnswer((_) async => const Right(result));
+    when(
+      () => mockRepo.getBoardPosts('pds', 0, SortOption.all),
+    ).thenAnswer((_) async => const Right(result));
 
     final response = await useCase('pds', 0, SortOption.all);
 
     expect(response, isA<Right<Failure, BoardListResult>>());
-    response.fold(
-      (_) => fail('Should not return left'),
-      (data) {
-        expect(data.posts, hasLength(1));
-        expect(data.totalPage, 3);
-      },
-    );
+    response.fold((_) => fail('Should not return left'), (data) {
+      expect(data.posts, hasLength(1));
+      expect(data.totalPage, 3);
+    });
   });
 
   test('should return failure when repository fails', () async {
-    when(() => mockRepo.getBoardPosts(any(), any(), any()))
-        .thenAnswer((_) async => const Left(ServerFailure('fail')));
+    when(
+      () => mockRepo.getBoardPosts(any(), any(), any()),
+    ).thenAnswer((_) async => const Left(ServerFailure('fail')));
 
     final response = await useCase('pds', 0, SortOption.all);
 
@@ -65,8 +64,9 @@ void main() {
 
   test('should pass correct parameters to repository', () async {
     const result = BoardListResult(posts: [], currentPage: 0, totalPage: 1);
-    when(() => mockRepo.getBoardPosts(any(), any(), any()))
-        .thenAnswer((_) async => const Right(result));
+    when(
+      () => mockRepo.getBoardPosts(any(), any(), any()),
+    ).thenAnswer((_) async => const Right(result));
 
     await useCase('pds', 2, SortOption.day);
 

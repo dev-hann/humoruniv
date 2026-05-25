@@ -4,12 +4,11 @@ import 'package:humoruniv/core/widgets/atoms/avatar.dart';
 
 void main() {
   group('Avatar', () {
-    testWidgets('should show person icon when imageUrl is null',
-        (tester) async {
+    testWidgets('should show person icon when imageUrl is null', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: Avatar()),
-        ),
+        const MaterialApp(home: Scaffold(body: Avatar())),
       );
 
       expect(find.byIcon(Icons.person), findsOneWidget);
@@ -17,9 +16,7 @@ void main() {
 
     testWidgets('should show CircleAvatar', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: Avatar()),
-        ),
+        const MaterialApp(home: Scaffold(body: Avatar())),
       );
 
       expect(find.byType(CircleAvatar), findsOneWidget);

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class NsfwWarningDialog extends StatelessWidget {
+  const NsfwWarningDialog({required this.onAcknowledge, super.key});
   final VoidCallback onAcknowledge;
-
-  const NsfwWarningDialog({super.key, required this.onAcknowledge});
 
   static Future<void> show(
     BuildContext context, {
@@ -12,8 +11,7 @@ class NsfwWarningDialog extends StatelessWidget {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) =>
-          NsfwWarningDialog(onAcknowledge: onAcknowledge),
+      builder: (_) => NsfwWarningDialog(onAcknowledge: onAcknowledge),
     );
   }
 

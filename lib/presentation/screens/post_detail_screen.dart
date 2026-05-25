@@ -6,7 +6,6 @@ import 'package:humoruniv/core/themes/app_colors.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/core/utils/time_ago.dart';
 import 'package:humoruniv/core/widgets/atoms/avatar.dart';
-import 'package:humoruniv/core/widgets/atoms/count_badge.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_post_detail.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:humoruniv/domain/entities/post_detail.dart';
@@ -15,9 +14,8 @@ import 'package:humoruniv/presentation/widgets/comment_tile.dart';
 import 'package:humoruniv/presentation/widgets/content_block_view.dart';
 
 class PostDetailScreen extends ConsumerWidget {
+  const PostDetailScreen({required this.postUrl, super.key});
   final String postUrl;
-
-  const PostDetailScreen({super.key, required this.postUrl});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -60,9 +58,8 @@ class PostDetailScreen extends ConsumerWidget {
 }
 
 class _PostDetailContent extends StatelessWidget {
-  final PostDetail detail;
-
   const _PostDetailContent({required this.detail});
+  final PostDetail detail;
 
   @override
   Widget build(BuildContext context) {
@@ -80,19 +77,13 @@ class _PostDetailContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  detail.title,
-                  style: textTheme.headlineMedium,
-                ),
+                Text(detail.title, style: textTheme.headlineMedium),
                 AppSpacing.sbH12,
                 Row(
                   children: [
                     const Avatar(radius: 16),
                     AppSpacing.sbW8,
-                    Text(
-                      detail.author,
-                      style: textTheme.labelLarge,
-                    ),
+                    Text(detail.author, style: textTheme.labelLarge),
                     AppSpacing.sbW12,
                     Text(
                       TimeAgo.format(detail.date),
@@ -105,27 +96,49 @@ class _PostDetailContent extends StatelessWidget {
                 AppSpacing.sbH12,
                 Row(
                   children: [
-                    Icon(Icons.thumb_up, size: 16, color: AppColors.recommendColor(detail.recommendCount, colorScheme)),
+                    Icon(
+                      Icons.thumb_up,
+                      size: 16,
+                      color: AppColors.recommendColor(
+                        detail.recommendCount,
+                        colorScheme,
+                      ),
+                    ),
                     AppSpacing.sbW4,
-                    Text('${detail.recommendCount}',
-                        style: textTheme.labelMedium?.copyWith(
-                              color: AppColors.recommendColor(detail.recommendCount, colorScheme),
-                              fontWeight: AppColors.recommendWeight(detail.recommendCount),
-                            )),
+                    Text(
+                      '${detail.recommendCount}',
+                      style: textTheme.labelMedium?.copyWith(
+                        color: AppColors.recommendColor(
+                          detail.recommendCount,
+                          colorScheme,
+                        ),
+                        fontWeight: AppColors.recommendWeight(
+                          detail.recommendCount,
+                        ),
+                      ),
+                    ),
                     AppSpacing.sbW16,
                     Icon(Icons.thumb_down, size: 16, color: colorScheme.error),
                     AppSpacing.sbW4,
-                    Text('${detail.notRecommendCount}',
-                        style: textTheme.labelMedium?.copyWith(
-                              color: colorScheme.error,
-                            )),
+                    Text(
+                      '${detail.notRecommendCount}',
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.error,
+                      ),
+                    ),
                     AppSpacing.sbW16,
-                    Icon(Icons.remove_red_eye, size: 16, color: colorScheme.onSurfaceVariant),
+                    Icon(
+                      Icons.remove_red_eye,
+                      size: 16,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                     AppSpacing.sbW4,
-                    Text('${detail.viewCount}',
-                        style: textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            )),
+                    Text(
+                      '${detail.viewCount}',
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -139,7 +152,7 @@ class _PostDetailContent extends StatelessWidget {
               children: [
                 if (detail.contentBlocks.isNotEmpty)
                   ...() {
-                    int imgCount = 0;
+                    var imgCount = 0;
                     return detail.contentBlocks.map((block) {
                       final idx = block is ImageBlock ? imgCount++ : -1;
                       return ContentBlockView(
@@ -157,7 +170,9 @@ class _PostDetailContent extends StatelessWidget {
                   ),
                 ),
                 AppSpacing.sbH12,
-                ...detail.comments.map((comment) => CommentTile(comment: comment)),
+                ...detail.comments.map(
+                  (comment) => CommentTile(comment: comment),
+                ),
               ],
             ),
           ),

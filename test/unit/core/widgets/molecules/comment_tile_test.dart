@@ -21,8 +21,9 @@ void main() {
       expect(find.text('댓글 내용'), findsOneWidget);
     });
 
-    testWidgets('should display BEST badge when isBest is true',
-        (tester) async {
+    testWidgets('should display BEST badge when isBest is true', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -39,16 +40,13 @@ void main() {
       expect(find.text('BEST'), findsOneWidget);
     });
 
-    testWidgets(
-        'should not display BEST badge when isBest is false', (tester) async {
+    testWidgets('should not display BEST badge when isBest is false', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: CommentTile(
-              author: '테스터',
-              content: '일반 댓글',
-              recommendCount: 0,
-            ),
+            body: CommentTile(author: '테스터', content: '일반 댓글'),
           ),
         ),
       );
@@ -84,11 +82,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: CommentTile(
-              author: '테스터',
-              content: '댓글',
-              recommendCount: 0,
-            ),
+            body: CommentTile(author: '테스터', content: '댓글'),
           ),
         ),
       );

@@ -7,9 +7,7 @@ void main() {
     final urls = ['https://example.com/img1.jpg'];
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: ImageViewerScreen(imageUrls: urls, initialIndex: 0),
-      ),
+      MaterialApp(home: ImageViewerScreen(imageUrls: urls)),
     );
 
     expect(find.byType(ImageViewerScreen), findsOneWidget);
@@ -24,9 +22,8 @@ void main() {
     ];
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: ImageViewerScreen(imageUrls: urls, initialIndex: 1),
-    ));
+      MaterialApp(home: ImageViewerScreen(imageUrls: urls, initialIndex: 1)),
+    );
 
     expect(find.text('2 / 3'), findsOneWidget);
   });
@@ -35,9 +32,7 @@ void main() {
     final urls = ['https://example.com/img1.jpg'];
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: ImageViewerScreen(imageUrls: urls, initialIndex: 0),
-      ),
+      MaterialApp(home: ImageViewerScreen(imageUrls: urls)),
     );
 
     expect(find.byIcon(Icons.close), findsOneWidget);
@@ -45,7 +40,7 @@ void main() {
 
   testWidgets('should pop when close button tapped', (tester) async {
     final urls = ['https://example.com/img1.jpg'];
-    bool popped = false;
+    var popped = false;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -56,7 +51,7 @@ void main() {
                 Navigator.push<bool>(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ImageViewerScreen(imageUrls: urls, initialIndex: 0),
+                    builder: (_) => ImageViewerScreen(imageUrls: urls),
                   ),
                 ).then((_) => popped = true);
               },
@@ -78,13 +73,13 @@ void main() {
     expect(popped, isTrue);
   });
 
-  testWidgets('should show single image without position indicator', (tester) async {
+  testWidgets('should show single image without position indicator', (
+    tester,
+  ) async {
     final urls = ['https://example.com/img1.jpg'];
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: ImageViewerScreen(imageUrls: urls, initialIndex: 0),
-      ),
+      MaterialApp(home: ImageViewerScreen(imageUrls: urls)),
     );
 
     expect(find.byType(PageView), findsNothing);

@@ -4,9 +4,8 @@ import 'package:humoruniv/domain/entities/post_detail.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 
 class GetPostDetail {
-  final PostRepository repository;
-
   const GetPostDetail({required this.repository});
+  final PostRepository repository;
 
   Future<Either<Failure, PostDetail>> call(String url) {
     return repository.getPostDetail(url);

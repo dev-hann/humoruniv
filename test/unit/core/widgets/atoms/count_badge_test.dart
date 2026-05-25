@@ -7,9 +7,7 @@ void main() {
     testWidgets('should display count', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: CountBadge(count: 42, icon: Icons.thumb_up),
-          ),
+          home: Scaffold(body: CountBadge(count: 42, icon: Icons.thumb_up)),
         ),
       );
 
@@ -19,9 +17,7 @@ void main() {
     testWidgets('should display icon', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: CountBadge(count: 42, icon: Icons.thumb_up),
-          ),
+          home: Scaffold(body: CountBadge(count: 42, icon: Icons.thumb_up)),
         ),
       );
 
@@ -32,11 +28,7 @@ void main() {
   group('RecommendBadge', () {
     testWidgets('should display recommend count', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: RecommendBadge(count: 100),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: RecommendBadge(count: 100))),
       );
 
       expect(find.text('100'), findsOneWidget);
@@ -47,11 +39,7 @@ void main() {
   group('CommentBadge', () {
     testWidgets('should display comment count', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: CommentBadge(count: 15),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: CommentBadge(count: 15))),
       );
 
       expect(find.text('15'), findsOneWidget);
@@ -62,11 +50,7 @@ void main() {
   group('BestBadge', () {
     testWidgets('should display BEST text', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: BestBadge(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: BestBadge())),
       );
 
       expect(find.text('BEST'), findsOneWidget);

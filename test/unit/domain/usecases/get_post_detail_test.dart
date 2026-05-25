@@ -24,16 +24,17 @@ void main() {
       author: '작성자',
       date: DateTime(2026, 5, 15),
       contentHtml: '<p>내용</p>',
-      contentBlocks: [],
-      imageUrls: [],
+      contentBlocks: const [],
+      imageUrls: const [],
       recommendCount: 100,
       notRecommendCount: 0,
       viewCount: 500,
       commentCount: 10,
-      comments: [],
+      comments: const [],
     );
-    when(() => mockRepo.getPostDetail(any()))
-        .thenAnswer((_) async => Right(detail));
+    when(
+      () => mockRepo.getPostDetail(any()),
+    ).thenAnswer((_) async => Right(detail));
 
     final result = await useCase('/test');
 
@@ -45,8 +46,9 @@ void main() {
   });
 
   test('should return failure when repository fails', () async {
-    when(() => mockRepo.getPostDetail(any()))
-        .thenAnswer((_) async => const Left(ServerFailure('fail')));
+    when(
+      () => mockRepo.getPostDetail(any()),
+    ).thenAnswer((_) async => const Left(ServerFailure('fail')));
 
     final result = await useCase('/test');
 
@@ -58,8 +60,9 @@ void main() {
   });
 
   test('should propagate NetworkFailure from repository', () async {
-    when(() => mockRepo.getPostDetail(any()))
-        .thenAnswer((_) async => const Left(NetworkFailure('No connection')));
+    when(
+      () => mockRepo.getPostDetail(any()),
+    ).thenAnswer((_) async => const Left(NetworkFailure('No connection')));
 
     final result = await useCase('/test');
 
@@ -84,10 +87,11 @@ void main() {
       notRecommendCount: 0,
       viewCount: 0,
       commentCount: 0,
-      comments: [],
+      comments: const [],
     );
-    when(() => mockRepo.getPostDetail(any()))
-        .thenAnswer((_) async => Right(detail));
+    when(
+      () => mockRepo.getPostDetail(any()),
+    ).thenAnswer((_) async => Right(detail));
 
     await useCase(url);
 

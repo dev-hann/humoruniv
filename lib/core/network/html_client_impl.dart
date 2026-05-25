@@ -6,21 +6,23 @@ import 'package:dio/dio.dart';
 import 'package:humoruniv/core/network/html_client.dart';
 
 class HtmlClientImpl implements HtmlClient {
-  final Dio _dio;
-  DateTime? _lastRequestTime;
-  static const _minRequestInterval = Duration(seconds: 2);
-
   HtmlClientImpl({Dio? dio})
-      : _dio = dio ??
-            Dio(BaseOptions(
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
               baseUrl: 'https://m.humoruniv.com',
               headers: {
                 'User-Agent':
                     'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 '
-                        '(KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36',
+                    '(KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36',
               },
               responseType: ResponseType.bytes,
-            ));
+            ),
+          );
+  final Dio _dio;
+  DateTime? _lastRequestTime;
+  static const _minRequestInterval = Duration(seconds: 2);
 
   @override
   Future<String> get(String path) async {

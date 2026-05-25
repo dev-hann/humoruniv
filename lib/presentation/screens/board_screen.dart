@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/core/widgets/atoms/loading_indicator.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_post_list.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
@@ -10,9 +9,8 @@ import 'package:humoruniv/presentation/providers/board_posts_provider.dart';
 import 'package:humoruniv/presentation/widgets/board_post_card.dart';
 
 class BoardScreen extends ConsumerStatefulWidget {
+  const BoardScreen({required this.table, super.key});
   final String table;
-
-  const BoardScreen({super.key, required this.table});
 
   @override
   ConsumerState<BoardScreen> createState() => _BoardScreenState();
@@ -28,8 +26,10 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
     _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        ref.read(boardPostsParamsProvider.notifier).state =
-            BoardPostsParams(table: widget.table, sort: _currentSort);
+        ref.read(boardPostsParamsProvider.notifier).state = BoardPostsParams(
+          table: widget.table,
+          sort: _currentSort,
+        );
       }
     });
   }
@@ -51,8 +51,10 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
 
   void _changeSort(SortOption sort) {
     setState(() => _currentSort = sort);
-    ref.read(boardPostsParamsProvider.notifier).state =
-        BoardPostsParams(table: widget.table, sort: sort);
+    ref.read(boardPostsParamsProvider.notifier).state = BoardPostsParams(
+      table: widget.table,
+      sort: sort,
+    );
     ref.invalidate(boardPostsProvider);
   }
 
@@ -68,10 +70,7 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
       appBar: AppBar(title: const Text('웃긴자료')),
       body: Column(
         children: [
-          SortTabs(
-            currentSort: _currentSort,
-            onChanged: _changeSort,
-          ),
+          SortTabs(currentSort: _currentSort, onChanged: _changeSort),
           Expanded(
             child: RefreshIndicator(
               onRefresh: _refresh,
@@ -114,7 +113,9 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
                     loadMoreError: state.loadMoreError,
                     scrollController: _scrollController,
                     onPostTap: (post) {
-                      context.push('/post?url=${Uri.encodeComponent(post.url)}');
+                      context.push(
+                        '/post?url=${Uri.encodeComponent(post.url)}',
+                      );
                     },
                     onRetry: () {
                       ref.read(boardPostsProvider.notifier).fetchNextPage();
@@ -131,10 +132,13 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
 }
 
 class SortTabs extends StatelessWidget {
+  const SortTabs({
+    required this.currentSort,
+    required this.onChanged,
+    super.key,
+  });
   final SortOption currentSort;
   final ValueChanged<SortOption> onChanged;
-
-  const SortTabs({super.key, required this.currentSort, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -159,14 +163,6 @@ class SortTabs extends StatelessWidget {
 }
 
 class _InfinitePostList extends StatelessWidget {
-  final List<BoardPost> posts;
-  final bool hasMore;
-  final bool isLoadingMore;
-  final Object? loadMoreError;
-  final ScrollController scrollController;
-  final ValueChanged<BoardPost> onPostTap;
-  final VoidCallback onRetry;
-
   const _InfinitePostList({
     required this.posts,
     required this.hasMore,
@@ -176,10 +172,19 @@ class _InfinitePostList extends StatelessWidget {
     required this.onPostTap,
     required this.onRetry,
   });
+  final List<BoardPost> posts;
+  final bool hasMore;
+  final bool isLoadingMore;
+  final Object? loadMoreError;
+  final ScrollController scrollController;
+  final ValueChanged<BoardPost> onPostTap;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    final extraCount = (hasMore || isLoadingMore || loadMoreError != null) ? 1 : 0;
+    final extraCount = (hasMore || isLoadingMore || loadMoreError != null)
+        ? 1
+        : 0;
 
     return ListView.builder(
       controller: scrollController,
@@ -187,10 +192,7 @@ class _InfinitePostList extends StatelessWidget {
       itemBuilder: (context, index) {
         if (index == posts.length) {
           if (loadMoreError != null) {
-            return LoadMoreError(
-              message: '불러오기 실패',
-              onRetry: onRetry,
-            );
+            return LoadMoreError(message: '불러오기 실패', onRetry: onRetry);
           }
           if (isLoadingMore) {
             return const LoadingIndicator();

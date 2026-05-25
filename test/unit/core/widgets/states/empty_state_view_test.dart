@@ -7,9 +7,7 @@ void main() {
     testWidgets('should display message', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: EmptyStateView(message: '게시글이 없습니다'),
-          ),
+          home: Scaffold(body: EmptyStateView(message: '게시글이 없습니다')),
         ),
       );
 
@@ -19,9 +17,7 @@ void main() {
     testWidgets('should display default icon', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: EmptyStateView(message: '비어있음'),
-          ),
+          home: Scaffold(body: EmptyStateView(message: '비어있음')),
         ),
       );
 
@@ -32,10 +28,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyStateView(
-              message: '검색 결과 없음',
-              icon: Icons.search_off,
-            ),
+            body: EmptyStateView(message: '검색 결과 없음', icon: Icons.search_off),
           ),
         ),
       );

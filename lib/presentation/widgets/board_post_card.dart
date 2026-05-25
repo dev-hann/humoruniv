@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:humoruniv/core/themes/app_colors.dart';
 import 'package:humoruniv/core/themes/app_radius.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/core/utils/time_ago.dart';
@@ -9,10 +8,9 @@ import 'package:humoruniv/core/widgets/atoms/thumbnail.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 
 class BoardPostCard extends StatelessWidget {
+  const BoardPostCard({required this.post, required this.onTap, super.key});
   final BoardPost post;
   final VoidCallback onTap;
-
-  const BoardPostCard({super.key, required this.post, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -21,16 +19,17 @@ class BoardPostCard extends StatelessWidget {
     final hasThumbnail = post.thumbnailUrl.isNotEmpty;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.p16,
+        vertical: AppSpacing.p4,
+      ),
       child: Material(
         color: colorScheme.surface,
         borderRadius: AppRadius.borderRadiusMd,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: AppRadius.borderRadiusMd,
-            border: Border.all(
-              color: colorScheme.outline.withOpacity(0.12),
-            ),
+            border: Border.all(color: colorScheme.outline.withOpacity(0.12)),
           ),
           child: InkWell(
             onTap: onTap,

@@ -8,19 +8,16 @@ abstract final class AppTheme {
   static ThemeData light() {
     final base = FlexThemeData.light(
       colors: AppSchemes.orange.light,
-      useMaterial3: true,
       surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
       blendLevel: 7,
       subThemesData: const FlexSubThemesData(
         blendOnLevel: 10,
-        blendOnColors: false,
         useTextTheme: true,
         useM2StyleDividerInM3: true,
         alignedDropdown: true,
         useInputDecoratorThemeInDialogs: true,
       ),
       visualDensity: FlexColorScheme.comfortablePlatformDensity,
-      fontFamily: null,
     );
 
     return _applyTypography(base);
@@ -29,7 +26,6 @@ abstract final class AppTheme {
   static ThemeData dark() {
     final base = FlexThemeData.dark(
       colors: AppSchemes.orange.dark,
-      useMaterial3: true,
       surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
       blendLevel: 13,
       subThemesData: const FlexSubThemesData(
@@ -40,7 +36,6 @@ abstract final class AppTheme {
         useInputDecoratorThemeInDialogs: true,
       ),
       visualDensity: FlexColorScheme.comfortablePlatformDensity,
-      fontFamily: null,
     );
 
     return _applyTypography(base);

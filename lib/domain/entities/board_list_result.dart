@@ -1,18 +1,16 @@
-import 'package:meta/meta.dart';
-
 import 'package:humoruniv/domain/entities/board_post.dart';
+import 'package:meta/meta.dart';
 
 @immutable
 class BoardListResult {
-  final List<BoardPost> posts;
-  final int currentPage;
-  final int totalPage;
-
   const BoardListResult({
     required this.posts,
     required this.currentPage,
     required this.totalPage,
   });
+  final List<BoardPost> posts;
+  final int currentPage;
+  final int totalPage;
 
   @override
   bool operator ==(Object other) =>

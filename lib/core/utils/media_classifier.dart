@@ -2,14 +2,16 @@ enum MediaType { image, video, audio, youtube, link, unknown }
 
 abstract final class MediaClassifier {
   static const _imageExts = {
-    '.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg',
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.gif',
+    '.webp',
+    '.bmp',
+    '.svg',
   };
-  static const _videoExts = {
-    '.mp4', '.webm', '.avi', '.mov', '.mkv',
-  };
-  static const _audioExts = {
-    '.mp3', '.wav', '.ogg',
-  };
+  static const _videoExts = {'.mp4', '.webm', '.avi', '.mov', '.mkv'};
+  static const _audioExts = {'.mp3', '.wav', '.ogg'};
 
   static MediaType classify(String url) {
     if (url.isEmpty) return MediaType.unknown;
@@ -39,7 +41,9 @@ abstract final class MediaClassifier {
   }
 
   static String? unwrapDownloadPhp(String url) {
-    final match = RegExp(r'download\.php\?url=(https?://[^&]+)').firstMatch(url);
+    final match = RegExp(
+      r'download\.php\?url=(https?://[^&]+)',
+    ).firstMatch(url);
     return match?.group(1);
   }
 

@@ -4,9 +4,8 @@ import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
 
 class SkeletonPostList extends StatelessWidget {
-  final int itemCount;
-
   const SkeletonPostList({super.key, this.itemCount = 5});
+  final int itemCount;
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +45,7 @@ class _SkeletonPostItem extends StatelessWidget {
             ),
           ),
           AppSpacing.sbW12,
-          const SkeletonBox(
-            width: 48,
-            height: 48,
-          ),
+          const SkeletonBox(width: 48, height: 48),
         ],
       ),
     );

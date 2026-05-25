@@ -6,6 +6,17 @@ import 'package:humoruniv/core/widgets/atoms/count_badge.dart';
 import 'package:humoruniv/core/widgets/atoms/thumbnail.dart';
 
 class PostCard extends StatelessWidget {
+  const PostCard({
+    required this.title,
+    required this.author,
+    required this.recommendCount,
+    required this.onTap,
+    super.key,
+    this.commentCount = 0,
+    this.thumbnailUrl,
+    this.timeAgo,
+    this.isRead = false,
+  });
   final String title;
   final String author;
   final int recommendCount;
@@ -15,39 +26,29 @@ class PostCard extends StatelessWidget {
   final bool isRead;
   final VoidCallback onTap;
 
-  const PostCard({
-    super.key,
-    required this.title,
-    required this.author,
-    required this.recommendCount,
-    this.commentCount = 0,
-    this.thumbnailUrl,
-    this.timeAgo,
-    this.isRead = false,
-    required this.onTap,
-  });
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final titleColor =
-        isRead ? colorScheme.onSurfaceVariant : colorScheme.onSurface;
+    final titleColor = isRead
+        ? colorScheme.onSurfaceVariant
+        : colorScheme.onSurface;
 
     final hasThumbnail = thumbnailUrl != null && thumbnailUrl!.isNotEmpty;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.p16,
+        vertical: AppSpacing.p4,
+      ),
       child: Material(
         color: colorScheme.surface,
         borderRadius: AppRadius.borderRadiusMd,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: AppRadius.borderRadiusMd,
-            border: Border.all(
-              color: colorScheme.outline.withOpacity(0.12),
-            ),
+            border: Border.all(color: colorScheme.outline.withOpacity(0.12)),
           ),
           child: InkWell(
             onTap: onTap,
@@ -55,7 +56,12 @@ class PostCard extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.edgeAll12,
               child: hasThumbnail
-                  ? _buildWithThumbnail(context, textTheme, colorScheme, titleColor)
+                  ? _buildWithThumbnail(
+                      context,
+                      textTheme,
+                      colorScheme,
+                      titleColor,
+                    )
                   : _buildTextOnly(context, textTheme, colorScheme, titleColor),
             ),
           ),
@@ -118,10 +124,7 @@ class PostCard extends StatelessWidget {
         AppSpacing.sbW12,
         Opacity(
           opacity: isRead ? 0.6 : 1.0,
-          child: Thumbnail(
-            imageUrl: thumbnailUrl,
-            size: ThumbnailSize.medium,
-          ),
+          child: Thumbnail(imageUrl: thumbnailUrl, size: ThumbnailSize.medium),
         ),
       ],
     );

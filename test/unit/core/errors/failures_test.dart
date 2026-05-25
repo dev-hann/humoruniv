@@ -91,20 +91,23 @@ void main() {
     test('should not be equal to other failure types', () {
       const a = AuthFailure('err');
 
-      expect(a, isNot(equals(ServerFailure('err'))));
-      expect(a, isNot(equals(NetworkFailure('err'))));
-      expect(a, isNot(equals(ParseFailure('err'))));
+      expect(a, isNot(equals(const ServerFailure('err'))));
+      expect(a, isNot(equals(const NetworkFailure('err'))));
+      expect(a, isNot(equals(const ParseFailure('err'))));
     });
   });
 
   group('Failure cross-type', () {
-    test('all four types with same message should not be equal to each other', () {
-      const server = ServerFailure('x');
-      const network = NetworkFailure('x');
-      const parse = ParseFailure('x');
-      const auth = AuthFailure('x');
+    test(
+      'all four types with same message should not be equal to each other',
+      () {
+        const server = ServerFailure('x');
+        const network = NetworkFailure('x');
+        const parse = ParseFailure('x');
+        const auth = AuthFailure('x');
 
-      expect({server, network, parse, auth}, hasLength(4));
-    });
+        expect({server, network, parse, auth}, hasLength(4));
+      },
+    );
   });
 }

@@ -3,14 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 
 class ErrorStateView extends StatelessWidget {
+  const ErrorStateView({required this.message, super.key, this.onRetry});
   final String message;
   final VoidCallback? onRetry;
-
-  const ErrorStateView({
-    super.key,
-    required this.message,
-    this.onRetry,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +24,8 @@ class ErrorStateView extends StatelessWidget {
             Text(
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[

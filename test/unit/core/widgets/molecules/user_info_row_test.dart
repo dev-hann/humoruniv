@@ -7,12 +7,7 @@ void main() {
     testWidgets('should display author', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: UserInfoRow(
-              author: '작성자',
-              recommendCount: 42,
-            ),
-          ),
+          home: Scaffold(body: UserInfoRow(author: '작성자', recommendCount: 42)),
         ),
       );
 
@@ -22,12 +17,7 @@ void main() {
     testWidgets('should display recommend count', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: UserInfoRow(
-              author: '작성자',
-              recommendCount: 42,
-            ),
-          ),
+          home: Scaffold(body: UserInfoRow(author: '작성자', recommendCount: 42)),
         ),
       );
 
@@ -54,11 +44,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: UserInfoRow(
-              author: '작성자',
-              recommendCount: 0,
-              viewCount: 500,
-            ),
+            body: UserInfoRow(author: '작성자', recommendCount: 0, viewCount: 500),
           ),
         ),
       );

@@ -5,7 +5,7 @@ import 'package:humoruniv/domain/entities/content_block.dart';
 void main() {
   group('PostDetailParser edge cases', () {
     test('should handle malformed date gracefully', () {
-      final html = '''
+      const html = '''
       <html><head><title>Test</title></head><body>
       <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
       <div id="read_profile_desc"><span class="etc">작성 not-a-date</span></div>
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('should handle missing date element', () {
-      final html = '''
+      const html = '''
       <html><head><title>Test</title></head><body>
       <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
       <div class="body_editor"><p>content</p></div>
@@ -32,7 +32,7 @@ void main() {
     });
 
     test('should handle view count with comma-formatted numbers', () {
-      final html = '''
+      const html = '''
       <html><head><title>Test</title></head><body>
       <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
       <div id="read_profile_desc">
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('should handle empty body_editor', () {
-      final html = '''
+      const html = '''
       <html><head><title>Test</title></head><body>
       <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
       <div id="read_profile_desc"><span class="etc">작성 2026-05-15 11:00:00</span></div>
@@ -64,7 +64,7 @@ void main() {
     });
 
     test('should extract text content when no image divs exist', () {
-      final html = '''
+      const html = '''
       <html><head><title>Test</title></head><body>
       <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
       <div id="read_profile_desc"><span class="etc">작성 2026-05-15 11:00:00</span></div>

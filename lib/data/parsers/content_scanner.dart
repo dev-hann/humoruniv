@@ -5,15 +5,14 @@ import 'package:humoruniv/core/utils/media_classifier.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 
 class ContentScanResult {
-  final List<ContentBlock> blocks;
-  final List<String> imageUrls;
-  final bool hasNsfw;
-
   const ContentScanResult({
     required this.blocks,
     required this.imageUrls,
     this.hasNsfw = false,
   });
+  final List<ContentBlock> blocks;
+  final List<String> imageUrls;
+  final bool hasNsfw;
 }
 
 abstract final class ContentScanner {
@@ -22,30 +21,36 @@ abstract final class ContentScanner {
     final seenKeys = <String>{};
     final imageUrls = <String>[];
 
-    _walkNodes(container.nodes, blocks, seenKeys, imageUrls, nsfw: false);
+    _walkNodes(container.nodes, blocks, seenKeys, imageUrls);
 
-    final hasNsfw = blocks.any((b) =>
-        (b is ImageBlock && b.isNsfw) || (b is VideoBlock && b.isNsfw));
+    final hasNsfw = blocks.any(
+      (b) => (b is ImageBlock && b.isNsfw) || (b is VideoBlock && b.isNsfw),
+    );
 
-    return ContentScanResult(blocks: blocks, imageUrls: imageUrls, hasNsfw: hasNsfw);
+    return ContentScanResult(
+      blocks: blocks,
+      imageUrls: imageUrls,
+      hasNsfw: hasNsfw,
+    );
   }
 
-  static ContentScanResult scanFull(
-      dom.Document doc, dom.Element contentEl) {
+  static ContentScanResult scanFull(dom.Document doc, dom.Element contentEl) {
     final blocks = <ContentBlock>[];
     final seenKeys = <String>{};
     final imageUrls = <String>[];
 
-    _walkNodes(contentEl.nodes, blocks, seenKeys, imageUrls, nsfw: false);
+    _walkNodes(contentEl.nodes, blocks, seenKeys, imageUrls);
 
-    final allDownloadLinks =
-        doc.querySelectorAll('a[href*="download.php?url="]');
+    final allDownloadLinks = doc.querySelectorAll(
+      'a[href*="download.php?url="]',
+    );
     for (final link in allDownloadLinks) {
       if (contentEl.contains(link)) continue;
 
       final href = link.attributes['href'] ?? '';
-      final match =
-          RegExp(r'download\.php\?url=(https?://[^&]+)').firstMatch(href);
+      final match = RegExp(
+        r'download\.php\?url=(https?://[^&]+)',
+      ).firstMatch(href);
       if (match == null) continue;
 
       final rawUrl = UrlNormalizer.normalize(match.group(1)!);
@@ -54,8 +59,9 @@ abstract final class ContentScanner {
       final mediaType = MediaClassifier.classify(rawUrl);
       final thumbImg = link.querySelector('img');
       final thumbSrc = thumbImg?.attributes['src'] ?? '';
-      final thumb =
-          thumbSrc.isNotEmpty ? UrlNormalizer.normalize(thumbSrc) : null;
+      final thumb = thumbSrc.isNotEmpty
+          ? UrlNormalizer.normalize(thumbSrc)
+          : null;
 
       switch (mediaType) {
         case MediaType.image:
@@ -68,10 +74,15 @@ abstract final class ContentScanner {
       }
     }
 
-    final hasNsfw = blocks.any((b) =>
-        (b is ImageBlock && b.isNsfw) || (b is VideoBlock && b.isNsfw));
+    final hasNsfw = blocks.any(
+      (b) => (b is ImageBlock && b.isNsfw) || (b is VideoBlock && b.isNsfw),
+    );
 
-    return ContentScanResult(blocks: blocks, imageUrls: imageUrls, hasNsfw: hasNsfw);
+    return ContentScanResult(
+      blocks: blocks,
+      imageUrls: imageUrls,
+      hasNsfw: hasNsfw,
+    );
   }
 
   static List<ContentBlock> scanCompact(dom.Element container) {
@@ -85,32 +96,37 @@ abstract final class ContentScanner {
       final rawUrl = UrlNormalizer.normalize(entry.url);
       if (!seenKeys.add(_dedupKey(rawUrl))) continue;
 
-      final unwrapped =
-          MediaClassifier.unwrapDownloadPhp(rawUrl) ?? rawUrl;
+      final unwrapped = MediaClassifier.unwrapDownloadPhp(rawUrl) ?? rawUrl;
       final normalized = UrlNormalizer.normalize(unwrapped);
       final mediaType = MediaClassifier.classify(normalized);
 
       switch (mediaType) {
         case MediaType.image:
-          blocks.add(ImageBlock(
-            url: normalized,
-            thumbnailUrl: entry.thumbUrl != null
-                ? UrlNormalizer.normalize(entry.thumbUrl!)
-                : null,
-          ));
+          blocks.add(
+            ImageBlock(
+              url: normalized,
+              thumbnailUrl: entry.thumbUrl != null
+                  ? UrlNormalizer.normalize(entry.thumbUrl!)
+                  : null,
+            ),
+          );
         case MediaType.video:
-          blocks.add(VideoBlock(
-            url: normalized,
-            thumbnailUrl: entry.thumbUrl != null
-                ? UrlNormalizer.normalize(entry.thumbUrl!)
-                : null,
-          ));
+          blocks.add(
+            VideoBlock(
+              url: normalized,
+              thumbnailUrl: entry.thumbUrl != null
+                  ? UrlNormalizer.normalize(entry.thumbUrl!)
+                  : null,
+            ),
+          );
         case MediaType.youtube:
           final ytId = MediaClassifier.extractYoutubeId(normalized)!;
-          blocks.add(VideoBlock(
-            url: 'https://www.youtube.com/watch?v=$ytId',
-            thumbnailUrl: 'https://img.youtube.com/vi/$ytId/hqdefault.jpg',
-          ));
+          blocks.add(
+            VideoBlock(
+              url: 'https://www.youtube.com/watch?v=$ytId',
+              thumbnailUrl: 'https://img.youtube.com/vi/$ytId/hqdefault.jpg',
+            ),
+          );
         default:
           break;
       }
@@ -153,13 +169,12 @@ abstract final class ContentScanner {
     final isNsfwContext = nsfw || _isRacyHidden(elId);
 
     final extracted = _extractUrlsFromElement(el);
-      if (extracted.isNotEmpty) {
+    if (extracted.isNotEmpty) {
       for (final entry in extracted) {
         final rawUrl = UrlNormalizer.normalize(entry.url);
         if (!seenKeys.add(_dedupKey(rawUrl))) continue;
 
-        final unwrapped =
-            MediaClassifier.unwrapDownloadPhp(rawUrl) ?? rawUrl;
+        final unwrapped = MediaClassifier.unwrapDownloadPhp(rawUrl) ?? rawUrl;
         final normalized = UrlNormalizer.normalize(unwrapped);
         final mediaType = MediaClassifier.classify(normalized);
         final thumb = entry.thumbUrl != null
@@ -169,23 +184,38 @@ abstract final class ContentScanner {
 
         switch (mediaType) {
           case MediaType.image:
-            blocks.add(ImageBlock(url: normalized, thumbnailUrl: thumb, isNsfw: blockIsNsfw));
+            blocks.add(
+              ImageBlock(
+                url: normalized,
+                thumbnailUrl: thumb,
+                isNsfw: blockIsNsfw,
+              ),
+            );
             imageUrls.add(normalized);
           case MediaType.video:
-            blocks.add(VideoBlock(url: normalized, thumbnailUrl: thumb, isNsfw: blockIsNsfw));
+            blocks.add(
+              VideoBlock(
+                url: normalized,
+                thumbnailUrl: thumb,
+                isNsfw: blockIsNsfw,
+              ),
+            );
           case MediaType.audio:
             blocks.add(HtmlBlock('<a href="$normalized">$normalized</a>'));
           case MediaType.youtube:
             final ytId = MediaClassifier.extractYoutubeId(normalized)!;
-            blocks.add(VideoBlock(
-              url: 'https://www.youtube.com/watch?v=$ytId',
-              thumbnailUrl: 'https://img.youtube.com/vi/$ytId/hqdefault.jpg',
-              isNsfw: blockIsNsfw,
-            ));
+            blocks.add(
+              VideoBlock(
+                url: 'https://www.youtube.com/watch?v=$ytId',
+                thumbnailUrl: 'https://img.youtube.com/vi/$ytId/hqdefault.jpg',
+                isNsfw: blockIsNsfw,
+              ),
+            );
           case MediaType.link:
             final linkText = entry.text ?? normalized;
             blocks.add(
-                HtmlBlock('<a href="$normalized" target="_blank">$linkText</a>'));
+              HtmlBlock('<a href="$normalized" target="_blank">$linkText</a>'),
+            );
           case MediaType.unknown:
             break;
         }
@@ -195,8 +225,7 @@ abstract final class ContentScanner {
     }
 
     if (el.localName == 'video' || el.querySelector('video') != null) {
-      final videoEl =
-          el.localName == 'video' ? el : el.querySelector('video')!;
+      final videoEl = el.localName == 'video' ? el : el.querySelector('video')!;
       final block = _parseVideoElement(videoEl, isNsfw: isNsfwContext);
       if (block != null) {
         final normalized = UrlNormalizer.normalize(block.url);
@@ -234,11 +263,13 @@ abstract final class ContentScanner {
       if (src.isNotEmpty && !src.contains('/images/')) {
         final url = el.attributes['img_file_url'] ?? src;
         if (url.isNotEmpty) {
-          entries.add(_UrlEntry(
-            url: url,
-            thumbUrl: src != url ? src : null,
-            isInsideRacyHidden: _isInsideRacyHidden(el),
-          ));
+          entries.add(
+            _UrlEntry(
+              url: url,
+              thumbUrl: src != url ? src : null,
+              isInsideRacyHidden: _isInsideRacyHidden(el),
+            ),
+          );
         }
       }
       return entries;
@@ -247,16 +278,19 @@ abstract final class ContentScanner {
     if (el.localName == 'a') {
       final href = el.attributes['href'] ?? '';
       if (href.contains('download.php?url=')) {
-        final match =
-            RegExp(r'download\.php\?url=(https?://[^&]+)').firstMatch(href);
+        final match = RegExp(
+          r'download\.php\?url=(https?://[^&]+)',
+        ).firstMatch(href);
         if (match != null) {
           final innerUrl = match.group(1)!;
           final thumbImg = el.querySelector('img');
-          entries.add(_UrlEntry(
-            url: innerUrl,
-            thumbUrl: thumbImg?.attributes['src'],
-            isInsideRacyHidden: _isInsideRacyHidden(el),
-          ));
+          entries.add(
+            _UrlEntry(
+              url: innerUrl,
+              thumbUrl: thumbImg?.attributes['src'],
+              isInsideRacyHidden: _isInsideRacyHidden(el),
+            ),
+          );
         }
         return entries;
       }
@@ -278,11 +312,13 @@ abstract final class ContentScanner {
       if (src.isEmpty || src.contains('/images/')) continue;
       final url = img.attributes['img_file_url'] ?? src;
       if (url.isNotEmpty) {
-        entries.add(_UrlEntry(
-          url: url,
-          thumbUrl: src != url ? src : null,
-          isInsideRacyHidden: _isInsideRacyHidden(img),
-        ));
+        entries.add(
+          _UrlEntry(
+            url: url,
+            thumbUrl: src != url ? src : null,
+            isInsideRacyHidden: _isInsideRacyHidden(img),
+          ),
+        );
       }
     }
 
@@ -290,24 +326,27 @@ abstract final class ContentScanner {
     for (final link in downloadLinks) {
       if (_isInsideRacyShow(link)) continue;
       final href = link.attributes['href'] ?? '';
-      final match =
-          RegExp(r'download\.php\?url=(https?://[^&]+)').firstMatch(href);
+      final match = RegExp(
+        r'download\.php\?url=(https?://[^&]+)',
+      ).firstMatch(href);
       if (match != null) {
         final innerUrl = match.group(1)!;
         final thumbImg = link.querySelector('img');
-        entries.add(_UrlEntry(
-          url: innerUrl,
-          thumbUrl: thumbImg?.attributes['src'],
-          isInsideRacyHidden: _isInsideRacyHidden(link),
-        ));
+        entries.add(
+          _UrlEntry(
+            url: innerUrl,
+            thumbUrl: thumbImg?.attributes['src'],
+            isInsideRacyHidden: _isInsideRacyHidden(link),
+          ),
+        );
       }
     }
 
     final onclick = el.attributes['onclick'] ?? el.attributes['OnClick'] ?? '';
     if (onclick.contains('comment_mp4_expand')) {
-      final mp4Match =
-          RegExp(r"comment_mp4_expand\('[^']*','([^']+)'")
-              .firstMatch(onclick);
+      final mp4Match = RegExp(
+        r"comment_mp4_expand\('[^']*','([^']+)'",
+      ).firstMatch(onclick);
       if (mp4Match != null) {
         entries.add(_UrlEntry(url: mp4Match.group(1)!));
       }
@@ -334,10 +373,12 @@ abstract final class ContentScanner {
     }
   }
 
-  static VideoBlock? _parseVideoElement(dom.Element video, {bool isNsfw = false}) {
+  static VideoBlock? _parseVideoElement(
+    dom.Element video, {
+    bool isNsfw = false,
+  }) {
     final source = video.querySelector('source');
-    final src =
-        source?.attributes['src'] ?? video.attributes['src'] ?? '';
+    final src = source?.attributes['src'] ?? video.attributes['src'] ?? '';
     if (src.isEmpty || src.startsWith("'") || src.contains('"+')) return null;
 
     final poster = video.attributes['poster'] ?? '';
@@ -346,8 +387,7 @@ abstract final class ContentScanner {
 
     return VideoBlock(
       url: UrlNormalizer.normalize(src),
-      thumbnailUrl:
-          poster.isNotEmpty ? UrlNormalizer.normalize(poster) : null,
+      thumbnailUrl: poster.isNotEmpty ? UrlNormalizer.normalize(poster) : null,
       width: widthStr != null ? int.tryParse(widthStr) : null,
       height: heightStr != null ? int.tryParse(heightStr) : null,
       isNsfw: isNsfw,
@@ -370,7 +410,7 @@ abstract final class ContentScanner {
   }
 
   static bool _isInsideRacyShow(dom.Element el) {
-    dom.Element? parent = el.parent;
+    var parent = el.parent;
     while (parent != null) {
       if (_isRacyShow(parent.id ?? '')) return true;
       parent = parent.parent;
@@ -379,7 +419,7 @@ abstract final class ContentScanner {
   }
 
   static bool _isInsideRacyHidden(dom.Element el) {
-    dom.Element? parent = el.parent;
+    var parent = el.parent;
     while (parent != null) {
       if (_isRacyHidden(parent.id ?? '')) return true;
       parent = parent.parent;
@@ -400,7 +440,8 @@ abstract final class ContentScanner {
   }
 
   static bool _isRichMixedContent(dom.Element el) {
-    final hasFormatting = el.querySelector('b, font, strong, em, span[style], table') != null;
+    final hasFormatting =
+        el.querySelector('b, font, strong, em, span[style], table') != null;
     final hasLinks = el.querySelector('a') != null;
     return hasFormatting && hasLinks;
   }
@@ -408,7 +449,7 @@ abstract final class ContentScanner {
   static String _dedupKey(String url) {
     try {
       final uri = Uri.parse(url);
-      return uri.path.replaceAll(RegExp(r'/+'), '/').toLowerCase();
+      return uri.path.replaceAll(RegExp('/+'), '/').toLowerCase();
     } catch (_) {
       return url.toLowerCase();
     }
@@ -416,15 +457,14 @@ abstract final class ContentScanner {
 }
 
 class _UrlEntry {
-  final String url;
-  final String? thumbUrl;
-  final String? text;
-  final bool isInsideRacyHidden;
-
   const _UrlEntry({
     required this.url,
     this.thumbUrl,
     this.text,
     this.isInsideRacyHidden = false,
   });
+  final String url;
+  final String? thumbUrl;
+  final String? text;
+  final bool isInsideRacyHidden;
 }

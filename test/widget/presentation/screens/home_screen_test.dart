@@ -28,12 +28,9 @@ void main() {
     di.sl.registerLazySingleton(() => GetBestPosts(repository: mockRepository));
   });
 
-  tearDown(() {
-    di.sl.reset();
-  });
+  tearDown(di.sl.reset);
 
-  testWidgets('should display post titles when data loads',
-      (tester) async {
+  testWidgets('should display post titles when data loads', (tester) async {
     final posts = [
       const Post(
         id: 1,
@@ -48,8 +45,9 @@ void main() {
         url: '/test2',
       ),
     ];
-    when(() => mockRepository.getBestPosts())
-        .thenAnswer((_) async => Right(posts));
+    when(
+      () => mockRepository.getBestPosts(),
+    ).thenAnswer((_) async => Right(posts));
 
     await tester.pumpWidget(
       const ProviderScope(child: MaterialApp(home: HomeScreen())),
@@ -62,11 +60,10 @@ void main() {
     expect(find.text('200'), findsOneWidget);
   });
 
-  testWidgets('should show loading indicator while fetching',
-      (tester) async {
-    when(() => mockRepository.getBestPosts()).thenAnswer(
-      (_) async => const Right([]),
-    );
+  testWidgets('should show loading indicator while fetching', (tester) async {
+    when(
+      () => mockRepository.getBestPosts(),
+    ).thenAnswer((_) async => const Right([]));
 
     await tester.pumpWidget(
       const ProviderScope(child: MaterialApp(home: HomeScreen())),
@@ -77,11 +74,10 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('should show error message when fetch fails',
-      (tester) async {
-    when(() => mockRepository.getBestPosts()).thenAnswer(
-      (_) async => const Left(ServerFailure('Network error')),
-    );
+  testWidgets('should show error message when fetch fails', (tester) async {
+    when(
+      () => mockRepository.getBestPosts(),
+    ).thenAnswer((_) async => const Left(ServerFailure('Network error')));
 
     await tester.pumpWidget(
       const ProviderScope(child: MaterialApp(home: HomeScreen())),
@@ -91,10 +87,10 @@ void main() {
     expect(find.text('게시글을 불러올 수 없습니다.'), findsOneWidget);
   });
 
-  testWidgets('should show empty message when no posts',
-      (tester) async {
-    when(() => mockRepository.getBestPosts())
-        .thenAnswer((_) async => const Right([]));
+  testWidgets('should show empty message when no posts', (tester) async {
+    when(
+      () => mockRepository.getBestPosts(),
+    ).thenAnswer((_) async => const Right([]));
 
     await tester.pumpWidget(
       const ProviderScope(child: MaterialApp(home: HomeScreen())),

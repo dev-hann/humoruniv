@@ -2,8 +2,8 @@ import 'package:meta/meta.dart';
 
 @immutable
 abstract class Failure {
-  final String message;
   const Failure(this.message);
+  final String message;
 
   @override
   bool operator ==(Object other) =>

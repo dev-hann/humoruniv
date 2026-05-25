@@ -3,14 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
 
 class Avatar extends StatelessWidget {
+  const Avatar({super.key, this.imageUrl, this.radius});
   final String? imageUrl;
   final double? radius;
-
-  const Avatar({
-    super.key,
-    this.imageUrl,
-    this.radius,
-  });
 
   @override
   Widget build(BuildContext context) {

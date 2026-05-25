@@ -69,7 +69,9 @@ class HomeScreen extends ConsumerWidget {
                       return PostCard(
                         post: posts[index],
                         onTap: () {
-                          context.push('/post?url=${Uri.encodeComponent(posts[index].url)}');
+                          context.push(
+                            '/post?url=${Uri.encodeComponent(posts[index].url)}',
+                          );
                         },
                       );
                     },

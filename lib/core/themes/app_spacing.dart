@@ -22,10 +22,22 @@ abstract final class AppSpacing {
   static const EdgeInsets edgeAll24 = EdgeInsets.all(p24);
   static const EdgeInsets edgeAll32 = EdgeInsets.all(p32);
 
-  static const EdgeInsets edgeH4V2 = EdgeInsets.symmetric(horizontal: p4, vertical: p2);
-  static const EdgeInsets edgeH8V4 = EdgeInsets.symmetric(horizontal: p8, vertical: p4);
-  static const EdgeInsets edgeH12V6 = EdgeInsets.symmetric(horizontal: p12, vertical: p6);
-  static const EdgeInsets edgeH16V8 = EdgeInsets.symmetric(horizontal: p16, vertical: p8);
+  static const EdgeInsets edgeH4V2 = EdgeInsets.symmetric(
+    horizontal: p4,
+    vertical: p2,
+  );
+  static const EdgeInsets edgeH8V4 = EdgeInsets.symmetric(
+    horizontal: p8,
+    vertical: p4,
+  );
+  static const EdgeInsets edgeH12V6 = EdgeInsets.symmetric(
+    horizontal: p12,
+    vertical: p6,
+  );
+  static const EdgeInsets edgeH16V8 = EdgeInsets.symmetric(
+    horizontal: p16,
+    vertical: p8,
+  );
 
   static const EdgeInsets edgeH16 = EdgeInsets.symmetric(horizontal: p16);
   static const EdgeInsets edgeH20 = EdgeInsets.symmetric(horizontal: p20);

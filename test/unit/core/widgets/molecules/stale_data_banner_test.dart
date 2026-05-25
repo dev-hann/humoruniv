@@ -7,9 +7,7 @@ void main() {
     testWidgets('should display message', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: StaleDataBanner(message: '마지막 업데이트: 5분 전'),
-          ),
+          home: Scaffold(body: StaleDataBanner(message: '마지막 업데이트: 5분 전')),
         ),
       );
 
@@ -19,16 +17,11 @@ void main() {
     testWidgets('should display offline icon', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: StaleDataBanner(message: '오프라인'),
-          ),
+          home: Scaffold(body: StaleDataBanner(message: '오프라인')),
         ),
       );
 
-      expect(
-        find.byIcon(Icons.cloud_off_outlined),
-        findsOneWidget,
-      );
+      expect(find.byIcon(Icons.cloud_off_outlined), findsOneWidget);
     });
   });
 }

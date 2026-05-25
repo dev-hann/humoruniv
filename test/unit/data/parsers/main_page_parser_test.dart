@@ -7,22 +7,22 @@ void main() {
   late String fixtureHtml;
 
   setUp(() {
-    fixtureHtml =
-        File('test/fixtures/main_page.html').readAsStringSync();
+    fixtureHtml = File('test/fixtures/main_page.html').readAsStringSync();
   });
 
   group('MainPageParser', () {
     test(
-        'should return list of posts when html contains valid pds best section',
-        () {
-      final result = MainPageParser.parseBestPosts(fixtureHtml);
+      'should return list of posts when html contains valid pds best section',
+      () {
+        final result = MainPageParser.parseBestPosts(fixtureHtml);
 
-      expect(result, isNotEmpty);
-      expect(result.first.title, isNotEmpty);
-      expect(result.first.id, greaterThan(0));
-      expect(result.first.recommendCount, greaterThanOrEqualTo(0));
-      expect(result.first.url, contains('number='));
-    });
+        expect(result, isNotEmpty);
+        expect(result.first.title, isNotEmpty);
+        expect(result.first.id, greaterThan(0));
+        expect(result.first.recommendCount, greaterThanOrEqualTo(0));
+        expect(result.first.url, contains('number='));
+      },
+    );
 
     test('should return empty list when html is empty string', () {
       final result = MainPageParser.parseBestPosts('');
@@ -31,7 +31,9 @@ void main() {
     });
 
     test('should return empty list when html has no pds best elements', () {
-      final result = MainPageParser.parseBestPosts('<html><body></body></html>');
+      final result = MainPageParser.parseBestPosts(
+        '<html><body></body></html>',
+      );
 
       expect(result, isEmpty);
     });
@@ -68,7 +70,7 @@ void main() {
     });
 
     test('should return partial results when some elements are malformed', () {
-      final partialHtml = '''
+      const partialHtml = '''
       <html><body>
       <ul>
         <a href="/rd.html?path=/m/main/pds/1&url=/board/read.html&table=pds&number=12345">

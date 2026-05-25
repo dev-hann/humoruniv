@@ -4,34 +4,29 @@ import 'package:humoruniv/core/widgets/atoms/thumbnail.dart';
 
 void main() {
   group('Thumbnail', () {
-    testWidgets('should show placeholder when imageUrl is null',
-        (tester) async {
+    testWidgets('should show placeholder when imageUrl is null', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: Thumbnail(imageUrl: null))),
+      );
+
+      expect(find.byIcon(Icons.image_outlined), findsOneWidget);
+    });
+
+    testWidgets('should show placeholder when imageUrl is empty', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: Thumbnail(imageUrl: null),
-          ),
+          home: Scaffold(body: Thumbnail(imageUrl: '')),
         ),
       );
 
       expect(find.byIcon(Icons.image_outlined), findsOneWidget);
     });
 
-    testWidgets('should show placeholder when imageUrl is empty',
-        (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Thumbnail(imageUrl: ''),
-          ),
-        ),
-      );
-
-      expect(find.byIcon(Icons.image_outlined), findsOneWidget);
-    });
-
-    testWidgets('should show image when imageUrl is provided',
-        (tester) async {
+    testWidgets('should show image when imageUrl is provided', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -45,11 +40,7 @@ void main() {
 
     testWidgets('should use small size by default', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Thumbnail(imageUrl: null),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: Thumbnail(imageUrl: null))),
       );
 
       final container = tester.widget<SizedBox>(find.byType(SizedBox).first);
@@ -60,10 +51,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: Thumbnail(
-              imageUrl: null,
-              size: ThumbnailSize.medium,
-            ),
+            body: Thumbnail(imageUrl: null, size: ThumbnailSize.medium),
           ),
         ),
       );
@@ -76,10 +64,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: Thumbnail(
-              imageUrl: null,
-              size: ThumbnailSize.large,
-            ),
+            body: Thumbnail(imageUrl: null, size: ThumbnailSize.large),
           ),
         ),
       );

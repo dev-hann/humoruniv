@@ -38,9 +38,18 @@ void main() {
 
     test('all values should be multiples of 4 or 4pt half-steps', () {
       const values = [
-        AppSpacing.p2, AppSpacing.p4, AppSpacing.p6, AppSpacing.p8,
-        AppSpacing.p12, AppSpacing.p16, AppSpacing.p20, AppSpacing.p24,
-        AppSpacing.p32, AppSpacing.p40, AppSpacing.p48, AppSpacing.p56,
+        AppSpacing.p2,
+        AppSpacing.p4,
+        AppSpacing.p6,
+        AppSpacing.p8,
+        AppSpacing.p12,
+        AppSpacing.p16,
+        AppSpacing.p20,
+        AppSpacing.p24,
+        AppSpacing.p32,
+        AppSpacing.p40,
+        AppSpacing.p48,
+        AppSpacing.p56,
         AppSpacing.p64,
       ];
       for (final v in values) {

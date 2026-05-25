@@ -8,9 +8,8 @@ import 'package:humoruniv/domain/entities/sort_option.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 
 class PostRepositoryImpl implements PostRepository {
-  final HumorunivRemoteDs remoteDs;
-
   const PostRepositoryImpl({required this.remoteDs});
+  final HumorunivRemoteDs remoteDs;
 
   @override
   Future<Either<Failure, List<Post>>> getBestPosts() async {
@@ -42,11 +41,13 @@ class PostRepositoryImpl implements PostRepository {
     try {
       final result = await remoteDs.fetchBoardList(table, page, sort.value);
       final posts = result.posts.map((dto) => dto.toEntity()).toList();
-      return Right(BoardListResult(
-        posts: posts,
-        currentPage: result.currentPage,
-        totalPage: result.totalPage,
-      ));
+      return Right(
+        BoardListResult(
+          posts: posts,
+          currentPage: result.currentPage,
+          totalPage: result.totalPage,
+        ),
+      );
     } on Failure catch (f) {
       return Left(f);
     }

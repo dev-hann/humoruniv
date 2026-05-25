@@ -23,14 +23,13 @@ class LoadingIndicator extends StatelessWidget {
 }
 
 class LoadMoreError extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-
   const LoadMoreError({
-    super.key,
     required this.message,
     required this.onRetry,
+    super.key,
   });
+  final String message;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -40,18 +39,20 @@ class LoadMoreError extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline,
-                size: 16, color: Theme.of(context).colorScheme.error),
-            AppSpacing.sbW8,
-            Text(message,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.error,
-                    )),
-            AppSpacing.sbW8,
-            TextButton(
-              onPressed: onRetry,
-              child: const Text('다시 시도'),
+            Icon(
+              Icons.error_outline,
+              size: 16,
+              color: Theme.of(context).colorScheme.error,
             ),
+            AppSpacing.sbW8,
+            Text(
+              message,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+            AppSpacing.sbW8,
+            TextButton(onPressed: onRetry, child: const Text('다시 시도')),
           ],
         ),
       ),

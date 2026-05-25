@@ -177,11 +177,7 @@ void main() {
 
   group('BoardListResult', () {
     test('should create with posts, currentPage, totalPage', () {
-      const result = BoardListResult(
-        posts: [],
-        currentPage: 0,
-        totalPage: 5,
-      );
+      const result = BoardListResult(posts: [], currentPage: 0, totalPage: 5);
 
       expect(result.posts, isEmpty);
       expect(result.currentPage, 0);

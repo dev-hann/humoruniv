@@ -9,11 +9,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: HomeFeed(
-              items: const [],
-              isLoading: true,
-              onPostTap: (_) {},
-            ),
+            body: HomeFeed(items: const [], isLoading: true, onPostTap: (_) {}),
           ),
         ),
       );
@@ -42,10 +38,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: HomeFeed(
-              items: const [],
-              onPostTap: (_) {},
-            ),
+            body: HomeFeed(items: const [], onPostTap: (_) {}),
           ),
         ),
       );
@@ -53,28 +46,18 @@ void main() {
       expect(find.text('게시글이 없습니다.'), findsOneWidget);
     });
 
-    testWidgets('should display items with hero card for first item',
-        (tester) async {
+    testWidgets('should display items with hero card for first item', (
+      tester,
+    ) async {
       final items = [
-        HomeFeedItem(
-          title: '첫 번째',
-          author: '작성자',
-          recommendCount: 100,
-        ),
-        HomeFeedItem(
-          title: '두 번째',
-          author: '작성자',
-          recommendCount: 50,
-        ),
+        const HomeFeedItem(title: '첫 번째', author: '작성자', recommendCount: 100),
+        const HomeFeedItem(title: '두 번째', author: '작성자', recommendCount: 50),
       ];
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: HomeFeed(
-              items: items,
-              onPostTap: (_) {},
-            ),
+            body: HomeFeed(items: items, onPostTap: (_) {}),
           ),
         ),
       );
@@ -87,20 +70,13 @@ void main() {
     testWidgets('should call onPostTap when item tapped', (tester) async {
       var tappedIndex = -1;
       final items = [
-        HomeFeedItem(
-          title: '첫 번째',
-          author: '작성자',
-          recommendCount: 100,
-        ),
+        const HomeFeedItem(title: '첫 번째', author: '작성자', recommendCount: 100),
       ];
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: HomeFeed(
-              items: items,
-              onPostTap: (i) => tappedIndex = i,
-            ),
+            body: HomeFeed(items: items, onPostTap: (i) => tappedIndex = i),
           ),
         ),
       );

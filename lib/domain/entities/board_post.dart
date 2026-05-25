@@ -2,17 +2,6 @@ import 'package:meta/meta.dart';
 
 @immutable
 class BoardPost {
-  final int id;
-  final String title;
-  final String url;
-  final String author;
-  final String date;
-  final int recommendCount;
-  final int notRecommendCount;
-  final int commentCount;
-  final int viewCount;
-  final String thumbnailUrl;
-
   const BoardPost({
     required this.id,
     required this.title,
@@ -25,6 +14,16 @@ class BoardPost {
     required this.viewCount,
     required this.thumbnailUrl,
   });
+  final int id;
+  final String title;
+  final String url;
+  final String author;
+  final String date;
+  final int recommendCount;
+  final int notRecommendCount;
+  final int commentCount;
+  final int viewCount;
+  final String thumbnailUrl;
 
   @override
   bool operator ==(Object other) =>
@@ -44,15 +43,15 @@ class BoardPost {
 
   @override
   int get hashCode => Object.hash(
-        id,
-        title,
-        url,
-        author,
-        date,
-        recommendCount,
-        notRecommendCount,
-        commentCount,
-        viewCount,
-        thumbnailUrl,
-      );
+    id,
+    title,
+    url,
+    author,
+    date,
+    recommendCount,
+    notRecommendCount,
+    commentCount,
+    viewCount,
+    thumbnailUrl,
+  );
 }

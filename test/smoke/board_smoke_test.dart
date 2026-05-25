@@ -13,7 +13,11 @@ void main() {
       final html = await fetchHtml('/board/list.html?table=pds&pg=0');
       final result = BoardListParser.parse(html);
 
-      expect(result.posts, isNotEmpty, reason: 'Board posts should not be empty');
+      expect(
+        result.posts,
+        isNotEmpty,
+        reason: 'Board posts should not be empty',
+      );
 
       for (final post in result.posts) {
         expect(post.id, greaterThan(0));
@@ -34,7 +38,11 @@ void main() {
       final html = await fetchHtml('/board/list.html?table=pds&pg=0&sort=day');
       final result = BoardListParser.parse(html);
 
-      expect(result.posts, isNotEmpty, reason: 'Sorted board posts should not be empty');
+      expect(
+        result.posts,
+        isNotEmpty,
+        reason: 'Sorted board posts should not be empty',
+      );
     }, skip: skip);
   });
 }

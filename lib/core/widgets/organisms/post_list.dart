@@ -5,6 +5,18 @@ import 'package:humoruniv/core/widgets/states/error_state_view.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_post_list.dart';
 
 class PostList extends StatelessWidget {
+  const PostList({
+    required this.items,
+    required this.onPostTap,
+    super.key,
+    this.isLoading = false,
+    this.hasError = false,
+    this.errorMessage,
+    this.onRetry,
+    this.onRefresh,
+    this.filterBar,
+    this.pagination,
+  });
   final List<PostListItem> items;
   final bool isLoading;
   final bool hasError;
@@ -15,27 +27,12 @@ class PostList extends StatelessWidget {
   final Widget? filterBar;
   final Widget? pagination;
 
-  const PostList({
-    super.key,
-    required this.items,
-    this.isLoading = false,
-    this.hasError = false,
-    this.errorMessage,
-    this.onRetry,
-    this.onRefresh,
-    required this.onPostTap,
-    this.filterBar,
-    this.pagination,
-  });
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         if (filterBar != null) filterBar!,
-        Expanded(
-          child: _buildBody(),
-        ),
+        Expanded(child: _buildBody()),
       ],
     );
   }
@@ -81,13 +78,6 @@ class PostList extends StatelessWidget {
 }
 
 class PostListItem {
-  final String title;
-  final String author;
-  final int recommendCount;
-  final int commentCount;
-  final String? thumbnailUrl;
-  final bool isRead;
-
   const PostListItem({
     required this.title,
     required this.author,
@@ -96,4 +86,10 @@ class PostListItem {
     this.thumbnailUrl,
     this.isRead = false,
   });
+  final String title;
+  final String author;
+  final int recommendCount;
+  final int commentCount;
+  final String? thumbnailUrl;
+  final bool isRead;
 }

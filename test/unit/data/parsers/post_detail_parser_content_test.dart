@@ -5,9 +5,10 @@ import 'package:humoruniv/domain/entities/content_block.dart';
 void main() {
   group('PostDetailParser content coverage', () {
     group('daum-wm-content fallback', () {
-      test('should parse content from daum-wm-content when body_editor missing',
-          () {
-        final html = '''
+      test(
+        'should parse content from daum-wm-content when body_editor missing',
+        () {
+          const html = '''
         <html><head><title>DAUM Test</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
@@ -24,16 +25,19 @@ void main() {
         </body></html>
         ''';
 
-        final result = PostDetailParser.parse(html);
+          final result = PostDetailParser.parse(html);
 
-        expect(result.contentBlocks, isNotEmpty);
-        expect(result.contentBlocks.any((b) => b is ImageBlock), isTrue);
-        expect(result.imageUrls, isNotEmpty);
-        expect(result.contentHtml, isNotEmpty);
-      });
+          expect(result.contentBlocks, isNotEmpty);
+          expect(result.contentBlocks.any((b) => b is ImageBlock), isTrue);
+          expect(result.imageUrls, isNotEmpty);
+          expect(result.contentHtml, isNotEmpty);
+        },
+      );
 
-      test('should prefer body_editor over daum-wm-content when both exist', () {
-        final html = '''
+      test(
+        'should prefer body_editor over daum-wm-content when both exist',
+        () {
+          const html = '''
         <html><head><title>Both Test</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
@@ -46,20 +50,24 @@ void main() {
         </body></html>
         ''';
 
-        final result = PostDetailParser.parse(html);
+          final result = PostDetailParser.parse(html);
 
-        expect(result.contentBlocks, isNotEmpty);
-        expect(
-          result.contentBlocks.whereType<TextBlock>().any((b) => b.text.contains('에디터')),
-          isTrue,
-        );
-      });
+          expect(result.contentBlocks, isNotEmpty);
+          expect(
+            result.contentBlocks.whereType<TextBlock>().any(
+              (b) => b.text.contains('에디터'),
+            ),
+            isTrue,
+          );
+        },
+      );
     });
 
     group('racy_hidden images', () {
-      test('should extract image from racy_hidden inside simple_attach_img_div',
-          () {
-        final html = '''
+      test(
+        'should extract image from racy_hidden inside simple_attach_img_div',
+        () {
+          const html = '''
         <html><head><title>Racy Test</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
@@ -87,21 +95,24 @@ void main() {
         </body></html>
         ''';
 
-        final result = PostDetailParser.parse(html);
+          final result = PostDetailParser.parse(html);
 
-        final imageBlocks = result.contentBlocks.whereType<ImageBlock>().toList();
-        expect(imageBlocks, isNotEmpty);
-        expect(imageBlocks.first.url, contains('hwiparambbs/data/editor'));
-        expect(imageBlocks.first.url, isNot(contains('ansim_man')));
-        expect(imageBlocks.first.isNsfw, isTrue);
-        expect(result.isNsfw, isTrue);
-        expect(result.imageUrls, isNotEmpty);
-      });
+          final imageBlocks = result.contentBlocks
+              .whereType<ImageBlock>()
+              .toList();
+          expect(imageBlocks, isNotEmpty);
+          expect(imageBlocks.first.url, contains('hwiparambbs/data/editor'));
+          expect(imageBlocks.first.url, isNot(contains('ansim_man')));
+          expect(imageBlocks.first.isNsfw, isTrue);
+          expect(result.isNsfw, isTrue);
+          expect(result.imageUrls, isNotEmpty);
+        },
+      );
     });
 
     group('download.php images', () {
       test('should extract image URLs from download.php links', () {
-        final html = '''
+        const html = '''
         <html><head><title>Download Test</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
@@ -124,14 +135,19 @@ void main() {
         final result = PostDetailParser.parse(html);
 
         expect(result.imageUrls, contains(contains('a_w001_test.jpg')));
-        final imageBlocks = result.contentBlocks.whereType<ImageBlock>().toList();
-        expect(imageBlocks.any((b) => b.url.contains('a_w001_test.jpg')), isTrue);
+        final imageBlocks = result.contentBlocks
+            .whereType<ImageBlock>()
+            .toList();
+        expect(
+          imageBlocks.any((b) => b.url.contains('a_w001_test.jpg')),
+          isTrue,
+        );
       });
     });
 
     group('img_file_url extraction', () {
       test('should prefer img_file_url over src for original image', () {
-        final html = '''
+        const html = '''
         <html><head><title>URL Priority</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
@@ -147,14 +163,19 @@ void main() {
 
         final result = PostDetailParser.parse(html);
 
-        final imageBlocks = result.contentBlocks.whereType<ImageBlock>().toList();
+        final imageBlocks = result.contentBlocks
+            .whereType<ImageBlock>()
+            .toList();
         expect(imageBlocks, hasLength(1));
-        expect(imageBlocks.first.url, equals('https://down.humoruniv.com/test.jpg'));
+        expect(
+          imageBlocks.first.url,
+          equals('https://down.humoruniv.com/test.jpg'),
+        );
         expect(imageBlocks.first.thumbnailUrl, contains('thumb.php'));
       });
 
       test('should extract img_bb webp images with fallback', () {
-        final html = '''
+        const html = '''
         <html><head><title>WebP Test</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
@@ -170,15 +191,20 @@ void main() {
 
         final result = PostDetailParser.parse(html);
 
-        final imageBlocks = result.contentBlocks.whereType<ImageBlock>().toList();
+        final imageBlocks = result.contentBlocks
+            .whereType<ImageBlock>()
+            .toList();
         expect(imageBlocks, hasLength(1));
-        expect(imageBlocks.first.url, contains('down.humoruniv.com/hwiparambbs'));
+        expect(
+          imageBlocks.first.url,
+          contains('down.humoruniv.com/hwiparambbs'),
+        );
       });
     });
 
     group('YouTube link detection', () {
       test('should detect youtu.be link in autolink span as VideoBlock', () {
-        final html = '''
+        const html = '''
         <html><head><title>YouTube Test</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
@@ -191,15 +217,22 @@ void main() {
 
         final result = PostDetailParser.parse(html);
 
-        final videoBlocks = result.contentBlocks.whereType<VideoBlock>().toList();
+        final videoBlocks = result.contentBlocks
+            .whereType<VideoBlock>()
+            .toList();
         expect(videoBlocks, isNotEmpty);
-        expect(videoBlocks.first.url, contains('youtube.com/watch?v=gJbvzUV8624'));
-        expect(videoBlocks.first.thumbnailUrl,
-            contains('img.youtube.com/vi/gJbvzUV8624'));
+        expect(
+          videoBlocks.first.url,
+          contains('youtube.com/watch?v=gJbvzUV8624'),
+        );
+        expect(
+          videoBlocks.first.thumbnailUrl,
+          contains('img.youtube.com/vi/gJbvzUV8624'),
+        );
       });
 
       test('should detect youtube.com/watch URL in autolink', () {
-        final html = '''
+        const html = '''
         <html><head><title>YouTube Watch</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
@@ -211,7 +244,9 @@ void main() {
 
         final result = PostDetailParser.parse(html);
 
-        final videoBlocks = result.contentBlocks.whereType<VideoBlock>().toList();
+        final videoBlocks = result.contentBlocks
+            .whereType<VideoBlock>()
+            .toList();
         expect(videoBlocks, isNotEmpty);
         expect(videoBlocks.first.url, contains('v=abc12345678'));
       });
@@ -219,7 +254,7 @@ void main() {
 
     group('comment images', () {
       test('should extract image URLs from comment items', () {
-        final html = '''
+        const html = '''
         <html><head><title>Comment Image</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">author</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
@@ -261,7 +296,7 @@ void main() {
 
     group('HtmlBlock for rich content', () {
       test('should produce HtmlBlock for element with bold and links', () {
-        final html = '''
+        const html = '''
         <html><head><title>Rich Test</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
@@ -285,7 +320,7 @@ void main() {
 
     group('JS template video rejection', () {
       test('should skip video tags with JS template variables', () {
-        final html = '''
+        const html = '''
         <html><head><title>JS Video</title></head><body>
         <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
         <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>

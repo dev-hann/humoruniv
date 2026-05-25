@@ -13,20 +13,19 @@ import 'package:video_player/video_player.dart';
 enum ContentBlockViewMode { full, compact }
 
 class ContentBlockView extends StatelessWidget {
+  const ContentBlockView({
+    required this.block,
+    required this.allImageUrls,
+    super.key,
+    this.imageIndex = 0,
+    this.mode = ContentBlockViewMode.full,
+    this.hideNsfw = true,
+  });
   final ContentBlock block;
   final List<String> allImageUrls;
   final int imageIndex;
   final ContentBlockViewMode mode;
   final bool hideNsfw;
-
-  const ContentBlockView({
-    super.key,
-    required this.block,
-    required this.allImageUrls,
-    this.imageIndex = 0,
-    this.mode = ContentBlockViewMode.full,
-    this.hideNsfw = true,
-  });
 
   bool get _isNsfwBlock {
     return (block is ImageBlock && (block as ImageBlock).isNsfw) ||
@@ -36,63 +35,58 @@ class ContentBlockView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (block) {
-      TextBlock(:final text) => text.isEmpty || mode == ContentBlockViewMode.compact
-          ? const SizedBox.shrink()
-          : Padding(
-              padding: AppSpacing.edgeOnlyBottom12,
-              child: Text(
-                text,
-                style: Theme.of(context).textTheme.bodyLarge,
+      TextBlock(:final text) =>
+        text.isEmpty || mode == ContentBlockViewMode.compact
+            ? const SizedBox.shrink()
+            : Padding(
+                padding: AppSpacing.edgeOnlyBottom12,
+                child: Text(text, style: Theme.of(context).textTheme.bodyLarge),
               ),
-            ),
-      HtmlBlock(:final html) => mode == ContentBlockViewMode.compact
-          ? const SizedBox.shrink()
-          : Padding(
-              padding: AppSpacing.edgeOnlyBottom12,
-              child: HtmlWidget(
-                html,
-                textStyle: Theme.of(context).textTheme.bodyLarge,
-                onTapUrl: (url) {
-                  return false;
-                },
-              ),
-            ),
-      ImageBlock(:final url) => Semantics(
-          label: '이미지 ${imageIndex + 1} — 탭하여 전체 화면으로 보기',
-          button: true,
-          child: _ImageBlockView(
-            block: block as ImageBlock,
-            allImageUrls: allImageUrls,
-            imageIndex: imageIndex,
-            mode: mode,
-            hideNsfw: hideNsfw && _isNsfwBlock,
-          ),
-        ),
-      VideoBlock(:final url, :final thumbnailUrl) => Semantics(
-          label: '동영상',
-          button: true,
-          child: mode == ContentBlockViewMode.compact
-              ? _CompactVideoThumbnail(
-                  block: block as VideoBlock,
-                  hideNsfw: hideNsfw && _isNsfwBlock,
-                )
-              : _InlineVideoPlayer(
-                  block: block as VideoBlock,
-                  hideNsfw: hideNsfw && _isNsfwBlock,
+      HtmlBlock(:final html) =>
+        mode == ContentBlockViewMode.compact
+            ? const SizedBox.shrink()
+            : Padding(
+                padding: AppSpacing.edgeOnlyBottom12,
+                child: HtmlWidget(
+                  html,
+                  textStyle: Theme.of(context).textTheme.bodyLarge,
+                  onTapUrl: (url) {
+                    return false;
+                  },
                 ),
+              ),
+      ImageBlock(:final url) => Semantics(
+        label: '이미지 ${imageIndex + 1} — 탭하여 전체 화면으로 보기',
+        button: true,
+        child: _ImageBlockView(
+          block: block as ImageBlock,
+          allImageUrls: allImageUrls,
+          imageIndex: imageIndex,
+          mode: mode,
+          hideNsfw: hideNsfw && _isNsfwBlock,
         ),
+      ),
+      VideoBlock(:final url, :final thumbnailUrl) => Semantics(
+        label: '동영상',
+        button: true,
+        child: mode == ContentBlockViewMode.compact
+            ? _CompactVideoThumbnail(
+                block: block as VideoBlock,
+                hideNsfw: hideNsfw && _isNsfwBlock,
+              )
+            : _InlineVideoPlayer(
+                block: block as VideoBlock,
+                hideNsfw: hideNsfw && _isNsfwBlock,
+              ),
+      ),
     };
   }
 }
 
 class _NsfwPlaceholder extends StatelessWidget {
+  const _NsfwPlaceholder({required this.isCompact, required this.onTap});
   final bool isCompact;
   final VoidCallback onTap;
-
-  const _NsfwPlaceholder({
-    required this.isCompact,
-    required this.onTap,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +108,7 @@ class _NsfwPlaceholder extends StatelessWidget {
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(isCompact ? 8 : 0),
-            border: Border.all(color: colorScheme.outline, width: 1),
+            border: Border.all(color: colorScheme.outline),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -148,12 +142,6 @@ class _NsfwPlaceholder extends StatelessWidget {
 }
 
 class _ImageBlockView extends StatefulWidget {
-  final ImageBlock block;
-  final List<String> allImageUrls;
-  final int imageIndex;
-  final ContentBlockViewMode mode;
-  final bool hideNsfw;
-
   const _ImageBlockView({
     required this.block,
     required this.allImageUrls,
@@ -161,6 +149,11 @@ class _ImageBlockView extends StatefulWidget {
     required this.mode,
     required this.hideNsfw,
   });
+  final ImageBlock block;
+  final List<String> allImageUrls;
+  final int imageIndex;
+  final ContentBlockViewMode mode;
+  final bool hideNsfw;
 
   @override
   State<_ImageBlockView> createState() => _ImageBlockViewState();
@@ -221,7 +214,7 @@ class _ImageBlockViewState extends State<_ImageBlockView> {
                     child: CircularProgressIndicator(
                       value: progress.expectedTotalBytes != null
                           ? progress.cumulativeBytesLoaded /
-                              progress.expectedTotalBytes!
+                                progress.expectedTotalBytes!
                           : null,
                     ),
                   ),
@@ -260,13 +253,9 @@ class _ImageBlockViewState extends State<_ImageBlockView> {
 }
 
 class _CompactVideoThumbnail extends StatefulWidget {
+  const _CompactVideoThumbnail({required this.block, required this.hideNsfw});
   final VideoBlock block;
   final bool hideNsfw;
-
-  const _CompactVideoThumbnail({
-    required this.block,
-    required this.hideNsfw,
-  });
 
   @override
   State<_CompactVideoThumbnail> createState() => _CompactVideoThumbnailState();
@@ -355,13 +344,9 @@ class _CompactVideoThumbnailState extends State<_CompactVideoThumbnail> {
 }
 
 class _InlineVideoPlayer extends StatefulWidget {
+  const _InlineVideoPlayer({required this.block, required this.hideNsfw});
   final VideoBlock block;
   final bool hideNsfw;
-
-  const _InlineVideoPlayer({
-    required this.block,
-    required this.hideNsfw,
-  });
 
   @override
   State<_InlineVideoPlayer> createState() => _InlineVideoPlayerState();
@@ -385,22 +370,24 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
 
   void _initController() {
     _controller = VideoPlayerController.networkUrl(Uri.parse(widget.block.url))
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {
-            _isInitialized = true;
+      ..initialize()
+          .then((_) {
+            if (mounted) {
+              setState(() {
+                _isInitialized = true;
+              });
+              _controller!.setLooping(true);
+              _controller!.setVolume(0);
+              _startHideTimer();
+            }
+          })
+          .catchError((_) {
+            if (mounted) {
+              setState(() {
+                _hasError = true;
+              });
+            }
           });
-          _controller!.setLooping(true);
-          _controller!.setVolume(0);
-          _startHideTimer();
-        }
-      }).catchError((_) {
-        if (mounted) {
-          setState(() {
-            _hasError = true;
-          });
-        }
-      });
   }
 
   @override
@@ -505,9 +492,8 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
       child: GestureDetector(
         onTap: _isInitialized ? _handleVideoTap : null,
         child: AspectRatio(
-          aspectRatio:
-              _isInitialized ? _controller!.value.aspectRatio : 16 / 9,
-          child: Container(
+          aspectRatio: _isInitialized ? _controller!.value.aspectRatio : 16 / 9,
+          child: ColoredBox(
             color: Colors.black,
             child: Stack(
               alignment: Alignment.center,
@@ -630,10 +616,7 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Colors.transparent,
-            Colors.black.withOpacity(0.7),
-          ],
+          colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
         ),
       ),
       padding: const EdgeInsets.only(top: 24, left: 4, right: 4, bottom: 4),
@@ -658,9 +641,7 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
                 child: IconButton(
                   tooltip: isPlaying ? '일시정지' : '재생',
                   icon: Icon(
-                    isPlaying
-                        ? Icons.pause
-                        : Icons.play_arrow,
+                    isPlaying ? Icons.pause : Icons.play_arrow,
                     color: AppColors.imageViewerForeground,
                     size: AppSizes.iconLarge,
                   ),
@@ -675,8 +656,8 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
               Text(
                 '${_formatDuration(position)} / ${_formatDuration(duration)}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.imageViewerForeground,
-                    ),
+                  color: AppColors.imageViewerForeground,
+                ),
               ),
               const Spacer(),
               SizedBox(
@@ -702,7 +683,7 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
                 height: AppSizes.minTouchTarget,
                 child: IconButton(
                   tooltip: '전체 화면',
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.fullscreen,
                     color: AppColors.imageViewerForeground,
                     size: AppSizes.iconLarge,
@@ -723,25 +704,22 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
   }
 
   Widget _buildLoading() {
-    return Container(
+    return const ColoredBox(
       color: AppColors.imagePlaceholder,
-      child: const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      ),
+      child: Center(child: CircularProgressIndicator(color: Colors.white)),
     );
   }
 
   Widget _buildError() {
-    return Container(
+    return const ColoredBox(
       color: AppColors.imagePlaceholder,
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.error_outline, color: Colors.white54, size: 32),
             SizedBox(height: 8),
-            Text('동영상을 불러올 수 없습니다',
-                style: TextStyle(color: Colors.white54)),
+            Text('동영상을 불러올 수 없습니다', style: TextStyle(color: Colors.white54)),
           ],
         ),
       ),
@@ -750,13 +728,12 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
 }
 
 class _FullscreenVideoScreen extends StatefulWidget {
-  final VideoBlock block;
-  final Duration initialPosition;
-
   const _FullscreenVideoScreen({
     required this.block,
     required this.initialPosition,
   });
+  final VideoBlock block;
+  final Duration initialPosition;
 
   @override
   State<_FullscreenVideoScreen> createState() => _FullscreenVideoScreenState();
@@ -774,9 +751,9 @@ class _FullscreenVideoScreenState extends State<_FullscreenVideoScreen> {
   @override
   void initState() {
     super.initState();
-    _controller =
-        VideoPlayerController.networkUrl(Uri.parse(widget.block.url))
-          ..initialize().then((_) {
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.block.url))
+      ..initialize()
+          .then((_) {
             if (mounted) {
               setState(() {
                 _isInitialized = true;
@@ -788,7 +765,8 @@ class _FullscreenVideoScreenState extends State<_FullscreenVideoScreen> {
               }
               _startHideTimer();
             }
-          }).catchError((_) {
+          })
+          .catchError((_) {
             if (mounted) {
               setState(() {
                 _hasError = true;
@@ -879,9 +857,10 @@ class _FullscreenVideoScreenState extends State<_FullscreenVideoScreen> {
             onTap: _isInitialized ? _handleVideoTap : null,
             child: Center(
               child: AspectRatio(
-                aspectRatio:
-                    _isInitialized ? _controller!.value.aspectRatio : 16 / 9,
-                child: Container(
+                aspectRatio: _isInitialized
+                    ? _controller!.value.aspectRatio
+                    : 16 / 9,
+                child: ColoredBox(
                   color: Colors.black,
                   child: Stack(
                     alignment: Alignment.center,
@@ -979,10 +958,7 @@ class _FullscreenVideoScreenState extends State<_FullscreenVideoScreen> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Colors.black.withOpacity(0.7),
-            Colors.transparent,
-          ],
+          colors: [Colors.black.withOpacity(0.7), Colors.transparent],
         ),
       ),
       padding: EdgeInsets.only(
@@ -998,7 +974,7 @@ class _FullscreenVideoScreenState extends State<_FullscreenVideoScreen> {
             height: AppSizes.minTouchTarget,
             child: IconButton(
               tooltip: '닫기',
-              icon: Icon(
+              icon: const Icon(
                 Icons.close,
                 color: AppColors.imageViewerForeground,
                 size: AppSizes.iconLarge,
@@ -1024,10 +1000,7 @@ class _FullscreenVideoScreenState extends State<_FullscreenVideoScreen> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Colors.transparent,
-            Colors.black.withOpacity(0.7),
-          ],
+          colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
         ),
       ),
       padding: EdgeInsets.only(
@@ -1057,9 +1030,7 @@ class _FullscreenVideoScreenState extends State<_FullscreenVideoScreen> {
                 child: IconButton(
                   tooltip: isPlaying ? '일시정지' : '재생',
                   icon: Icon(
-                    isPlaying
-                        ? Icons.pause
-                        : Icons.play_arrow,
+                    isPlaying ? Icons.pause : Icons.play_arrow,
                     color: AppColors.imageViewerForeground,
                     size: AppSizes.iconLarge,
                   ),
@@ -1074,8 +1045,8 @@ class _FullscreenVideoScreenState extends State<_FullscreenVideoScreen> {
               Text(
                 '${_formatDuration(position)} / ${_formatDuration(duration)}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.imageViewerForeground,
-                    ),
+                  color: AppColors.imageViewerForeground,
+                ),
               ),
               const Spacer(),
               SizedBox(
@@ -1104,16 +1075,15 @@ class _FullscreenVideoScreenState extends State<_FullscreenVideoScreen> {
   }
 
   Widget _buildError() {
-    return Container(
+    return const ColoredBox(
       color: AppColors.imagePlaceholder,
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.error_outline, color: Colors.white54, size: 32),
             SizedBox(height: 8),
-            Text('동영상을 불러올 수 없습니다',
-                style: TextStyle(color: Colors.white54)),
+            Text('동영상을 불러올 수 없습니다', style: TextStyle(color: Colors.white54)),
           ],
         ),
       ),

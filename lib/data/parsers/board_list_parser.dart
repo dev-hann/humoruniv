@@ -4,21 +4,24 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:humoruniv/data/models/board_post_dto.dart';
 
 class BoardListParseResult {
-  final List<BoardPostDto> posts;
-  final int currentPage;
-  final int totalPage;
-
   const BoardListParseResult({
     required this.posts,
     required this.currentPage,
     required this.totalPage,
   });
+  final List<BoardPostDto> posts;
+  final int currentPage;
+  final int totalPage;
 }
 
 class BoardListParser {
   static BoardListParseResult parse(String htmlString) {
     if (htmlString.isEmpty) {
-      return const BoardListParseResult(posts: [], currentPage: 0, totalPage: 0);
+      return const BoardListParseResult(
+        posts: [],
+        currentPage: 0,
+        totalPage: 0,
+      );
     }
 
     final doc = html_parser.parse(htmlString);
@@ -42,7 +45,8 @@ class BoardListParser {
 
       final title = anchor.querySelector('span.link_hover')?.text.trim() ?? '';
       final thumbnailUrl = _extractThumbnail(anchor);
-      final author = anchor.querySelector('span.hu_nick_txt')?.text.trim() ?? '';
+      final author =
+          anchor.querySelector('span.hu_nick_txt')?.text.trim() ?? '';
 
       final blk = anchor.querySelector('span.blk');
       final recommendCount = _extractStatNumber(blk, 'span.ok_num');
@@ -81,7 +85,7 @@ class BoardListParser {
     final el = parent.querySelector(selector);
     if (el == null) return 0;
     final text = el.text.trim();
-    return int.tryParse(text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    return int.tryParse(text.replaceAll(RegExp('[^0-9]'), '')) ?? 0;
   }
 
   static int _extractViewCount(dom.Element? blk) {
@@ -89,7 +93,7 @@ class BoardListParser {
     final extras = blk.querySelectorAll('span.extra');
     for (final extra in extras) {
       final text = extra.text.trim();
-      final num = int.tryParse(text.replaceAll(RegExp(r'[^0-9]'), ''));
+      final num = int.tryParse(text.replaceAll(RegExp('[^0-9]'), ''));
       if (num != null && num > 0) return num;
     }
     return 0;
@@ -130,7 +134,9 @@ class BoardListParser {
       final href = a.attributes['href'] ?? '';
       final match = RegExp(r'pg=(\d+)').firstMatch(href);
       if (match != null) {
-        maxPage = maxPage > int.parse(match.group(1)!) ? maxPage : int.parse(match.group(1)!) ;
+        maxPage = maxPage > int.parse(match.group(1)!)
+            ? maxPage
+            : int.parse(match.group(1)!);
       }
     }
     return maxPage + 1;

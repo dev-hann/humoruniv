@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/data/parsers/main_page_parser.dart';
 import 'package:humoruniv/data/parsers/post_detail_parser.dart';
-import 'package:humoruniv/domain/entities/comment.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 
 import 'helpers.dart';
@@ -21,8 +20,16 @@ void main() {
       final detailHtml = await fetchHtml(firstPostUrl);
       final detail = PostDetailParser.parse(detailHtml);
 
-      expect(detail.title, isNotEmpty, reason: 'Post title should not be empty');
-      expect(detail.author, isNotEmpty, reason: 'Post author should not be empty');
+      expect(
+        detail.title,
+        isNotEmpty,
+        reason: 'Post title should not be empty',
+      );
+      expect(
+        detail.author,
+        isNotEmpty,
+        reason: 'Post author should not be empty',
+      );
       expect(detail.recommendCount, greaterThanOrEqualTo(0));
       expect(detail.viewCount, greaterThanOrEqualTo(0));
     }, skip: skip);
@@ -35,11 +42,19 @@ void main() {
       final detailHtml = await fetchHtml(posts.first.url);
       final detail = PostDetailParser.parse(detailHtml);
 
-      expect(detail.contentBlocks, isNotEmpty, reason: 'Content blocks should not be empty');
+      expect(
+        detail.contentBlocks,
+        isNotEmpty,
+        reason: 'Content blocks should not be empty',
+      );
 
       final hasText = detail.contentBlocks.any((b) => b is TextBlock);
       final hasImage = detail.contentBlocks.any((b) => b is ImageBlock);
-      expect(hasText || hasImage, isTrue, reason: 'Should have text or image blocks');
+      expect(
+        hasText || hasImage,
+        isTrue,
+        reason: 'Should have text or image blocks',
+      );
     }, skip: skip);
 
     test('should parse comments from live post', () async {

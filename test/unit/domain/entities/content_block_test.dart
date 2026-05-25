@@ -62,8 +62,14 @@ void main() {
     });
 
     test('should support value equality when url and thumbnailUrl match', () {
-      const a = ImageBlock(url: 'http://x.com/a.jpg', thumbnailUrl: 'http://x.com/t.jpg');
-      const b = ImageBlock(url: 'http://x.com/a.jpg', thumbnailUrl: 'http://x.com/t.jpg');
+      const a = ImageBlock(
+        url: 'http://x.com/a.jpg',
+        thumbnailUrl: 'http://x.com/t.jpg',
+      );
+      const b = ImageBlock(
+        url: 'http://x.com/a.jpg',
+        thumbnailUrl: 'http://x.com/t.jpg',
+      );
 
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));
@@ -77,18 +83,30 @@ void main() {
     });
 
     test('should not be equal when thumbnailUrl differs', () {
-      const a = ImageBlock(url: 'http://x.com/a.jpg', thumbnailUrl: 'http://x.com/ta.jpg');
-      const b = ImageBlock(url: 'http://x.com/a.jpg', thumbnailUrl: 'http://x.com/tb.jpg');
+      const a = ImageBlock(
+        url: 'http://x.com/a.jpg',
+        thumbnailUrl: 'http://x.com/ta.jpg',
+      );
+      const b = ImageBlock(
+        url: 'http://x.com/a.jpg',
+        thumbnailUrl: 'http://x.com/tb.jpg',
+      );
 
       expect(a, isNot(equals(b)));
     });
 
-    test('should not be equal when one has null thumbnailUrl and other does not', () {
-      const a = ImageBlock(url: 'http://x.com/a.jpg');
-      const b = ImageBlock(url: 'http://x.com/a.jpg', thumbnailUrl: 'http://x.com/t.jpg');
+    test(
+      'should not be equal when one has null thumbnailUrl and other does not',
+      () {
+        const a = ImageBlock(url: 'http://x.com/a.jpg');
+        const b = ImageBlock(
+          url: 'http://x.com/a.jpg',
+          thumbnailUrl: 'http://x.com/t.jpg',
+        );
 
-      expect(a, isNot(equals(b)));
-    });
+        expect(a, isNot(equals(b)));
+      },
+    );
 
     test('should be equal when both have null thumbnailUrl', () {
       const a = ImageBlock(url: 'http://x.com/a.jpg');
@@ -110,7 +128,7 @@ void main() {
     });
 
     test('should not be equal when isNsfw differs', () {
-      const a = ImageBlock(url: 'http://x.com/a.jpg', isNsfw: false);
+      const a = ImageBlock(url: 'http://x.com/a.jpg');
       const b = ImageBlock(url: 'http://x.com/a.jpg', isNsfw: true);
 
       expect(a, isNot(equals(b)));
@@ -156,14 +174,12 @@ void main() {
         thumbnailUrl: 'http://x.com/t.jpg',
         width: 480,
         height: 360,
-        isGifConversion: false,
       );
       const b = VideoBlock(
         url: 'http://x.com/v.mp4',
         thumbnailUrl: 'http://x.com/t.jpg',
         width: 480,
         height: 360,
-        isGifConversion: false,
       );
 
       expect(a, equals(b));
@@ -178,7 +194,7 @@ void main() {
     });
 
     test('should not be equal when isGifConversion differs', () {
-      const a = VideoBlock(url: 'http://x.com/v.mp4', isGifConversion: false);
+      const a = VideoBlock(url: 'http://x.com/v.mp4');
       const b = VideoBlock(url: 'http://x.com/v.mp4', isGifConversion: true);
 
       expect(a, isNot(equals(b)));
@@ -197,7 +213,7 @@ void main() {
     });
 
     test('should not be equal when isNsfw differs', () {
-      const a = VideoBlock(url: 'http://x.com/v.mp4', isNsfw: false);
+      const a = VideoBlock(url: 'http://x.com/v.mp4');
       const b = VideoBlock(url: 'http://x.com/v.mp4', isNsfw: true);
 
       expect(a, isNot(equals(b)));

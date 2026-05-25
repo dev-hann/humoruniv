@@ -6,18 +6,17 @@ import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 
 class CountBadge extends StatelessWidget {
+  const CountBadge({
+    required this.count,
+    required this.icon,
+    super.key,
+    this.color,
+    this.fontWeight,
+  });
   final int count;
   final IconData icon;
   final Color? color;
   final FontWeight? fontWeight;
-
-  const CountBadge({
-    super.key,
-    required this.count,
-    required this.icon,
-    this.color,
-    this.fontWeight,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +29,9 @@ class CountBadge extends StatelessWidget {
         Text(
           '$count',
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: effectiveColor,
-                fontWeight: fontWeight,
-              ),
+            color: effectiveColor,
+            fontWeight: fontWeight,
+          ),
         ),
       ],
     );
@@ -40,9 +39,8 @@ class CountBadge extends StatelessWidget {
 }
 
 class RecommendBadge extends StatelessWidget {
+  const RecommendBadge({required this.count, super.key});
   final int count;
-
-  const RecommendBadge({super.key, required this.count});
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +55,8 @@ class RecommendBadge extends StatelessWidget {
 }
 
 class CommentBadge extends StatelessWidget {
+  const CommentBadge({required this.count, super.key});
   final int count;
-
-  const CommentBadge({super.key, required this.count});
 
   @override
   Widget build(BuildContext context) {
@@ -72,9 +69,8 @@ class CommentBadge extends StatelessWidget {
 }
 
 class ViewBadge extends StatelessWidget {
+  const ViewBadge({required this.count, super.key});
   final int count;
-
-  const ViewBadge({super.key, required this.count});
 
   @override
   Widget build(BuildContext context) {
@@ -100,9 +96,9 @@ class BestBadge extends StatelessWidget {
       child: Text(
         'BEST',
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

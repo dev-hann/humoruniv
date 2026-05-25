@@ -10,15 +10,15 @@ void main() {
         id: 123,
         title: '테스트 제목',
         author: '작성자',
-        date: DateTime(2026, 5, 15, 11, 0),
+        date: DateTime(2026, 5, 15, 11),
         contentHtml: '<p>내용</p>',
         contentBlocks: const [TextBlock('내용')],
-        imageUrls: ['https://example.com/img.jpg'],
+        imageUrls: const ['https://example.com/img.jpg'],
         recommendCount: 86,
         notRecommendCount: 1,
         viewCount: 36491,
         commentCount: 39,
-        comments: [],
+        comments: const [],
       );
 
       expect(detail.id, 123);
@@ -37,7 +37,7 @@ void main() {
         id: 1,
         title: '제목',
         author: '작성자',
-        date: DateTime(2026, 1, 1),
+        date: DateTime(2026),
         contentHtml: '',
         contentBlocks: const [],
         imageUrls: const [],
@@ -45,13 +45,13 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
       final b = PostDetail(
         id: 1,
         title: '제목',
         author: '작성자',
-        date: DateTime(2026, 1, 1),
+        date: DateTime(2026),
         contentHtml: '',
         contentBlocks: const [],
         imageUrls: const [],
@@ -59,7 +59,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
 
       expect(a, equals(b));
@@ -79,7 +79,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
       final b = PostDetail(
         id: 2,
@@ -93,7 +93,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
 
       expect(a, isNot(equals(b)));
@@ -112,7 +112,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
       final b = PostDetail(
         id: 1,
@@ -126,7 +126,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
 
       expect(a, isNot(equals(b)));
@@ -145,7 +145,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
       final b = PostDetail(
         id: 1,
@@ -159,7 +159,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
 
       expect(a, isNot(equals(b)));
@@ -178,7 +178,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
       final b = PostDetail(
         id: 1,
@@ -192,7 +192,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
 
       expect(a, isNot(equals(b)));
@@ -211,7 +211,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
       );
 
       expect(detail.isNsfw, isFalse);
@@ -230,7 +230,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
         isNsfw: true,
       );
 
@@ -250,8 +250,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
-        isNsfw: false,
+        comments: const [],
       );
       final b = PostDetail(
         id: 1,
@@ -265,7 +264,7 @@ void main() {
         notRecommendCount: 0,
         viewCount: 0,
         commentCount: 0,
-        comments: [],
+        comments: const [],
         isNsfw: true,
       );
 
@@ -279,10 +278,10 @@ void main() {
         id: 2,
         author: '대댓글러',
         content: '대댓글 내용',
-        date: DateTime(2026, 5, 15, 12, 0),
+        date: DateTime(2026, 5, 15, 12),
         recommendCount: 5,
         isBest: false,
-        replies: [],
+        replies: const [],
       );
       final comment = Comment(
         id: 1,
@@ -304,19 +303,19 @@ void main() {
         id: 1,
         author: 'a',
         content: 'c',
-        date: DateTime(2026, 1, 1),
+        date: DateTime(2026),
         recommendCount: 0,
         isBest: false,
-        replies: [],
+        replies: const [],
       );
       final b = Comment(
         id: 1,
         author: 'a',
         content: 'c',
-        date: DateTime(2026, 1, 1),
+        date: DateTime(2026),
         recommendCount: 0,
         isBest: false,
-        replies: [],
+        replies: const [],
       );
 
       expect(a, equals(b));
@@ -331,7 +330,7 @@ void main() {
         date: DateTime(2026),
         recommendCount: 0,
         isBest: false,
-        replies: [],
+        replies: const [],
       );
       final b = Comment(
         id: 2,
@@ -340,7 +339,7 @@ void main() {
         date: DateTime(2026),
         recommendCount: 0,
         isBest: false,
-        replies: [],
+        replies: const [],
       );
 
       expect(a, isNot(equals(b)));
@@ -354,7 +353,7 @@ void main() {
         date: DateTime(2026),
         recommendCount: 0,
         isBest: true,
-        replies: [],
+        replies: const [],
       );
       final b = Comment(
         id: 1,
@@ -363,7 +362,7 @@ void main() {
         date: DateTime(2026),
         recommendCount: 0,
         isBest: false,
-        replies: [],
+        replies: const [],
       );
 
       expect(a, isNot(equals(b)));
@@ -377,7 +376,7 @@ void main() {
         date: DateTime(2026),
         recommendCount: 0,
         isBest: false,
-        replies: [],
+        replies: const [],
       );
       final a = Comment(
         id: 1,
@@ -395,7 +394,7 @@ void main() {
         date: DateTime(2026),
         recommendCount: 0,
         isBest: false,
-        replies: [],
+        replies: const [],
       );
 
       expect(a, isNot(equals(b)));
@@ -409,7 +408,7 @@ void main() {
         date: DateTime(2026),
         recommendCount: 0,
         isBest: false,
-        replies: [],
+        replies: const [],
       );
       final b = Comment(
         id: 1,
@@ -418,7 +417,7 @@ void main() {
         date: DateTime(2026),
         recommendCount: 0,
         isBest: false,
-        replies: [],
+        replies: const [],
       );
 
       expect(a, isNot(equals(b)));

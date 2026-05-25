@@ -6,6 +6,16 @@ import 'package:humoruniv/core/widgets/states/error_state_view.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_post_list.dart';
 
 class HomeFeed extends StatelessWidget {
+  const HomeFeed({
+    required this.items,
+    required this.onPostTap,
+    super.key,
+    this.isLoading = false,
+    this.hasError = false,
+    this.errorMessage,
+    this.onRetry,
+    this.onRefresh,
+  });
   final List<HomeFeedItem> items;
   final bool isLoading;
   final bool hasError;
@@ -13,17 +23,6 @@ class HomeFeed extends StatelessWidget {
   final VoidCallback? onRetry;
   final VoidCallback? onRefresh;
   final ValueChanged<int> onPostTap;
-
-  const HomeFeed({
-    super.key,
-    required this.items,
-    this.isLoading = false,
-    this.hasError = false,
-    this.errorMessage,
-    this.onRetry,
-    this.onRefresh,
-    required this.onPostTap,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -74,14 +73,6 @@ class HomeFeed extends StatelessWidget {
 }
 
 class HomeFeedItem {
-  final String title;
-  final String author;
-  final int recommendCount;
-  final int commentCount;
-  final String? thumbnailUrl;
-  final String? timeAgo;
-  final bool isRead;
-
   const HomeFeedItem({
     required this.title,
     required this.author,
@@ -91,4 +82,11 @@ class HomeFeedItem {
     this.timeAgo,
     this.isRead = false,
   });
+  final String title;
+  final String author;
+  final int recommendCount;
+  final int commentCount;
+  final String? thumbnailUrl;
+  final String? timeAgo;
+  final bool isRead;
 }

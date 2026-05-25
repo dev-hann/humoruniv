@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 
 class FilterBar<T> extends StatelessWidget {
+  const FilterBar({
+    required this.options,
+    required this.onChanged,
+    super.key,
+    this.selectedValue,
+  });
   final List<FilterOption<T>> options;
   final T? selectedValue;
   final ValueChanged<T> onChanged;
-
-  const FilterBar({
-    super.key,
-    required this.options,
-    this.selectedValue,
-    required this.onChanged,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +39,7 @@ class FilterBar<T> extends StatelessWidget {
 }
 
 class FilterOption<T> {
+  const FilterOption({required this.value, required this.label});
   final T value;
   final String label;
-
-  const FilterOption({required this.value, required this.label});
 }

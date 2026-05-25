@@ -74,8 +74,7 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('should display comment count when non-zero',
-        (tester) async {
+    testWidgets('should display comment count when non-zero', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -93,8 +92,9 @@ void main() {
       expect(find.text('15'), findsOneWidget);
     });
 
-    testWidgets('should not display comment badge when count is 0',
-        (tester) async {
+    testWidgets('should not display comment badge when count is 0', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -102,7 +102,6 @@ void main() {
               title: '제목',
               author: '작성자',
               recommendCount: 0,
-              commentCount: 0,
               onTap: () {},
             ),
           ),

@@ -18,11 +18,8 @@ final _testDetail = PostDetail(
   author: '테스트작성자',
   date: DateTime(2026, 5, 16, 14, 30),
   contentHtml: '<p>본문 내용</p>',
-  contentBlocks: const [
-    TextBlock('첫 번째 문단'),
-    TextBlock('두 번째 문단'),
-  ],
-  imageUrls: [],
+  contentBlocks: const [TextBlock('첫 번째 문단'), TextBlock('두 번째 문단')],
+  imageUrls: const [],
   recommendCount: 42,
   notRecommendCount: 3,
   viewCount: 1500,
@@ -35,7 +32,7 @@ final _testDetail = PostDetail(
       date: DateTime(2026, 5, 16),
       recommendCount: 10,
       isBest: true,
-      replies: [],
+      replies: const [],
     ),
     Comment(
       id: 2,
@@ -52,7 +49,7 @@ final _testDetail = PostDetail(
           date: DateTime(2026, 5, 16),
           recommendCount: 5,
           isBest: false,
-          replies: [],
+          replies: const [],
         ),
       ],
     ),
@@ -60,8 +57,9 @@ final _testDetail = PostDetail(
 );
 
 void main() {
-  testWidgets('should display title and author when data loads',
-      (tester) async {
+  testWidgets('should display title and author when data loads', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -69,9 +67,7 @@ void main() {
             (ref, url) async => Right(_testDetail),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -88,9 +84,7 @@ void main() {
             (ref, url) async => Right(_testDetail),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -99,8 +93,9 @@ void main() {
     expect(find.textContaining('전'), findsWidgets);
   });
 
-  testWidgets('should display recommend, not-recommend, and view counts',
-      (tester) async {
+  testWidgets('should display recommend, not-recommend, and view counts', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -108,9 +103,7 @@ void main() {
             (ref, url) async => Right(_testDetail),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -128,9 +121,7 @@ void main() {
             (ref, url) async => Right(_testDetail),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -147,9 +138,7 @@ void main() {
             (ref, url) async => Right(_testDetail),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -165,9 +154,7 @@ void main() {
             (ref, url) async => Right(_testDetail),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -186,9 +173,7 @@ void main() {
             (ref, url) async => Right(_testDetail),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -204,9 +189,7 @@ void main() {
             (ref, url) async => Right(_testDetail),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -220,13 +203,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          postDetailProvider.overrideWith(
-            (ref, url) => completer.future,
-          ),
+          postDetailProvider.overrideWith((ref, url) => completer.future),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pump();
@@ -245,9 +224,7 @@ void main() {
             (ref, url) async => const Left(ServerFailure('HTTP 500')),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -263,9 +240,7 @@ void main() {
             (ref, url) async => const Left(ServerFailure('HTTP 500')),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -279,32 +254,30 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          postDetailProvider.overrideWith(
-            (ref, url) async {
-              callCount++;
-              if (callCount == 1) {
-                return const Left(ServerFailure('HTTP 500'));
-              }
-              return Right(PostDetail(
+          postDetailProvider.overrideWith((ref, url) async {
+            callCount++;
+            if (callCount == 1) {
+              return const Left(ServerFailure('HTTP 500'));
+            }
+            return Right(
+              PostDetail(
                 id: 1,
                 title: 'Retried Post',
                 author: '작성자',
                 date: DateTime(2026),
                 contentHtml: '',
                 contentBlocks: const [],
-                imageUrls: [],
+                imageUrls: const [],
                 recommendCount: 0,
                 notRecommendCount: 0,
                 viewCount: 0,
                 commentCount: 0,
-                comments: [],
-              ));
-            },
-          ),
+                comments: const [],
+              ),
+            );
+          }),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -326,15 +299,13 @@ void main() {
       author: '작성자',
       date: DateTime(2026, 5, 16),
       contentHtml: '',
-      contentBlocks: const [
-        ImageBlock(url: 'https://example.com/test.jpg'),
-      ],
-      imageUrls: ['https://example.com/test.jpg'],
+      contentBlocks: const [ImageBlock(url: 'https://example.com/test.jpg')],
+      imageUrls: const ['https://example.com/test.jpg'],
       recommendCount: 0,
       notRecommendCount: 0,
       viewCount: 0,
       commentCount: 0,
-      comments: [],
+      comments: const [],
     );
 
     await tester.pumpWidget(
@@ -344,9 +315,7 @@ void main() {
             (ref, url) async => Right(detailWithImage),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();
@@ -361,16 +330,13 @@ void main() {
       author: '작성자',
       date: DateTime(2026, 5, 16),
       contentHtml: '',
-      contentBlocks: const [
-        TextBlock(''),
-        TextBlock('내용 있음'),
-      ],
-      imageUrls: [],
+      contentBlocks: const [TextBlock(''), TextBlock('내용 있음')],
+      imageUrls: const [],
       recommendCount: 0,
       notRecommendCount: 0,
       viewCount: 0,
       commentCount: 0,
-      comments: [],
+      comments: const [],
     );
 
     await tester.pumpWidget(
@@ -380,9 +346,7 @@ void main() {
             (ref, url) async => Right(detailWithEmpty),
           ),
         ],
-        child: const MaterialApp(
-          home: PostDetailScreen(postUrl: '/test'),
-        ),
+        child: const MaterialApp(home: PostDetailScreen(postUrl: '/test')),
       ),
     );
     await tester.pumpAndSettle();

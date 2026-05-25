@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 
 class EmptyStateView extends StatelessWidget {
-  final String message;
-  final IconData icon;
-
   const EmptyStateView({
-    super.key,
     required this.message,
+    super.key,
     this.icon = Icons.inbox_outlined,
   });
+  final String message;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +28,8 @@ class EmptyStateView extends StatelessWidget {
             Text(
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

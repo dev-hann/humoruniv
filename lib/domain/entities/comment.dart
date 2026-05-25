@@ -1,8 +1,18 @@
-import 'package:meta/meta.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
+import 'package:meta/meta.dart';
 
 @immutable
 class Comment {
+  const Comment({
+    required this.id,
+    required this.author,
+    required this.content,
+    required this.date,
+    required this.recommendCount,
+    required this.isBest,
+    required this.replies,
+    this.mediaBlocks = const [],
+  });
   final int id;
   final String author;
   final String content;
@@ -12,21 +22,8 @@ class Comment {
   final List<ContentBlock> mediaBlocks;
   final List<Comment> replies;
 
-  const Comment({
-    required this.id,
-    required this.author,
-    required this.content,
-    required this.date,
-    required this.recommendCount,
-    required this.isBest,
-    this.mediaBlocks = const [],
-    required this.replies,
-  });
-
-  List<String> get imageUrls => mediaBlocks
-      .whereType<ImageBlock>()
-      .map((b) => b.url)
-      .toList();
+  List<String> get imageUrls =>
+      mediaBlocks.whereType<ImageBlock>().map((b) => b.url).toList();
 
   @override
   bool operator ==(Object other) =>

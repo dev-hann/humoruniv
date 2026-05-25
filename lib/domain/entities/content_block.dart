@@ -6,14 +6,15 @@ sealed class ContentBlock {
 
 @immutable
 class TextBlock extends ContentBlock {
-  final String text;
-
   const TextBlock(this.text);
+  final String text;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is TextBlock && runtimeType == other.runtimeType && text == other.text;
+      other is TextBlock &&
+          runtimeType == other.runtimeType &&
+          text == other.text;
 
   @override
   int get hashCode => text.hashCode;
@@ -21,11 +22,10 @@ class TextBlock extends ContentBlock {
 
 @immutable
 class ImageBlock extends ContentBlock {
+  const ImageBlock({required this.url, this.thumbnailUrl, this.isNsfw = false});
   final String url;
   final String? thumbnailUrl;
   final bool isNsfw;
-
-  const ImageBlock({required this.url, this.thumbnailUrl, this.isNsfw = false});
 
   @override
   bool operator ==(Object other) =>
@@ -42,13 +42,6 @@ class ImageBlock extends ContentBlock {
 
 @immutable
 class VideoBlock extends ContentBlock {
-  final String url;
-  final String? thumbnailUrl;
-  final int? width;
-  final int? height;
-  final bool isGifConversion;
-  final bool isNsfw;
-
   const VideoBlock({
     required this.url,
     this.thumbnailUrl,
@@ -57,6 +50,12 @@ class VideoBlock extends ContentBlock {
     this.isGifConversion = false,
     this.isNsfw = false,
   });
+  final String url;
+  final String? thumbnailUrl;
+  final int? width;
+  final int? height;
+  final bool isGifConversion;
+  final bool isNsfw;
 
   @override
   bool operator ==(Object other) =>
@@ -71,19 +70,21 @@ class VideoBlock extends ContentBlock {
           isNsfw == other.isNsfw;
 
   @override
-  int get hashCode => Object.hash(url, thumbnailUrl, width, height, isGifConversion, isNsfw);
+  int get hashCode =>
+      Object.hash(url, thumbnailUrl, width, height, isGifConversion, isNsfw);
 }
 
 @immutable
 class HtmlBlock extends ContentBlock {
-  final String html;
-
   const HtmlBlock(this.html);
+  final String html;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HtmlBlock && runtimeType == other.runtimeType && html == other.html;
+      other is HtmlBlock &&
+          runtimeType == other.runtimeType &&
+          html == other.html;
 
   @override
   int get hashCode => html.hashCode;

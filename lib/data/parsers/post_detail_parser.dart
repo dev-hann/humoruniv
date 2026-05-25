@@ -57,13 +57,13 @@ class PostDetailParser {
       author: '',
       date: DateTime(1970),
       contentHtml: '',
-      contentBlocks: [],
-      imageUrls: [],
+      contentBlocks: const [],
+      imageUrls: const [],
       recommendCount: 0,
       notRecommendCount: 0,
       viewCount: 0,
       commentCount: 0,
-      comments: [],
+      comments: const [],
     );
   }
 
@@ -150,7 +150,8 @@ class PostDetailParser {
 
     final regularItems = doc.querySelectorAll('li[id^="comment_li_"]');
     for (final item in regularItems) {
-      final isSub = item.classes.contains('sub_comm_bt') ||
+      final isSub =
+          item.classes.contains('sub_comm_bt') ||
           item.attributes['name'] == 'sub_comm_block';
       if (isSub) continue;
 
@@ -162,16 +163,18 @@ class PostDetailParser {
         replies.add(_parseCommentItem(sub, isBest: false));
       }
 
-      comments.add(Comment(
-        id: comment.id,
-        author: comment.author,
-        content: comment.content,
-        date: comment.date,
-        recommendCount: comment.recommendCount,
-        isBest: comment.isBest,
-        mediaBlocks: comment.mediaBlocks,
-        replies: replies,
-      ));
+      comments.add(
+        Comment(
+          id: comment.id,
+          author: comment.author,
+          content: comment.content,
+          date: comment.date,
+          recommendCount: comment.recommendCount,
+          isBest: comment.isBest,
+          mediaBlocks: comment.mediaBlocks,
+          replies: replies,
+        ),
+      );
     }
 
     return comments;
@@ -182,7 +185,7 @@ class PostDetailParser {
     final author = nickEl?.text.trim() ?? '';
 
     final bodyEl = item.querySelector('.comment_body');
-    String content = '';
+    var content = '';
     if (bodyEl != null) {
       final textEl = bodyEl.querySelector('.comment_text');
       if (textEl != null) {
@@ -191,7 +194,8 @@ class PostDetailParser {
         final clone = bodyEl.clone(true);
         clone
             .querySelectorAll(
-                '.recomm_btn, .btn_move, .comment_num, .comment_thumb_notice, .comment_img_div, .comment_crop_wrap, .comment_crop_href, .comment_crop_href_mp4')
+              '.recomm_btn, .btn_move, .comment_num, .comment_thumb_notice, .comment_img_div, .comment_crop_wrap, .comment_crop_href, .comment_crop_href_mp4',
+            )
             .forEach((el) => el.remove());
         content = clone.text.trim();
       }
@@ -203,7 +207,7 @@ class PostDetailParser {
     }
 
     final etcEls = item.querySelectorAll('.etc');
-    DateTime date = DateTime(1970);
+    var date = DateTime(1970);
     for (final el in etcEls) {
       final text = el.text.trim();
       final parsed = DateTime.tryParse(text);
@@ -213,7 +217,7 @@ class PostDetailParser {
       }
     }
 
-    int recommendCount = 0;
+    var recommendCount = 0;
     final okSpan = item.querySelector('.o');
     if (okSpan != null) {
       recommendCount = int.tryParse(okSpan.text.trim()) ?? 0;
@@ -224,7 +228,7 @@ class PostDetailParser {
     }
 
     final idAttr = item.id;
-    final idNum = int.tryParse(idAttr.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    final idNum = int.tryParse(idAttr.replaceAll(RegExp('[^0-9]'), '')) ?? 0;
 
     return Comment(
       id: idNum,
@@ -234,7 +238,7 @@ class PostDetailParser {
       recommendCount: recommendCount,
       isBest: isBest,
       mediaBlocks: mediaBlocks,
-      replies: [],
+      replies: const [],
     );
   }
 }

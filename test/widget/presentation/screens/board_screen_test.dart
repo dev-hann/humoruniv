@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/errors/failures.dart';
-import 'package:humoruniv/di/injection.dart' as di;
 import 'package:humoruniv/core/widgets/states/skeleton_post_list.dart';
+import 'package:humoruniv/di/injection.dart' as di;
 import 'package:humoruniv/domain/entities/board_list_result.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/sort_option.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
-import 'package:humoruniv/presentation/providers/board_posts_provider.dart';
 import 'package:humoruniv/presentation/screens/board_screen.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -59,20 +58,29 @@ void main() {
       di.sl.unregister<GetBoardPosts>();
     }
     di.sl.registerLazySingleton<PostRepository>(() => mockRepository);
-    di.sl.registerLazySingleton(() => GetBoardPosts(repository: mockRepository));
+    di.sl.registerLazySingleton(
+      () => GetBoardPosts(repository: mockRepository),
+    );
   });
 
-  tearDown(() {
-    di.sl.reset();
-  });
+  tearDown(di.sl.reset);
 
-  testWidgets('should display board post titles when data loads', (tester) async {
-    const result = BoardListResult(posts: testPosts, currentPage: 0, totalPage: 5);
-    when(() => mockRepository.getBoardPosts('pds', 0, SortOption.all))
-        .thenAnswer((_) async => const Right(result));
+  testWidgets('should display board post titles when data loads', (
+    tester,
+  ) async {
+    const result = BoardListResult(
+      posts: testPosts,
+      currentPage: 0,
+      totalPage: 5,
+    );
+    when(
+      () => mockRepository.getBoardPosts('pds', 0, SortOption.all),
+    ).thenAnswer((_) async => const Right(result));
 
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: BoardScreen(table: 'pds'))),
+      const ProviderScope(
+        child: MaterialApp(home: BoardScreen(table: 'pds')),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -81,11 +89,15 @@ void main() {
   });
 
   testWidgets('should show loading indicator while fetching', (tester) async {
-    when(() => mockRepository.getBoardPosts(any(), any(), any()))
-        .thenAnswer((_) async => const Right(BoardListResult(posts: [], currentPage: 0, totalPage: 1)));
+    when(() => mockRepository.getBoardPosts(any(), any(), any())).thenAnswer(
+      (_) async =>
+          const Right(BoardListResult(posts: [], currentPage: 0, totalPage: 1)),
+    );
 
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: BoardScreen(table: 'pds'))),
+      const ProviderScope(
+        child: MaterialApp(home: BoardScreen(table: 'pds')),
+      ),
     );
     await tester.pump();
 
@@ -95,11 +107,14 @@ void main() {
   });
 
   testWidgets('should show error message when fetch fails', (tester) async {
-    when(() => mockRepository.getBoardPosts(any(), any(), any()))
-        .thenAnswer((_) async => const Left(ServerFailure('Error')));
+    when(
+      () => mockRepository.getBoardPosts(any(), any(), any()),
+    ).thenAnswer((_) async => const Left(ServerFailure('Error')));
 
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: BoardScreen(table: 'pds'))),
+      const ProviderScope(
+        child: MaterialApp(home: BoardScreen(table: 'pds')),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -107,12 +122,19 @@ void main() {
   });
 
   testWidgets('should display sort tabs', (tester) async {
-    const result = BoardListResult(posts: testPosts, currentPage: 0, totalPage: 1);
-    when(() => mockRepository.getBoardPosts(any(), any(), any()))
-        .thenAnswer((_) async => const Right(result));
+    const result = BoardListResult(
+      posts: testPosts,
+      currentPage: 0,
+      totalPage: 1,
+    );
+    when(
+      () => mockRepository.getBoardPosts(any(), any(), any()),
+    ).thenAnswer((_) async => const Right(result));
 
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: BoardScreen(table: 'pds'))),
+      const ProviderScope(
+        child: MaterialApp(home: BoardScreen(table: 'pds')),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -121,13 +143,22 @@ void main() {
     expect(find.text('주간'), findsOneWidget);
   });
 
-  testWidgets('should not show pagination when infinite scroll', (tester) async {
-    const result = BoardListResult(posts: testPosts, currentPage: 0, totalPage: 5);
-    when(() => mockRepository.getBoardPosts(any(), any(), any()))
-        .thenAnswer((_) async => const Right(result));
+  testWidgets('should not show pagination when infinite scroll', (
+    tester,
+  ) async {
+    const result = BoardListResult(
+      posts: testPosts,
+      currentPage: 0,
+      totalPage: 5,
+    );
+    when(
+      () => mockRepository.getBoardPosts(any(), any(), any()),
+    ).thenAnswer((_) async => const Right(result));
 
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: BoardScreen(table: 'pds'))),
+      const ProviderScope(
+        child: MaterialApp(home: BoardScreen(table: 'pds')),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -138,11 +169,14 @@ void main() {
 
   testWidgets('should show empty state when no posts', (tester) async {
     const result = BoardListResult(posts: [], currentPage: 0, totalPage: 0);
-    when(() => mockRepository.getBoardPosts(any(), any(), any()))
-        .thenAnswer((_) async => const Right(result));
+    when(
+      () => mockRepository.getBoardPosts(any(), any(), any()),
+    ).thenAnswer((_) async => const Right(result));
 
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: BoardScreen(table: 'pds'))),
+      const ProviderScope(
+        child: MaterialApp(home: BoardScreen(table: 'pds')),
+      ),
     );
     await tester.pumpAndSettle();
 

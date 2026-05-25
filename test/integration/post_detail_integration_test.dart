@@ -8,9 +8,8 @@ import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 
 class FixtureHtmlClient implements HtmlClient {
-  final Map<String, String> _fixtures;
-
   FixtureHtmlClient(this._fixtures);
+  final Map<String, String> _fixtures;
 
   @override
   Future<String> get(String path) async {
@@ -40,33 +39,30 @@ void main() {
 
   group('Integration: post detail flow', () {
     test(
-        'should parse real fixture HTML through full chain and return PostDetail',
-        () async {
-      final result = await repository
-          .getPostDetail('/board/read.html?table=pds&number=1410286');
+      'should parse real fixture HTML through full chain and return PostDetail',
+      () async {
+        final result = await repository.getPostDetail(
+          '/board/read.html?table=pds&number=1410286',
+        );
 
-      final detail = result.fold(
-        (failure) => null,
-        (detail) => detail,
-      );
+        final detail = result.fold((failure) => null, (detail) => detail);
 
-      expect(detail, isNotNull);
-      expect(detail!.title, isNotEmpty);
-      expect(detail.title, contains('MBC PD'));
-      expect(detail.author, equals('오유의감동브레이커'));
-      expect(detail.recommendCount, greaterThan(0));
-      expect(detail.viewCount, greaterThan(0));
-      expect(detail.commentCount, greaterThan(0));
-    });
+        expect(detail, isNotNull);
+        expect(detail!.title, isNotEmpty);
+        expect(detail.title, contains('MBC PD'));
+        expect(detail.author, equals('오유의감동브레이커'));
+        expect(detail.recommendCount, greaterThan(0));
+        expect(detail.viewCount, greaterThan(0));
+        expect(detail.commentCount, greaterThan(0));
+      },
+    );
 
     test('should extract image URLs from real post detail', () async {
-      final result = await repository
-          .getPostDetail('/board/read.html?table=pds&number=1410286');
-
-      final detail = result.fold(
-        (failure) => null,
-        (detail) => detail,
+      final result = await repository.getPostDetail(
+        '/board/read.html?table=pds&number=1410286',
       );
+
+      final detail = result.fold((failure) => null, (detail) => detail);
 
       expect(detail, isNotNull);
       expect(detail!.imageUrls, isNotEmpty);
@@ -75,75 +71,74 @@ void main() {
       }
     });
 
-    test('should extract comments with best and regular from real data',
-        () async {
-      final result = await repository
-          .getPostDetail('/board/read.html?table=pds&number=1410286');
+    test(
+      'should extract comments with best and regular from real data',
+      () async {
+        final result = await repository.getPostDetail(
+          '/board/read.html?table=pds&number=1410286',
+        );
 
-      final detail = result.fold(
-        (failure) => null,
-        (detail) => detail,
-      );
+        final detail = result.fold((failure) => null, (detail) => detail);
 
-      expect(detail, isNotNull);
-      expect(detail!.comments, isNotEmpty);
+        expect(detail, isNotNull);
+        expect(detail!.comments, isNotEmpty);
 
-      final bestComments =
-          detail.comments.where((c) => c.isBest).toList();
-      expect(bestComments, isNotEmpty);
+        final bestComments = detail.comments.where((c) => c.isBest).toList();
+        expect(bestComments, isNotEmpty);
 
-      for (final comment in detail.comments) {
-        expect(comment.author, isNotEmpty);
-        expect(comment.content, isNotEmpty);
-      }
-    });
+        for (final comment in detail.comments) {
+          expect(comment.author, isNotEmpty);
+          expect(comment.content, isNotEmpty);
+        }
+      },
+    );
   });
 
   group('Integration: daum-wm-content layout (no body_editor)', () {
-    test('should parse post with image and text from daum-wm-content', () async {
-      final result = await repository
-          .getPostDetail('/board/read.html?table=pds&number=999999');
+    test(
+      'should parse post with image and text from daum-wm-content',
+      () async {
+        final result = await repository.getPostDetail(
+          '/board/read.html?table=pds&number=999999',
+        );
 
-      final detail = result.fold(
-        (failure) => null,
-        (detail) => detail,
-      );
+        final detail = result.fold((failure) => null, (detail) => detail);
 
-      expect(detail, isNotNull);
-      expect(detail!.title, contains('daum-wm-content'));
-      expect(detail.author, equals('testAuthor'));
-      expect(detail.recommendCount, equals(83));
-      expect(detail.viewCount, greaterThan(0));
-      expect(detail.commentCount, equals(3));
-    });
+        expect(detail, isNotNull);
+        expect(detail!.title, contains('daum-wm-content'));
+        expect(detail.author, equals('testAuthor'));
+        expect(detail.recommendCount, equals(83));
+        expect(detail.viewCount, greaterThan(0));
+        expect(detail.commentCount, equals(3));
+      },
+    );
 
-    test('should extract both image and text blocks from daum-wm-content', () async {
-      final result = await repository
-          .getPostDetail('/board/read.html?table=pds&number=999999');
+    test(
+      'should extract both image and text blocks from daum-wm-content',
+      () async {
+        final result = await repository.getPostDetail(
+          '/board/read.html?table=pds&number=999999',
+        );
 
-      final detail = result.fold(
-        (failure) => null,
-        (detail) => detail,
-      );
+        final detail = result.fold((failure) => null, (detail) => detail);
 
-      expect(detail, isNotNull);
+        expect(detail, isNotNull);
 
-      final images = detail!.contentBlocks.whereType<ImageBlock>().toList();
-      final texts = detail.contentBlocks.whereType<TextBlock>().toList();
+        final images = detail!.contentBlocks.whereType<ImageBlock>().toList();
+        final texts = detail.contentBlocks.whereType<TextBlock>().toList();
 
-      expect(images, isNotEmpty);
-      expect(texts, isNotEmpty);
-      expect(texts.any((t) => t.text.contains('딸이 초등학교')), isTrue);
-    });
+        expect(images, isNotEmpty);
+        expect(texts, isNotEmpty);
+        expect(texts.any((t) => t.text.contains('딸이 초등학교')), isTrue);
+      },
+    );
 
     test('should extract image URL from daum-wm-content post', () async {
-      final result = await repository
-          .getPostDetail('/board/read.html?table=pds&number=999999');
-
-      final detail = result.fold(
-        (failure) => null,
-        (detail) => detail,
+      final result = await repository.getPostDetail(
+        '/board/read.html?table=pds&number=999999',
       );
+
+      final detail = result.fold((failure) => null, (detail) => detail);
 
       expect(detail, isNotNull);
       expect(detail!.imageUrls, isNotEmpty);

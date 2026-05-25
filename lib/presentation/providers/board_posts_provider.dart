@@ -1,4 +1,3 @@
-import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/di/injection.dart';
@@ -7,12 +6,6 @@ import 'package:humoruniv/domain/entities/sort_option.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 
 class BoardPostsState {
-  final List<BoardPost> posts;
-  final int currentPage;
-  final int totalPage;
-  final bool isLoadingMore;
-  final Object? loadMoreError;
-
   const BoardPostsState({
     this.posts = const [],
     this.currentPage = 0,
@@ -20,6 +13,11 @@ class BoardPostsState {
     this.isLoadingMore = false,
     this.loadMoreError,
   });
+  final List<BoardPost> posts;
+  final int currentPage;
+  final int totalPage;
+  final bool isLoadingMore;
+  final Object? loadMoreError;
 
   bool get hasMore => currentPage < totalPage - 1;
 
@@ -41,17 +39,14 @@ class BoardPostsState {
 }
 
 class BoardPostsParams {
+  const BoardPostsParams({required this.table, required this.sort});
   final String table;
   final SortOption sort;
-
-  const BoardPostsParams({required this.table, required this.sort});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is BoardPostsParams &&
-          table == other.table &&
-          sort == other.sort;
+      other is BoardPostsParams && table == other.table && sort == other.sort;
 
   @override
   int get hashCode => Object.hash(table, sort);
@@ -76,7 +71,7 @@ class BoardPostsNotifier extends AsyncNotifier<BoardPostsState> {
     final current = state.value;
     if (current == null || current.isLoadingMore || !current.hasMore) return;
 
-    state = AsyncData(current.copyWith(isLoadingMore: true, loadMoreError: null));
+    state = AsyncData(current.copyWith(isLoadingMore: true));
 
     final arg = ref.read(boardPostsParamsProvider);
     final nextPage = current.currentPage + 1;
@@ -85,31 +80,30 @@ class BoardPostsNotifier extends AsyncNotifier<BoardPostsState> {
     result.fold(
       (failure) {
         final prev = state.value ?? current;
-        state = AsyncData(prev.copyWith(
-          isLoadingMore: false,
-          loadMoreError: failure,
-        ));
+        state = AsyncData(
+          prev.copyWith(isLoadingMore: false, loadMoreError: failure),
+        );
       },
       (data) {
         final prev = state.value ?? current;
-        state = AsyncData(prev.copyWith(
-          posts: [...prev.posts, ...data.posts],
-          currentPage: data.currentPage,
-          totalPage: data.totalPage,
-          isLoadingMore: false,
-          loadMoreError: null,
-        ));
+        state = AsyncData(
+          prev.copyWith(
+            posts: [...prev.posts, ...data.posts],
+            currentPage: data.currentPage,
+            totalPage: data.totalPage,
+            isLoadingMore: false,
+          ),
+        );
       },
     );
   }
 }
 
-final boardPostsParamsProvider =
-    StateProvider<BoardPostsParams>(
+final boardPostsParamsProvider = StateProvider<BoardPostsParams>(
   (ref) => const BoardPostsParams(table: 'pds', sort: SortOption.all),
 );
 
 final boardPostsProvider =
     AsyncNotifierProvider<BoardPostsNotifier, BoardPostsState>(
-  BoardPostsNotifier.new,
-);
+      BoardPostsNotifier.new,
+    );

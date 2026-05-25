@@ -69,7 +69,7 @@ void main() {
         expect(
           style?.letterSpacing ?? 0,
           greaterThanOrEqualTo(0),
-          reason: '${style.toString()} has negative letter spacing',
+          reason: '$style has negative letter spacing',
         );
       }
     });

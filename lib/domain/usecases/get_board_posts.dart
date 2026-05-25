@@ -5,9 +5,8 @@ import 'package:humoruniv/domain/entities/sort_option.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 
 class GetBoardPosts {
-  final PostRepository repository;
-
   const GetBoardPosts({required this.repository});
+  final PostRepository repository;
 
   Future<Either<Failure, BoardListResult>> call(
     String table,

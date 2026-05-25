@@ -3,20 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 
 class UserInfoRow extends StatelessWidget {
+  const UserInfoRow({
+    required this.author,
+    required this.recommendCount,
+    super.key,
+    this.date,
+    this.notRecommendCount,
+    this.viewCount,
+  });
   final String author;
   final String? date;
   final int recommendCount;
   final int? notRecommendCount;
   final int? viewCount;
-
-  const UserInfoRow({
-    super.key,
-    required this.author,
-    this.date,
-    required this.recommendCount,
-    this.notRecommendCount,
-    this.viewCount,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,28 +27,45 @@ class UserInfoRow extends StatelessWidget {
           Text(
             date!,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
         const Spacer(),
-        _metric(context, Icons.thumb_up, '$recommendCount',
-            Theme.of(context).colorScheme.primary),
+        _metric(
+          context,
+          Icons.thumb_up,
+          '$recommendCount',
+          Theme.of(context).colorScheme.primary,
+        ),
         if (notRecommendCount != null) ...[
           AppSpacing.sbW12,
-          _metric(context, Icons.thumb_down, '$notRecommendCount',
-              Theme.of(context).colorScheme.error),
+          _metric(
+            context,
+            Icons.thumb_down,
+            '$notRecommendCount',
+            Theme.of(context).colorScheme.error,
+          ),
         ],
         if (viewCount != null) ...[
           AppSpacing.sbW12,
-          _metric(context, Icons.remove_red_eye, '$viewCount',
-              Theme.of(context).colorScheme.onSurfaceVariant),
+          _metric(
+            context,
+            Icons.remove_red_eye,
+            '$viewCount',
+            Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ],
       ],
     );
   }
 
-  Widget _metric(BuildContext context, IconData icon, String value, Color color) {
+  Widget _metric(
+    BuildContext context,
+    IconData icon,
+    String value,
+    Color color,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

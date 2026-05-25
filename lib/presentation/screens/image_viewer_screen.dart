@@ -6,14 +6,13 @@ import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 
 class ImageViewerScreen extends StatefulWidget {
-  final List<String> imageUrls;
-  final int initialIndex;
-
   const ImageViewerScreen({
-    super.key,
     required this.imageUrls,
+    super.key,
     this.initialIndex = 0,
   });
+  final List<String> imageUrls;
+  final int initialIndex;
 
   @override
   State<ImageViewerScreen> createState() => _ImageViewerScreenState();
@@ -45,7 +44,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.close, color: AppColors.imageViewerForeground),
+          icon: const Icon(Icons.close, color: AppColors.imageViewerForeground),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -59,7 +58,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     return Center(
       child: InteractiveViewer(
         minScale: 0.5,
-        maxScale: 4.0,
+        maxScale: 4,
         child: Image.network(
           widget.imageUrls.first,
           fit: BoxFit.contain,
@@ -68,13 +67,14 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
             return Center(
               child: CircularProgressIndicator(
                 value: progress.expectedTotalBytes != null
-                    ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes!
+                    ? progress.cumulativeBytesLoaded /
+                          progress.expectedTotalBytes!
                     : null,
                 color: AppColors.imageViewerForeground,
               ),
             );
           },
-          errorBuilder: (_, __, ___) => Center(
+          errorBuilder: (_, __, ___) => const Center(
             child: Icon(
               Icons.broken_image,
               color: AppColors.imageViewerForegroundMuted,
@@ -101,7 +101,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
             return Center(
               child: InteractiveViewer(
                 minScale: 0.5,
-                maxScale: 4.0,
+                maxScale: 4,
                 child: Image.network(
                   widget.imageUrls[index],
                   fit: BoxFit.contain,
@@ -110,13 +110,14 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                     return Center(
                       child: CircularProgressIndicator(
                         value: progress.expectedTotalBytes != null
-                            ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes!
+                            ? progress.cumulativeBytesLoaded /
+                                  progress.expectedTotalBytes!
                             : null,
                         color: AppColors.imageViewerForeground,
                       ),
                     );
                   },
-                  errorBuilder: (_, __, ___) => Center(
+                  errorBuilder: (_, __, ___) => const Center(
                     child: Icon(
                       Icons.broken_image,
                       color: AppColors.imageViewerForegroundMuted,
@@ -135,13 +136,13 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
           child: Center(
             child: Container(
               padding: AppSpacing.edgeH12V6,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.imageViewerOverlay,
                 borderRadius: AppRadius.borderRadiusXl,
               ),
               child: Text(
                 '${_currentIndex + 1} / ${widget.imageUrls.length}',
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.imageViewerForeground,
                   fontSize: 16,
                 ),

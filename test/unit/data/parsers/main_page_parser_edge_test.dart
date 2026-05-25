@@ -4,7 +4,7 @@ import 'package:humoruniv/data/parsers/main_page_parser.dart';
 void main() {
   group('MainPageParser edge cases', () {
     test('should handle href with missing url param', () {
-      final html = '''
+      const html = '''
       <html><body>
       <a href="/rd.html?table=pds&number=123">
         <li id="pds_best_li_123">
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('should handle href with missing table param', () {
-      final html = '''
+      const html = '''
       <html><body>
       <a href="/rd.html?url=/board/read.html&number=123">
         <li id="pds_best_li_123">
@@ -39,7 +39,7 @@ void main() {
     });
 
     test('should handle empty href', () {
-      final html = '''
+      const html = '''
       <html><body>
       <a href="">
         <li id="pds_best_li_123">
@@ -57,7 +57,7 @@ void main() {
     });
 
     test('should handle li without parent anchor', () {
-      final html = '''
+      const html = '''
       <html><body>
       <li id="pds_best_li_123">
         <span id="title_chk_pds-123">Orphan Post</span>

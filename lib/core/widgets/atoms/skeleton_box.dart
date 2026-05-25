@@ -2,16 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
 
 class SkeletonBox extends StatelessWidget {
+  const SkeletonBox({super.key, this.width, this.height, this.borderRadius});
   final double? width;
   final double? height;
   final BorderRadius? borderRadius;
-
-  const SkeletonBox({
-    super.key,
-    this.width,
-    this.height,
-    this.borderRadius,
-  });
 
   @override
   Widget build(BuildContext context) {

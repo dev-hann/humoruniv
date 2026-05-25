@@ -19,7 +19,6 @@ class HumorUnivApp extends StatelessWidget {
       title: 'HumorUniv',
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
       routerConfig: appRouter,
     );
   }

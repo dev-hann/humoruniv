@@ -8,18 +8,19 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Smoke: real network', () {
-    testWidgets('should launch app and load posts from live server',
-        (tester) async {
+    testWidgets('should launch app and load posts from live server', (
+      tester,
+    ) async {
       await tester.pumpWidget(const ProviderScope(child: HumorUnivApp()));
       await tester.pump(const Duration(seconds: 15));
 
       final hasPosts = find.byType(ListTile).evaluate().isNotEmpty;
-      final hasLoading =
-          find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
-      final hasError =
-          find.text('Failed to load posts').evaluate().isNotEmpty;
-      final hasEmpty =
-          find.text('No posts available').evaluate().isNotEmpty;
+      final hasLoading = find
+          .byType(CircularProgressIndicator)
+          .evaluate()
+          .isNotEmpty;
+      final hasError = find.text('Failed to load posts').evaluate().isNotEmpty;
+      final hasEmpty = find.text('No posts available').evaluate().isNotEmpty;
 
       expect(
         hasPosts || hasLoading || hasError || hasEmpty,
@@ -29,30 +30,34 @@ void main() {
     });
 
     testWidgets(
-        'should navigate to post detail and load content from live server',
-        (tester) async {
-      await tester.pumpWidget(const ProviderScope(child: HumorUnivApp()));
-      await tester.pump(const Duration(seconds: 15));
-
-      final postCards = find.byType(ListTile);
-      if (postCards.evaluate().isNotEmpty) {
-        await tester.tap(postCards.first);
+      'should navigate to post detail and load content from live server',
+      (tester) async {
+        await tester.pumpWidget(const ProviderScope(child: HumorUnivApp()));
         await tester.pump(const Duration(seconds: 15));
 
-        final hasContent =
-            find.byType(ScrollView).evaluate().isNotEmpty;
-        final hasError =
-            find.text('Failed to load post').evaluate().isNotEmpty;
-        final hasLoading =
-            find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
+        final postCards = find.byType(ListTile);
+        if (postCards.evaluate().isNotEmpty) {
+          await tester.tap(postCards.first);
+          await tester.pump(const Duration(seconds: 15));
 
-        expect(
-          hasContent || hasError || hasLoading,
-          isTrue,
-          reason:
-              'Post detail screen should render content, error, or loading',
-        );
-      }
-    });
+          final hasContent = find.byType(ScrollView).evaluate().isNotEmpty;
+          final hasError = find
+              .text('Failed to load post')
+              .evaluate()
+              .isNotEmpty;
+          final hasLoading = find
+              .byType(CircularProgressIndicator)
+              .evaluate()
+              .isNotEmpty;
+
+          expect(
+            hasContent || hasError || hasLoading,
+            isTrue,
+            reason:
+                'Post detail screen should render content, error, or loading',
+          );
+        }
+      },
+    );
   });
 }

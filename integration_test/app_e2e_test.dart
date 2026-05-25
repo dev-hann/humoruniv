@@ -35,10 +35,8 @@ final _testPostDetail = PostDetail(
   author: '테스트작성자',
   date: DateTime(2026, 5, 16),
   contentHtml: '<p>테스트 본문 내용입니다.</p>',
-  contentBlocks: const [
-    TextBlock('테스트 본문 내용입니다.'),
-  ],
-  imageUrls: [],
+  contentBlocks: const [TextBlock('테스트 본문 내용입니다.')],
+  imageUrls: const [],
   recommendCount: 42,
   notRecommendCount: 3,
   viewCount: 1500,
@@ -51,30 +49,25 @@ final _testPostDetail = PostDetail(
       date: DateTime(2026, 5, 16),
       recommendCount: 10,
       isBest: true,
-      replies: [],
+      replies: const [],
     ),
   ],
 );
 
 GoRouter _createTestRouter() => GoRouter(
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const HomeScreen(),
-        ),
-        GoRoute(
-          path: '/post',
-          builder: (context, state) {
-            final url = state.uri.queryParameters['url'] ?? '';
-            return PostDetailScreen(postUrl: url);
-          },
-        ),
-      ],
-    );
+  routes: [
+    GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+    GoRoute(
+      path: '/post',
+      builder: (context, state) {
+        final url = state.uri.queryParameters['url'] ?? '';
+        return PostDetailScreen(postUrl: url);
+      },
+    ),
+  ],
+);
 
-Widget _buildTestApp({
-  List<Override> overrides = const [],
-}) {
+Widget _buildTestApp({List<Override> overrides = const []}) {
   return ProviderScope(
     overrides: overrides,
     child: MaterialApp.router(
@@ -88,28 +81,27 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('E2E: home screen', () {
-    testWidgets('should display app bar with HumorUniv title',
-        (tester) async {
-      await tester.pumpWidget(_buildTestApp(
-        overrides: [
-          bestPostsProvider.overrideWith(
-            (ref) async => Right(_testPosts),
-          ),
-        ],
-      ));
+    testWidgets('should display app bar with HumorUniv title', (tester) async {
+      await tester.pumpWidget(
+        _buildTestApp(
+          overrides: [
+            bestPostsProvider.overrideWith((ref) async => Right(_testPosts)),
+          ],
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('HumorUniv'), findsOneWidget);
     });
 
     testWidgets('should display post list from fake data', (tester) async {
-      await tester.pumpWidget(_buildTestApp(
-        overrides: [
-          bestPostsProvider.overrideWith(
-            (ref) async => Right(_testPosts),
-          ),
-        ],
-      ));
+      await tester.pumpWidget(
+        _buildTestApp(
+          overrides: [
+            bestPostsProvider.overrideWith((ref) async => Right(_testPosts)),
+          ],
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('E2E 테스트 게시글 1'), findsOneWidget);
@@ -117,13 +109,15 @@ void main() {
     });
 
     testWidgets('should show error state when provider fails', (tester) async {
-      await tester.pumpWidget(_buildTestApp(
-        overrides: [
-          bestPostsProvider.overrideWith(
-            (ref) async => Left(ServerFailure('test error')),
-          ),
-        ],
-      ));
+      await tester.pumpWidget(
+        _buildTestApp(
+          overrides: [
+            bestPostsProvider.overrideWith(
+              (ref) async => const Left(ServerFailure('test error')),
+            ),
+          ],
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Failed to load posts'), findsOneWidget);
@@ -131,18 +125,19 @@ void main() {
   });
 
   group('E2E: post detail navigation', () {
-    testWidgets('should navigate to post detail and display content',
-        (tester) async {
-      await tester.pumpWidget(_buildTestApp(
-        overrides: [
-          bestPostsProvider.overrideWith(
-            (ref) async => Right(_testPosts),
-          ),
-          postDetailProvider.overrideWith(
-            (ref, url) async => Right(_testPostDetail),
-          ),
-        ],
-      ));
+    testWidgets('should navigate to post detail and display content', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildTestApp(
+          overrides: [
+            bestPostsProvider.overrideWith((ref) async => Right(_testPosts)),
+            postDetailProvider.overrideWith(
+              (ref, url) async => Right(_testPostDetail),
+            ),
+          ],
+        ),
+      );
       await tester.pumpAndSettle();
 
       final postCards = find.byType(ListTile);
@@ -156,18 +151,19 @@ void main() {
       expect(find.text('댓글러'), findsOneWidget);
     });
 
-    testWidgets('should show error state on post detail failure',
-        (tester) async {
-      await tester.pumpWidget(_buildTestApp(
-        overrides: [
-          bestPostsProvider.overrideWith(
-            (ref) async => Right(_testPosts),
-          ),
-          postDetailProvider.overrideWith(
-            (ref, url) async => Left(ServerFailure('detail error')),
-          ),
-        ],
-      ));
+    testWidgets('should show error state on post detail failure', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildTestApp(
+          overrides: [
+            bestPostsProvider.overrideWith((ref) async => Right(_testPosts)),
+            postDetailProvider.overrideWith(
+              (ref, url) async => const Left(ServerFailure('detail error')),
+            ),
+          ],
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(ListTile), findsWidgets);

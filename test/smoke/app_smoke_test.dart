@@ -14,13 +14,25 @@ void main() {
       final posts = MainPageParser.parseBestPosts(html);
 
       expect(posts, isNotEmpty, reason: 'Best posts should not be empty');
-      expect(posts.length, greaterThanOrEqualTo(5), reason: 'Should have at least 5 best posts');
+      expect(
+        posts.length,
+        greaterThanOrEqualTo(5),
+        reason: 'Should have at least 5 best posts',
+      );
 
       for (final post in posts) {
         expect(post.id, greaterThan(0), reason: 'Post id should be positive');
-        expect(post.title, isNotEmpty, reason: 'Post title should not be empty');
+        expect(
+          post.title,
+          isNotEmpty,
+          reason: 'Post title should not be empty',
+        );
         expect(post.recommendCount, greaterThanOrEqualTo(0));
-        expect(post.url, contains('number='), reason: 'Post url should contain number param');
+        expect(
+          post.url,
+          contains('number='),
+          reason: 'Post url should contain number param',
+        );
       }
     }, skip: skip);
 

@@ -8,9 +8,8 @@ import 'package:humoruniv/domain/entities/post.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 
 class FixtureHtmlClient implements HtmlClient {
-  final Map<String, String> _fixtures;
-
   FixtureHtmlClient(this._fixtures);
+  final Map<String, String> _fixtures;
 
   @override
   Future<String> get(String path) async {
@@ -35,33 +34,28 @@ void main() {
 
   group('Integration: best posts flow', () {
     test(
-        'should parse real fixture HTML through full chain and return posts',
-        () async {
-      final result = await repository.getBestPosts();
+      'should parse real fixture HTML through full chain and return posts',
+      () async {
+        final result = await repository.getBestPosts();
 
-      final posts = result.fold(
-        (failure) => <Post>[],
-        (posts) => posts,
-      );
+        final posts = result.fold((failure) => <Post>[], (posts) => posts);
 
-      expect(posts, isNotEmpty);
-      expect(posts.length, greaterThanOrEqualTo(10));
+        expect(posts, isNotEmpty);
+        expect(posts.length, greaterThanOrEqualTo(10));
 
-      final first = posts.first;
-      expect(first.id, greaterThan(0));
-      expect(first.title, isNotEmpty);
-      expect(first.recommendCount, greaterThanOrEqualTo(0));
-      expect(first.url, contains('table=pds'));
-      expect(first.url, contains('number='));
-    });
+        final first = posts.first;
+        expect(first.id, greaterThan(0));
+        expect(first.title, isNotEmpty);
+        expect(first.recommendCount, greaterThanOrEqualTo(0));
+        expect(first.url, contains('table=pds'));
+        expect(first.url, contains('number='));
+      },
+    );
 
     test('should produce valid Post entities from real data', () async {
       final result = await repository.getBestPosts();
 
-      final posts = result.fold(
-        (failure) => <Post>[],
-        (posts) => posts,
-      );
+      final posts = result.fold((failure) => <Post>[], (posts) => posts);
 
       for (final post in posts) {
         expect(post.id, greaterThan(0));
@@ -70,16 +64,12 @@ void main() {
       }
     });
 
-    test('should have posts ordered by recommend count (descending)',
-        () async {
+    test('should have posts ordered by recommend count (descending)', () async {
       final result = await repository.getBestPosts();
 
-      final posts = result.fold(
-        (failure) => <Post>[],
-        (posts) => posts,
-      );
+      final posts = result.fold((failure) => <Post>[], (posts) => posts);
 
-      for (int i = 1; i < posts.length; i++) {
+      for (var i = 1; i < posts.length; i++) {
         expect(
           posts[i - 1].recommendCount,
           greaterThanOrEqualTo(posts[i].recommendCount),

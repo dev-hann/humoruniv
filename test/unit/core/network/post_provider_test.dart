@@ -26,16 +26,15 @@ void main() {
     di.sl.registerLazySingleton(() => GetBestPosts(repository: mockRepository));
   });
 
-  tearDown(() {
-    di.sl.reset();
-  });
+  tearDown(di.sl.reset);
 
   test('should emit data when fetch succeeds', () async {
     final posts = [
       const Post(id: 1, title: 'Post 1', recommendCount: 100, url: '/test'),
     ];
-    when(() => mockRepository.getBestPosts())
-        .thenAnswer((_) async => Right(posts));
+    when(
+      () => mockRepository.getBestPosts(),
+    ).thenAnswer((_) async => Right(posts));
 
     final container = ProviderContainer();
     addTearDown(container.dispose);
@@ -51,8 +50,9 @@ void main() {
 
   test('should emit failure when fetch fails', () async {
     const failure = ServerFailure('Error');
-    when(() => mockRepository.getBestPosts())
-        .thenAnswer((_) async => const Left(failure));
+    when(
+      () => mockRepository.getBestPosts(),
+    ).thenAnswer((_) async => const Left(failure));
 
     final container = ProviderContainer();
     addTearDown(container.dispose);

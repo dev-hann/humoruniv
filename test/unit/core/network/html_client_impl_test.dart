@@ -6,16 +6,15 @@ void main() {
   group('HtmlClientImpl', () {
     test('should throw DioException when dio fails with bad URL', () {
       final client = HtmlClientImpl(
-        dio: Dio(BaseOptions(
-          baseUrl: 'http://invalid.host.that.does.not.exist.example',
-          responseType: ResponseType.bytes,
-        )),
+        dio: Dio(
+          BaseOptions(
+            baseUrl: 'http://invalid.host.that.does.not.exist.example',
+            responseType: ResponseType.bytes,
+          ),
+        ),
       );
 
-      expect(
-        () => client.get('/test.html'),
-        throwsA(isA<DioException>()),
-      );
+      expect(() => client.get('/test.html'), throwsA(isA<DioException>()));
     });
 
     test('should construct with default dio config', () {

@@ -21,12 +21,7 @@ void main() {
   });
 
   test('should preserve all fields during conversion', () {
-    const dto = PostDto(
-      id: 1,
-      title: '',
-      recommendCount: 0,
-      url: '',
-    );
+    const dto = PostDto(id: 1, title: '', recommendCount: 0, url: '');
 
     final entity = dto.toEntity();
 

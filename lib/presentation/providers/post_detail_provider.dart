@@ -5,8 +5,7 @@ import 'package:humoruniv/di/injection.dart';
 import 'package:humoruniv/domain/entities/post_detail.dart';
 import 'package:humoruniv/domain/usecases/get_post_detail.dart';
 
-final postDetailProvider =
-    FutureProvider.autoDispose.family<Either<Failure, PostDetail>, String>(
-        (ref, url) {
-  return sl<GetPostDetail>()(url);
-});
+final postDetailProvider = FutureProvider.autoDispose
+    .family<Either<Failure, PostDetail>, String>((ref, url) {
+      return sl<GetPostDetail>()(url);
+    });

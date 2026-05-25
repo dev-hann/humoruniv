@@ -30,7 +30,10 @@ void main() {
 
     test('all values should be multiples of 4 or 4pt half-steps', () {
       const values = [
-        AppRadius.sm, AppRadius.md, AppRadius.lg, AppRadius.xl,
+        AppRadius.sm,
+        AppRadius.md,
+        AppRadius.lg,
+        AppRadius.xl,
         AppRadius.xxl,
       ];
       for (final v in values) {

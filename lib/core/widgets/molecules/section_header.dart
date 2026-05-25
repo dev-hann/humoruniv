@@ -3,14 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 
 class SectionHeader extends StatelessWidget {
+  const SectionHeader({required this.title, super.key, this.trailing});
   final String title;
   final Widget? trailing;
-
-  const SectionHeader({
-    super.key,
-    required this.title,
-    this.trailing,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +13,7 @@ class SectionHeader extends StatelessWidget {
       padding: AppSpacing.edgeH16V8,
       child: Row(
         children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
           const Spacer(),
           if (trailing != null) trailing!,
         ],

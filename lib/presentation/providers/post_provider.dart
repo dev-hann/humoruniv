@@ -7,5 +7,5 @@ import 'package:humoruniv/domain/usecases/get_best_posts.dart';
 
 final bestPostsProvider =
     FutureProvider.autoDispose<Either<Failure, List<Post>>>((ref) {
-  return sl<GetBestPosts>()();
-});
+      return sl<GetBestPosts>()();
+    });

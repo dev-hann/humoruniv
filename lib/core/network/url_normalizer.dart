@@ -12,10 +12,7 @@ abstract final class UrlNormalizer {
       normalized = normalized.replaceFirst(':///', '://');
     }
 
-    normalized = normalized.replaceAllMapped(
-      RegExp(r'(?<!:)/{2,}'),
-      (m) => '/',
-    );
+    normalized = normalized.replaceAllMapped(RegExp('(?<!:)/{2,}'), (m) => '/');
 
     return normalized;
   }

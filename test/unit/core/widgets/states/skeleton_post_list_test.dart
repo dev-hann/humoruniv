@@ -8,10 +8,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              height: 800,
-              child: SkeletonPostList(),
-            ),
+            body: SizedBox(height: 800, child: SkeletonPostList()),
           ),
         ),
       );
@@ -23,10 +20,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              height: 800,
-              child: SkeletonPostList(itemCount: 3),
-            ),
+            body: SizedBox(height: 800, child: SkeletonPostList(itemCount: 3)),
           ),
         ),
       );

@@ -1,24 +1,9 @@
-import 'package:meta/meta.dart';
-
 import 'package:humoruniv/domain/entities/comment.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
+import 'package:meta/meta.dart';
 
 @immutable
 class PostDetail {
-  final int id;
-  final String title;
-  final String author;
-  final DateTime date;
-  final String contentHtml;
-  final List<ContentBlock> contentBlocks;
-  final List<String> imageUrls;
-  final int recommendCount;
-  final int notRecommendCount;
-  final int viewCount;
-  final int commentCount;
-  final List<Comment> comments;
-  final bool isNsfw;
-
   const PostDetail({
     required this.id,
     required this.title,
@@ -34,6 +19,19 @@ class PostDetail {
     required this.comments,
     this.isNsfw = false,
   });
+  final int id;
+  final String title;
+  final String author;
+  final DateTime date;
+  final String contentHtml;
+  final List<ContentBlock> contentBlocks;
+  final List<String> imageUrls;
+  final int recommendCount;
+  final int notRecommendCount;
+  final int viewCount;
+  final int commentCount;
+  final List<Comment> comments;
+  final bool isNsfw;
 
   @override
   bool operator ==(Object other) =>
@@ -53,15 +51,15 @@ class PostDetail {
 
   @override
   int get hashCode => Object.hash(
-        id,
-        title,
-        author,
-        date,
-        contentHtml,
-        recommendCount,
-        notRecommendCount,
-        viewCount,
-        commentCount,
-        isNsfw,
-      );
+    id,
+    title,
+    author,
+    date,
+    contentHtml,
+    recommendCount,
+    notRecommendCount,
+    viewCount,
+    commentCount,
+    isNsfw,
+  );
 }

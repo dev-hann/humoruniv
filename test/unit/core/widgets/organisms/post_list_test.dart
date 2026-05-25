@@ -5,26 +5,15 @@ import 'package:humoruniv/core/widgets/organisms/post_list.dart';
 void main() {
   group('PostList', () {
     final items = [
-      PostListItem(
-        title: '첫 번째',
-        author: '작성자',
-        recommendCount: 100,
-      ),
-      PostListItem(
-        title: '두 번째',
-        author: '작성자2',
-        recommendCount: 50,
-      ),
+      const PostListItem(title: '첫 번째', author: '작성자', recommendCount: 100),
+      const PostListItem(title: '두 번째', author: '작성자2', recommendCount: 50),
     ];
 
     testWidgets('should display post titles', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PostList(
-              items: items,
-              onPostTap: (_) {},
-            ),
+            body: PostList(items: items, onPostTap: (_) {}),
           ),
         ),
       );
@@ -37,10 +26,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PostList(
-              items: const [],
-              onPostTap: (_) {},
-            ),
+            body: PostList(items: const [], onPostTap: (_) {}),
           ),
         ),
       );

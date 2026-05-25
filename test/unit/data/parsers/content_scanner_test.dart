@@ -9,7 +9,8 @@ void main() {
     group('scan', () {
       test('should extract text as TextBlock', () {
         final doc = html_parser.parse(
-            '<div class="body_editor">Hello world</div>');
+          '<div class="body_editor">Hello world</div>',
+        );
         final container = doc.querySelector('.body_editor')!;
 
         final result = ContentScanner.scan(container);
@@ -66,12 +67,13 @@ void main() {
         expect(types, contains(TextBlock));
         expect(types, contains(ImageBlock));
 
-        final textBeforeIdx =
-            result.blocks.indexWhere((b) => b is TextBlock && (b as TextBlock).text.contains('Text before'));
-        final imgIdx =
-            result.blocks.indexWhere((b) => b is ImageBlock);
-        final textAfterIdx =
-            result.blocks.indexWhere((b) => b is TextBlock && (b as TextBlock).text.contains('Text after'));
+        final textBeforeIdx = result.blocks.indexWhere(
+          (b) => b is TextBlock && b.text.contains('Text before'),
+        );
+        final imgIdx = result.blocks.indexWhere((b) => b is ImageBlock);
+        final textAfterIdx = result.blocks.indexWhere(
+          (b) => b is TextBlock && b.text.contains('Text after'),
+        );
 
         expect(textBeforeIdx, lessThan(imgIdx));
         expect(imgIdx, lessThan(textAfterIdx));
@@ -91,8 +93,10 @@ void main() {
 
         final result = ContentScanner.scan(container);
 
-        final texts =
-            result.blocks.whereType<TextBlock>().map((b) => b.text).toList();
+        final texts = result.blocks
+            .whereType<TextBlock>()
+            .map((b) => b.text)
+            .toList();
         expect(texts, isNot(contains('some notice')));
         expect(texts, isNot(contains('crop link')));
         expect(texts, isNot(contains('mp4 crop')));
@@ -320,8 +324,10 @@ void main() {
         expect(video.url, 'http://example.com/clip.mp4');
       });
 
-      test('should not duplicate image found both inside and outside container', () {
-        final doc = html_parser.parse('''
+      test(
+        'should not duplicate image found both inside and outside container',
+        () {
+          final doc = html_parser.parse('''
           <html><body>
           <div class="body_editor">
             <div class="simple_attach_img_div">
@@ -337,13 +343,14 @@ void main() {
           </div>
           </body></html>
         ''');
-        final container = doc.querySelector('.body_editor')!;
+          final container = doc.querySelector('.body_editor')!;
 
-        final result = ContentScanner.scanFull(doc, container);
+          final result = ContentScanner.scanFull(doc, container);
 
-        final imgs = result.blocks.whereType<ImageBlock>().toList();
-        expect(imgs, hasLength(1));
-      });
+          final imgs = result.blocks.whereType<ImageBlock>().toList();
+          expect(imgs, hasLength(1));
+        },
+      );
 
       test('should not duplicate when scheme differs (http vs https)', () {
         final doc = html_parser.parse('''
@@ -511,7 +518,8 @@ void main() {
 
         final imgIdx = result.blocks.indexWhere((b) => b is ImageBlock);
         final textIdx = result.blocks.indexWhere(
-            (b) => b is TextBlock && (b as TextBlock).text.contains('이미지 다음'));
+          (b) => b is TextBlock && b.text.contains('이미지 다음'),
+        );
         expect(imgIdx, lessThan(textIdx));
       });
     });

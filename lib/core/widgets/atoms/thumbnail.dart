@@ -6,20 +6,19 @@ import 'package:humoruniv/core/themes/app_sizes.dart';
 enum ThumbnailSize { small, medium, large }
 
 class Thumbnail extends StatelessWidget {
+  const Thumbnail({
+    required this.imageUrl,
+    super.key,
+    this.size = ThumbnailSize.small,
+  });
   final String? imageUrl;
   final ThumbnailSize size;
 
-  const Thumbnail({
-    super.key,
-    required this.imageUrl,
-    this.size = ThumbnailSize.small,
-  });
-
   double get _dimension => switch (size) {
-        ThumbnailSize.small => AppSizes.thumbnailSmall,
-        ThumbnailSize.medium => AppSizes.thumbnailMedium,
-        ThumbnailSize.large => AppSizes.thumbnailLarge,
-      };
+    ThumbnailSize.small => AppSizes.thumbnailSmall,
+    ThumbnailSize.medium => AppSizes.thumbnailMedium,
+    ThumbnailSize.large => AppSizes.thumbnailLarge,
+  };
 
   @override
   Widget build(BuildContext context) {

@@ -20,10 +20,13 @@ Future<String> fetchHtml(String path) async {
     );
     await tempFile.writeAsBytes(bytes);
 
-    final result = await Process.run(
-      'iconv',
-      ['-f', 'cp949', '-t', 'utf-8', tempFile.path],
-    );
+    final result = await Process.run('iconv', [
+      '-f',
+      'cp949',
+      '-t',
+      'utf-8',
+      tempFile.path,
+    ]);
     await tempFile.delete();
 
     if (result.exitCode != 0) {

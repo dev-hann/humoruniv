@@ -5,10 +5,7 @@ import 'package:humoruniv/presentation/screens/post_detail_screen.dart';
 
 final appRouter = GoRouter(
   routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const HomeScreen(),
-    ),
+    GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
     GoRoute(
       path: '/board/:table',
       builder: (context, state) {

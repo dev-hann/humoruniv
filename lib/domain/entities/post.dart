@@ -2,17 +2,16 @@ import 'package:meta/meta.dart';
 
 @immutable
 class Post {
-  final int id;
-  final String title;
-  final int recommendCount;
-  final String url;
-
   const Post({
     required this.id,
     required this.title,
     required this.recommendCount,
     required this.url,
   });
+  final int id;
+  final String title;
+  final int recommendCount;
+  final String url;
 
   @override
   bool operator ==(Object other) =>

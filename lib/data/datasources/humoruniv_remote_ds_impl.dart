@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/core/network/html_client.dart';
 import 'package:humoruniv/data/datasources/humoruniv_remote_ds.dart';
-import 'package:humoruniv/data/models/board_post_dto.dart';
 import 'package:humoruniv/data/models/post_dto.dart';
 import 'package:humoruniv/data/parsers/board_list_parser.dart';
 import 'package:humoruniv/data/parsers/main_page_parser.dart';
@@ -10,9 +9,8 @@ import 'package:humoruniv/data/parsers/post_detail_parser.dart';
 import 'package:humoruniv/domain/entities/post_detail.dart';
 
 class HumorunivRemoteDsImpl implements HumorunivRemoteDs {
-  final HtmlClient htmlClient;
-
   const HumorunivRemoteDsImpl({required this.htmlClient});
+  final HtmlClient htmlClient;
 
   @override
   Future<List<PostDto>> fetchMainPage() async {

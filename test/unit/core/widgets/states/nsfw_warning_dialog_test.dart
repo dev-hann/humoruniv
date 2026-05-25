@@ -13,9 +13,7 @@ void main() {
                 onPressed: () {
                   showDialog<void>(
                     context: context,
-                    builder: (_) => NsfwWarningDialog(
-                      onAcknowledge: () {},
-                    ),
+                    builder: (_) => NsfwWarningDialog(onAcknowledge: () {}),
                   );
                 },
                 child: const Text('show'),
@@ -40,9 +38,7 @@ void main() {
                 onPressed: () {
                   showDialog<void>(
                     context: context,
-                    builder: (_) => NsfwWarningDialog(
-                      onAcknowledge: () {},
-                    ),
+                    builder: (_) => NsfwWarningDialog(onAcknowledge: () {}),
                   );
                 },
                 child: const Text('show'),
@@ -58,8 +54,9 @@ void main() {
       expect(find.text('확인'), findsOneWidget);
     });
 
-    testWidgets('should call onAcknowledge and close on confirm',
-        (tester) async {
+    testWidgets('should call onAcknowledge and close on confirm', (
+      tester,
+    ) async {
       var acknowledged = false;
       await tester.pumpWidget(
         MaterialApp(

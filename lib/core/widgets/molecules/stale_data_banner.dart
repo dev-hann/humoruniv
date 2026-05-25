@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 
 class StaleDataBanner extends StatelessWidget {
+  const StaleDataBanner({required this.message, super.key});
   final String message;
-
-  const StaleDataBanner({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +24,8 @@ class StaleDataBanner extends StatelessWidget {
             child: Text(
               message,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ],

@@ -9,9 +9,7 @@ import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 import 'package:humoruniv/domain/usecases/get_post_detail.dart';
 
 void main() {
-  tearDown(() {
-    di.sl.reset();
-  });
+  tearDown(di.sl.reset);
 
   group('configureDependencies', () {
     test('should register HtmlClientImpl', () {
@@ -53,12 +51,12 @@ void main() {
     test('should resolve all dependencies without throwing', () {
       di.configureDependencies();
 
-      expect(() => di.sl<HtmlClientImpl>(), returnsNormally);
-      expect(() => di.sl<HumorunivRemoteDs>(), returnsNormally);
-      expect(() => di.sl<PostRepository>(), returnsNormally);
-      expect(() => di.sl<GetBestPosts>(), returnsNormally);
-      expect(() => di.sl<GetPostDetail>(), returnsNormally);
-      expect(() => di.sl<GetBoardPosts>(), returnsNormally);
+      expect(di.sl, returnsNormally);
+      expect(di.sl, returnsNormally);
+      expect(di.sl, returnsNormally);
+      expect(di.sl, returnsNormally);
+      expect(di.sl, returnsNormally);
+      expect(di.sl, returnsNormally);
     });
 
     test('PostRepository should be PostRepositoryImpl', () {

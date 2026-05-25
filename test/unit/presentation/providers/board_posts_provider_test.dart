@@ -29,12 +29,12 @@ void main() {
       di.sl.unregister<GetBoardPosts>();
     }
     di.sl.registerLazySingleton<PostRepository>(() => mockRepository);
-    di.sl.registerLazySingleton(() => GetBoardPosts(repository: mockRepository));
+    di.sl.registerLazySingleton(
+      () => GetBoardPosts(repository: mockRepository),
+    );
   });
 
-  tearDown(() {
-    di.sl.reset();
-  });
+  tearDown(di.sl.reset);
 
   test('should load initial page with posts', () async {
     const result = BoardListResult(
@@ -55,8 +55,9 @@ void main() {
       currentPage: 0,
       totalPage: 5,
     );
-    when(() => mockRepository.getBoardPosts('pds', 0, SortOption.all))
-        .thenAnswer((_) async => const Right(result));
+    when(
+      () => mockRepository.getBoardPosts('pds', 0, SortOption.all),
+    ).thenAnswer((_) async => const Right(result));
 
     final container = ProviderContainer(
       overrides: [
@@ -76,8 +77,9 @@ void main() {
   });
 
   test('should be in error state when fetch fails', () async {
-    when(() => mockRepository.getBoardPosts(any(), any(), any()))
-        .thenAnswer((_) async => const Left(ServerFailure('Error')));
+    when(
+      () => mockRepository.getBoardPosts(any(), any(), any()),
+    ).thenAnswer((_) async => const Left(ServerFailure('Error')));
 
     final container = ProviderContainer(
       overrides: [
@@ -131,10 +133,12 @@ void main() {
       currentPage: 1,
       totalPage: 3,
     );
-    when(() => mockRepository.getBoardPosts('pds', 0, SortOption.all))
-        .thenAnswer((_) async => const Right(page0));
-    when(() => mockRepository.getBoardPosts('pds', 1, SortOption.all))
-        .thenAnswer((_) async => const Right(page1));
+    when(
+      () => mockRepository.getBoardPosts('pds', 0, SortOption.all),
+    ).thenAnswer((_) async => const Right(page0));
+    when(
+      () => mockRepository.getBoardPosts('pds', 1, SortOption.all),
+    ).thenAnswer((_) async => const Right(page1));
 
     final container = ProviderContainer(
       overrides: [
@@ -175,8 +179,9 @@ void main() {
       currentPage: 0,
       totalPage: 1,
     );
-    when(() => mockRepository.getBoardPosts('pds', 0, SortOption.all))
-        .thenAnswer((_) async => const Right(result));
+    when(
+      () => mockRepository.getBoardPosts('pds', 0, SortOption.all),
+    ).thenAnswer((_) async => const Right(result));
 
     final container = ProviderContainer(
       overrides: [
@@ -215,10 +220,12 @@ void main() {
       currentPage: 0,
       totalPage: 3,
     );
-    when(() => mockRepository.getBoardPosts('pds', 0, SortOption.all))
-        .thenAnswer((_) async => const Right(page0));
-    when(() => mockRepository.getBoardPosts('pds', 1, SortOption.all))
-        .thenAnswer((_) async => const Left(ServerFailure('Network error')));
+    when(
+      () => mockRepository.getBoardPosts('pds', 0, SortOption.all),
+    ).thenAnswer((_) async => const Right(page0));
+    when(
+      () => mockRepository.getBoardPosts('pds', 1, SortOption.all),
+    ).thenAnswer((_) async => const Left(ServerFailure('Network error')));
 
     final container = ProviderContainer(
       overrides: [

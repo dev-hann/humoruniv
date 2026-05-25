@@ -43,7 +43,9 @@ void main() {
       expect(find.text('42'), findsOneWidget);
     });
 
-    testWidgets('should not display thumbnail when thumbnailUrl is empty', (tester) async {
+    testWidgets('should not display thumbnail when thumbnailUrl is empty', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

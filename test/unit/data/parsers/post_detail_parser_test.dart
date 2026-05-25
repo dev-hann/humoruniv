@@ -8,8 +8,7 @@ void main() {
   late String fixtureHtml;
 
   setUpAll(() {
-    fixtureHtml =
-        File('test/fixtures/post_detail.html').readAsStringSync();
+    fixtureHtml = File('test/fixtures/post_detail.html').readAsStringSync();
   });
 
   test('should parse title from fixture', () {
@@ -99,7 +98,7 @@ void main() {
   });
 
   test('should extract text outside simple_attach_img_div', () {
-    final html = '''
+    const html = '''
     <html><head><title>Test</title></head><body>
     <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
     <div id="read_profile_desc"><span class="etc">작성 2026-05-15 11:00:00</span></div>
@@ -117,13 +116,16 @@ void main() {
 
     final result = PostDetailParser.parse(html);
 
-    final texts = result.contentBlocks.whereType<TextBlock>().map((b) => b.text).toList();
+    final texts = result.contentBlocks
+        .whereType<TextBlock>()
+        .map((b) => b.text)
+        .toList();
     expect(texts, contains('Text before divs'));
     expect(texts, contains('Text after divs'));
   });
 
   test('should not produce empty TextBlocks from br-only divs', () {
-    final html = '''
+    const html = '''
     <html><head><title>Test</title></head><body>
     <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
     <div id="read_profile_desc"><span class="etc">작성 2026-05-15 11:00:00</span></div>
@@ -137,12 +139,14 @@ void main() {
 
     final result = PostDetailParser.parse(html);
 
-    final emptyBlocks = result.contentBlocks.whereType<TextBlock>().where((b) => b.text.trim().isEmpty);
+    final emptyBlocks = result.contentBlocks.whereType<TextBlock>().where(
+      (b) => b.text.trim().isEmpty,
+    );
     expect(emptyBlocks, isEmpty);
   });
 
   test('should detect video tag as VideoBlock', () {
-    final html = '''
+    const html = '''
     <html><head><title>Test</title></head><body>
     <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
     <div id="read_profile_desc"><span class="etc">작성 2026-05-15 11:00:00</span></div>
@@ -167,7 +171,7 @@ void main() {
   });
 
   test('should detect video embed div with mp4 data attributes', () {
-    final html = '''
+    const html = '''
     <html><head><title>Test</title></head><body>
     <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
     <div id="read_profile_desc"><span class="etc">작성 2026-05-15 11:00:00</span></div>

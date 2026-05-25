@@ -73,8 +73,14 @@ void main() {
     test('should extract thumbnail url from posts with images', () {
       final result = BoardListParser.parse(fixtureHtml);
 
-      final withThumb = result.posts.where((p) => p.thumbnailUrl.isNotEmpty).toList();
-      expect(withThumb, isNotEmpty, reason: 'Some posts should have thumbnail URLs');
+      final withThumb = result.posts
+          .where((p) => p.thumbnailUrl.isNotEmpty)
+          .toList();
+      expect(
+        withThumb,
+        isNotEmpty,
+        reason: 'Some posts should have thumbnail URLs',
+      );
 
       for (final post in withThumb) {
         expect(post.thumbnailUrl, contains('https://timg.humoruniv.com'));
@@ -84,12 +90,18 @@ void main() {
     test('should return empty thumbnail for no_image posts', () {
       final result = BoardListParser.parse(fixtureHtml);
 
-      final noThumb = result.posts.where((p) => p.thumbnailUrl.isEmpty).toList();
-      expect(noThumb, isNotEmpty, reason: 'Some posts should have no thumbnail');
+      final noThumb = result.posts
+          .where((p) => p.thumbnailUrl.isEmpty)
+          .toList();
+      expect(
+        noThumb,
+        isNotEmpty,
+        reason: 'Some posts should have no thumbnail',
+      );
     });
 
     test('should parse partial results when some elements are malformed', () {
-      final partialHtml = '''
+      const partialHtml = '''
       <html><body>
       <div class="post_item">
         <a class="post_link" href="/rd.html?url=/board/read.html&table=pds&number=100" data-number="100">

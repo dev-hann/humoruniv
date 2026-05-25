@@ -7,12 +7,7 @@ void main() {
     testWidgets('should display all tab labels', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: BottomNavBar(
-              currentIndex: 0,
-              onTap: (_) {},
-            ),
-          ),
+          home: Scaffold(body: BottomNavBar(currentIndex: 0, onTap: (_) {})),
         ),
       );
 
@@ -22,16 +17,12 @@ void main() {
       expect(find.text('설정'), findsOneWidget);
     });
 
-    testWidgets('should call onTap with index when tab tapped',
-        (tester) async {
+    testWidgets('should call onTap with index when tab tapped', (tester) async {
       var tappedIndex = -1;
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: BottomNavBar(
-              currentIndex: 0,
-              onTap: (i) => tappedIndex = i,
-            ),
+            body: BottomNavBar(currentIndex: 0, onTap: (i) => tappedIndex = i),
           ),
         ),
       );
@@ -43,12 +34,7 @@ void main() {
     testWidgets('should display NavigationBar', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: BottomNavBar(
-              currentIndex: 0,
-              onTap: (_) {},
-            ),
-          ),
+          home: Scaffold(body: BottomNavBar(currentIndex: 0, onTap: (_) {})),
         ),
       );
 

@@ -6,11 +6,7 @@ void main() {
   group('SkeletonPostDetail', () {
     testWidgets('should render skeleton boxes', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonPostDetail(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonPostDetail())),
       );
 
       expect(find.byType(SkeletonPostDetail), findsOneWidget);
@@ -18,11 +14,7 @@ void main() {
 
     testWidgets('should be scrollable', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonPostDetail(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonPostDetail())),
       );
 
       expect(find.byType(SingleChildScrollView), findsOneWidget);

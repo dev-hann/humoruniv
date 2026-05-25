@@ -7,9 +7,7 @@ void main() {
     testWidgets('should display title', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: SectionHeader(title: '댓글'),
-          ),
+          home: Scaffold(body: SectionHeader(title: '댓글')),
         ),
       );
 
@@ -20,10 +18,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SectionHeader(
-              title: '댓글',
-              trailing: Text('더보기'),
-            ),
+            body: SectionHeader(title: '댓글', trailing: Text('더보기')),
           ),
         ),
       );

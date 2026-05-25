@@ -6,20 +6,19 @@ import 'package:humoruniv/core/widgets/atoms/count_badge.dart';
 import 'package:humoruniv/core/widgets/atoms/thumbnail.dart';
 
 class HeroCard extends StatelessWidget {
+  const HeroCard({
+    required this.title,
+    required this.author,
+    required this.recommendCount,
+    required this.onTap,
+    super.key,
+    this.thumbnailUrl,
+  });
   final String title;
   final String author;
   final int recommendCount;
   final String? thumbnailUrl;
   final VoidCallback onTap;
-
-  const HeroCard({
-    super.key,
-    required this.title,
-    required this.author,
-    required this.recommendCount,
-    this.thumbnailUrl,
-    required this.onTap,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +31,7 @@ class HeroCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (thumbnailUrl != null && thumbnailUrl!.isNotEmpty)
-              Thumbnail(
-                imageUrl: thumbnailUrl,
-                size: ThumbnailSize.large,
-              ),
+              Thumbnail(imageUrl: thumbnailUrl, size: ThumbnailSize.large),
             Padding(
               padding: AppSpacing.edgeAll12,
               child: Column(
@@ -51,7 +47,8 @@ class HeroCard extends StatelessWidget {
                         ),
                         child: Text(
                           '오늘의 1위',
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
                                 color: Theme.of(context).colorScheme.onPrimary,
                               ),
                         ),

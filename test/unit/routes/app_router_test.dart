@@ -39,18 +39,21 @@ void main() {
     }
     di.sl.registerLazySingleton<PostRepository>(() => mockRepository);
     di.sl.registerLazySingleton(() => GetBestPosts(repository: mockRepository));
-    di.sl.registerLazySingleton(() => GetPostDetail(repository: mockRepository));
-    di.sl.registerLazySingleton(() => GetBoardPosts(repository: mockRepository));
+    di.sl.registerLazySingleton(
+      () => GetPostDetail(repository: mockRepository),
+    );
+    di.sl.registerLazySingleton(
+      () => GetBoardPosts(repository: mockRepository),
+    );
   });
 
-  tearDown(() {
-    di.sl.reset();
-  });
+  tearDown(di.sl.reset);
 
   group('appRouter', () {
     testWidgets('route / should render HomeScreen', (tester) async {
-      when(() => mockRepository.getBestPosts())
-          .thenAnswer((_) async => const Right([]));
+      when(
+        () => mockRepository.getBestPosts(),
+      ).thenAnswer((_) async => const Right([]));
 
       await tester.pumpWidget(
         ProviderScope(child: MaterialApp.router(routerConfig: appRouter)),
@@ -60,11 +63,17 @@ void main() {
       expect(find.byType(HomeScreen), findsOneWidget);
     });
 
-    testWidgets('route /post should render PostDetailScreen with empty url', (tester) async {
-      when(() => mockRepository.getBestPosts())
-          .thenAnswer((_) async => Right([const Post(id: 1, title: 'Test', recommendCount: 0, url: '/test')]));
-      when(() => mockRepository.getPostDetail(any()))
-          .thenAnswer((_) async => const Left(ServerFailure('no url')));
+    testWidgets('route /post should render PostDetailScreen with empty url', (
+      tester,
+    ) async {
+      when(() => mockRepository.getBestPosts()).thenAnswer(
+        (_) async => const Right([
+          Post(id: 1, title: 'Test', recommendCount: 0, url: '/test'),
+        ]),
+      );
+      when(
+        () => mockRepository.getPostDetail(any()),
+      ).thenAnswer((_) async => const Left(ServerFailure('no url')));
 
       await tester.pumpWidget(
         ProviderScope(child: MaterialApp.router(routerConfig: appRouter)),

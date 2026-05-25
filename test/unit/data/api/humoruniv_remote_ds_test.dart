@@ -1,8 +1,8 @@
+import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/core/network/html_client.dart';
 import 'package:humoruniv/data/datasources/humoruniv_remote_ds_impl.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:flutter_test/flutter_test.dart';
 
 class MockHtmlClient extends Mock implements HtmlClient {}
 
@@ -39,16 +39,17 @@ void main() {
     });
 
     test('should throw ServerFailure when fetchMainPage throws', () async {
-      when(() => mockHtmlClient.get(any())).thenThrow(Exception('Network error'));
+      when(
+        () => mockHtmlClient.get(any()),
+      ).thenThrow(Exception('Network error'));
 
-      expect(
-        () => remoteDs.fetchMainPage(),
-        throwsA(isA<ServerFailure>()),
-      );
+      expect(() => remoteDs.fetchMainPage(), throwsA(isA<ServerFailure>()));
     });
 
     test('should call get with correct main page url', () async {
-      when(() => mockHtmlClient.get(any())).thenAnswer((_) async => '<html></html>');
+      when(
+        () => mockHtmlClient.get(any()),
+      ).thenAnswer((_) async => '<html></html>');
 
       await remoteDs.fetchMainPage();
 
@@ -71,11 +72,15 @@ void main() {
       ''';
       when(() => mockHtmlClient.get(any())).thenAnswer((_) async => testHtml);
 
-      final result = await remoteDs.fetchPostDetail('/board/read.html?table=pds&number=123');
+      final result = await remoteDs.fetchPostDetail(
+        '/board/read.html?table=pds&number=123',
+      );
 
       expect(result.title, '테스트 글');
       expect(result.author, '작성자');
-      verify(() => mockHtmlClient.get('/board/read.html?table=pds&number=123')).called(1);
+      verify(
+        () => mockHtmlClient.get('/board/read.html?table=pds&number=123'),
+      ).called(1);
     });
 
     test('should throw ServerFailure when fetchPostDetail fails', () async {
@@ -87,8 +92,10 @@ void main() {
       );
     });
 
-    test('should return BoardListDsResult when fetchBoardList succeeds', () async {
-      const testHtml = '''
+    test(
+      'should return BoardListDsResult when fetchBoardList succeeds',
+      () async {
+        const testHtml = '''
       <html><body>
       <div class="post_item">
         <a class="post_link" href="/rd.html?url=/board/read.html&table=pds&number=100" data-number="100">
@@ -103,14 +110,17 @@ void main() {
       </div>
       </body></html>
       ''';
-      when(() => mockHtmlClient.get(any())).thenAnswer((_) async => testHtml);
+        when(() => mockHtmlClient.get(any())).thenAnswer((_) async => testHtml);
 
-      final result = await remoteDs.fetchBoardList('pds', 0, '');
+        final result = await remoteDs.fetchBoardList('pds', 0, '');
 
-      expect(result.posts, isNotEmpty);
-      expect(result.posts.first.title, 'Board Test Post');
-      verify(() => mockHtmlClient.get('/board/list.html?table=pds&pg=0')).called(1);
-    });
+        expect(result.posts, isNotEmpty);
+        expect(result.posts.first.title, 'Board Test Post');
+        verify(
+          () => mockHtmlClient.get('/board/list.html?table=pds&pg=0'),
+        ).called(1);
+      },
+    );
 
     test('should throw ServerFailure when fetchBoardList fails', () async {
       when(() => mockHtmlClient.get(any())).thenThrow(Exception('fail'));
@@ -122,11 +132,15 @@ void main() {
     });
 
     test('should include sort param in fetchBoardList URL', () async {
-      when(() => mockHtmlClient.get(any())).thenAnswer((_) async => '<html></html>');
+      when(
+        () => mockHtmlClient.get(any()),
+      ).thenAnswer((_) async => '<html></html>');
 
       await remoteDs.fetchBoardList('pds', 1, 'day');
 
-      verify(() => mockHtmlClient.get('/board/list.html?table=pds&pg=1&sort=day')).called(1);
+      verify(
+        () => mockHtmlClient.get('/board/list.html?table=pds&pg=1&sort=day'),
+      ).called(1);
     });
   });
 }
