@@ -21,9 +21,9 @@ class BottomNavBar extends StatelessWidget {
           label: '홈',
         ),
         NavigationDestination(
-          icon: Icon(Icons.access_time_outlined),
-          selectedIcon: Icon(Icons.access_time),
-          label: '최신',
+          icon: Icon(Icons.dashboard_outlined),
+          selectedIcon: Icon(Icons.dashboard),
+          label: '게시판',
         ),
         NavigationDestination(
           icon: Icon(Icons.search_outlined),

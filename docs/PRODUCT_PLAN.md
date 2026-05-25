@@ -32,7 +32,7 @@ Rationale:
 
 - **Behavior**: Visits daily. Reads broadly.
 - **Core Need**: Full post list with filters.
-- **Scenario**: Opens app during lunch break. Checks recent tab first, then switches to weekly best filter. Reads 10-15 posts including comments. Occasionally bookmarks.
+- **Scenario**: Opens app during lunch break. Goes to Board tab, selects a board, checks latest posts, then switches to weekly best filter. Reads 10-15 posts including comments. Occasionally bookmarks.
 - **Frequency**: Daily.
 
 ### Active User
@@ -64,31 +64,56 @@ Rationale:
 
 ```
 ┌──────────┬──────────┬──────────┬──────────┐
-│   Home   │  Recent  │  Search  │ Settings │
-│ (House)  │ (Clock)  │ (Search) │ (Gear)   │
-│  Best    │  All     │  PDS     │          │
+│   홈     │  게시판   │   검색   │   설정   │
+│ (House)  │ (Grid)   │ (Search) │ (Gear)   │
+│ 종합베스트│ 보드선택  │          │          │
 └──────────┴──────────┴──────────┴──────────┘
 ```
 
-### Home Tab (Best Posts)
+| Position | Icon (normal → selected) | Label | AppBar Title | Screen |
+|----------|--------------------------|-------|-------------|--------|
+| 0 | `home_outlined` → `home` | 홈 | 종합베스트 | HomeScreen |
+| 1 | `dashboard_outlined` → `dashboard` | 게시판 | 웃긴자료 (P1) / board name (P3) | BoardDetailScreen (P1) / BoardListScreen (P3) |
+| 2 | `search_outlined` → `search` | 검색 | 검색 | SearchScreen |
+| 3 | `settings_outlined` → `settings` | 설정 | 설정 | SettingsScreen |
 
+### Home Tab (종합 베스트 피드)
+
+- All boards' best posts aggregated into a single feed.
 - Hero card: today's #1 post with thumbnail, title, recommend count.
-- Best posts list: top 25 by recommend count.
+- Best posts list: top posts by recommend count across all boards.
 - Pull-to-refresh.
 - Read posts shown in muted color.
 - Cached data shown when offline.
+- Currently shows pds best only (Phase 1); will aggregate all boards in Phase 3.
 
-### Recent Tab (All Posts)
+### Board Tab (게시판 탐색)
 
-- All posts in chronological order.
-- Filter tabs: daily best / weekly best / monthly / yearly / recommend 500+.
+**Phase 1 (single board — pds only)**:
+- Skips BoardListScreen entirely. Shows BoardDetailScreen directly for pds.
+- AppBar title: "웃긴자료".
+- No board selector UI (clean, no placeholders).
+
+**Phase 3 (multi-board)**:
+- BoardListScreen first: favorites + all boards with icons.
+- Tapping a board navigates to BoardDetailScreen.
+- BoardDetailScreen AppBar shows current board name with chevron/dropdown to switch.
+
+**BoardDetailScreen (shared by both phases)**:
+- Full post list in chronological order.
+- Filter bar: horizontal scrollable chip row below AppBar.
+  - Chips: 전체(default), 일간베스트, 주간베스트, 월간베스트, 연간베스트, 추천500+.
+  - "전체" shows chronological order — same experience as old "최신" tab.
+  - Selected chip uses `primary` container color.
+  - 44pt minimum touch target per chip.
 - Infinite scroll with pagination.
 - Pull-to-refresh.
-- Write button (FAB) when logged in (Phase 3).
+- Write button (FAB) when logged in (Phase 2).
 
 ### Search Tab
 
 - Search bar with debounce.
+- Board filter: search within specific board or all boards.
 - Period filter: 1 day / 1 week / 1 month / 6 months / 1 year / all.
 - Search history (stored locally).
 - Results shown as post cards.
@@ -113,8 +138,10 @@ App
 │   │   └── PostDetailScreen
 │   │       ├── ImageViewerScreen
 │   │       └── CommentSection (inline)
-│   ├── RecentTab
-│   │   └── PostDetailScreen → (shared)
+│   ├── BoardTab
+│   │   ├── Phase 1: BoardDetailScreen (pds directly)
+│   │   ├── Phase 3: BoardListScreen → BoardDetailScreen
+│   │   └── BoardDetailScreen → PostDetailScreen → (shared)
 │   ├── SearchTab
 │   │   └── PostDetailScreen → (shared)
 │   └── SettingsTab
@@ -160,7 +187,7 @@ Navigation rules:
 
 ### SearchResult — Phase: P1
 
-- Same post cards as RecentTab.
+- Same post cards as BoardDetailScreen.
 - Empty state: "No results found" with suggestion to adjust filter.
 
 ## 7. User Flows
@@ -183,7 +210,16 @@ HomeTab → See hero card → Tap → PostDetailScreen
   → Back → HomeTab
 ```
 
-### Flow 3: Search
+### Flow 3: Board Exploration
+
+```
+BoardTab → See board list → Tap a board → BoardDetailScreen
+  → See post list with filters → Tap post → PostDetailScreen
+  → Back → BoardDetailScreen → Change filter (daily/weekly/monthly)
+  → Back → BoardTab
+```
+
+### Flow 4: Search
 
 ```
 SearchTab → Tap search bar → Type query (debounced)
@@ -191,7 +227,7 @@ SearchTab → Tap search bar → Type query (debounced)
   → Tap result → PostDetailScreen → Back → SearchTab
 ```
 
-### Flow 4: Login + Interaction (P2)
+### Flow 5: Login + Interaction (P2)
 
 ```
 SettingsTab → Tap "Login" → LoginScreen (WebView)
@@ -211,8 +247,8 @@ SettingsTab → Tap "Login" → LoginScreen (WebView)
 
 ### Gestures
 
-- Pull-to-refresh: all list screens (Home, Recent, Search results).
-- Infinite scroll: RecentTab, Search results (pagination trigger at 80% scroll).
+- Pull-to-refresh: all list screens (Home, BoardDetail, Search results).
+- Infinite scroll: BoardDetail, Search results (pagination trigger at 80% scroll).
 - Swipe: image viewer left/right navigation.
 - Pinch-to-zoom: image viewer.
 - Double-tap: image viewer reset zoom.
@@ -249,7 +285,7 @@ Read-only humor content viewer.
 | ID | Feature | Priority |
 |----|---------|----------|
 | F-01 | Home: best posts list with hero card | P0 |
-| F-02 | Recent: full post list with filters and pagination | P0 |
+| F-02 | Board: board list + full post list with filters and pagination | P0 |
 | F-03 | Post detail: text + images + video + comments (read) | P0 |
 | F-04 | Image viewer: fullscreen, swipe, pinch-zoom | P0 |
 | F-05 | Search: keyword + period filter | P1 |

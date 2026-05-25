@@ -85,7 +85,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('홈'), findsOneWidget);
-      expect(find.text('최신'), findsOneWidget);
+      expect(find.text('게시판'), findsOneWidget);
       expect(find.text('검색'), findsOneWidget);
       expect(find.text('설정'), findsOneWidget);
     });
@@ -98,10 +98,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('웃긴자료 베스트'), findsOneWidget);
+      expect(find.text('종합베스트'), findsOneWidget);
     });
 
-    testWidgets('should switch to recent tab on tap', (tester) async {
+    testWidgets('should switch to board tab on tap', (tester) async {
       setupMocks();
 
       await tester.pumpWidget(
@@ -109,7 +109,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('최신'));
+      await tester.tap(find.text('게시판'));
       await tester.pumpAndSettle();
 
       expect(find.text('웃긴자료'), findsOneWidget);
@@ -207,7 +207,7 @@ void main() {
 
       final appBar = tester.widget<AppBar>(find.byType(AppBar));
       final title = (appBar.title as Text).data;
-      expect(title, '웃긴자료 베스트');
+      expect(title, '종합베스트');
     });
   });
 }

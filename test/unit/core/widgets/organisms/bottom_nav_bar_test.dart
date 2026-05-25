@@ -12,7 +12,7 @@ void main() {
       );
 
       expect(find.text('홈'), findsOneWidget);
-      expect(find.text('최신'), findsOneWidget);
+      expect(find.text('게시판'), findsOneWidget);
       expect(find.text('검색'), findsOneWidget);
       expect(find.text('설정'), findsOneWidget);
     });
@@ -27,7 +27,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.text('최신'));
+      await tester.tap(find.text('게시판'));
       expect(tappedIndex, 1);
     });
 
