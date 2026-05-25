@@ -31,3 +31,7 @@ class ParseFailure extends Failure {
 class AuthFailure extends Failure {
   const AuthFailure(super.message);
 }
+
+class UpdateFailure extends Failure {
+  const UpdateFailure(super.message);
+}

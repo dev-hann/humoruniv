@@ -1,9 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/network/html_client_impl.dart';
+import 'package:humoruniv/data/datasources/github_remote_ds.dart';
 import 'package:humoruniv/data/datasources/humoruniv_remote_ds.dart';
 import 'package:humoruniv/data/repositories/post_repository_impl.dart';
+import 'package:humoruniv/data/repositories/update_repository_impl.dart';
 import 'package:humoruniv/di/injection.dart' as di;
 import 'package:humoruniv/domain/repositories/post_repository.dart';
+import 'package:humoruniv/domain/repositories/update_repository.dart';
+import 'package:humoruniv/domain/usecases/check_for_update.dart';
 import 'package:humoruniv/domain/usecases/get_best_posts.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 import 'package:humoruniv/domain/usecases/get_post_detail.dart';
@@ -57,6 +61,9 @@ void main() {
       expect(() => di.sl<GetBestPosts>(), returnsNormally);
       expect(() => di.sl<GetPostDetail>(), returnsNormally);
       expect(() => di.sl<GetBoardPosts>(), returnsNormally);
+      expect(() => di.sl<GitHubRemoteDs>(), returnsNormally);
+      expect(() => di.sl<UpdateRepository>(), returnsNormally);
+      expect(() => di.sl<CheckForUpdate>(), returnsNormally);
     });
 
     test('PostRepository should be PostRepositoryImpl', () {
@@ -64,6 +71,13 @@ void main() {
 
       final repo = di.sl<PostRepository>();
       expect(repo, isA<PostRepositoryImpl>());
+    });
+
+    test('UpdateRepository should be UpdateRepositoryImpl', () {
+      di.configureDependencies();
+
+      final repo = di.sl<UpdateRepository>();
+      expect(repo, isA<UpdateRepositoryImpl>());
     });
   });
 }

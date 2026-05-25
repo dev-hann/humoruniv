@@ -97,16 +97,42 @@ void main() {
     });
   });
 
+  group('UpdateFailure', () {
+    test('should store message', () {
+      const failure = UpdateFailure('GitHub API rate limit');
+
+      expect(failure.message, 'GitHub API rate limit');
+    });
+
+    test('should support value equality', () {
+      const a = UpdateFailure('err');
+      const b = UpdateFailure('err');
+
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('should not be equal to other failure types', () {
+      const a = UpdateFailure('err');
+
+      expect(a, isNot(equals(const ServerFailure('err'))));
+      expect(a, isNot(equals(const NetworkFailure('err'))));
+      expect(a, isNot(equals(const ParseFailure('err'))));
+      expect(a, isNot(equals(const AuthFailure('err'))));
+    });
+  });
+
   group('Failure cross-type', () {
     test(
-      'all four types with same message should not be equal to each other',
+      'all five types with same message should not be equal to each other',
       () {
         const server = ServerFailure('x');
         const network = NetworkFailure('x');
         const parse = ParseFailure('x');
         const auth = AuthFailure('x');
+        const update = UpdateFailure('x');
 
-        expect({server, network, parse, auth}, hasLength(4));
+        expect({server, network, parse, auth, update}, hasLength(5));
       },
     );
   });
