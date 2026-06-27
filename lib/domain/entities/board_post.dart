@@ -13,6 +13,8 @@ class BoardPost {
     required this.commentCount,
     required this.viewCount,
     required this.thumbnailUrl,
+    this.previewText,
+    this.isNsfw = false,
   });
   final int id;
   final String title;
@@ -24,6 +26,8 @@ class BoardPost {
   final int commentCount;
   final int viewCount;
   final String thumbnailUrl;
+  final String? previewText;
+  final bool isNsfw;
 
   @override
   bool operator ==(Object other) =>
@@ -39,7 +43,9 @@ class BoardPost {
           notRecommendCount == other.notRecommendCount &&
           commentCount == other.commentCount &&
           viewCount == other.viewCount &&
-          thumbnailUrl == other.thumbnailUrl;
+          thumbnailUrl == other.thumbnailUrl &&
+          previewText == other.previewText &&
+          isNsfw == other.isNsfw;
 
   @override
   int get hashCode => Object.hash(
@@ -53,5 +59,7 @@ class BoardPost {
     commentCount,
     viewCount,
     thumbnailUrl,
+    previewText,
+    isNsfw,
   );
 }

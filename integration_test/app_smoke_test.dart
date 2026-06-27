@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:humoruniv/core/widgets/molecules/feed_card.dart';
+import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
 import 'package:humoruniv/main.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -14,13 +16,12 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: HumorUnivApp()));
       await tester.pump(const Duration(seconds: 15));
 
-      final hasPosts = find.byType(ListTile).evaluate().isNotEmpty;
-      final hasLoading = find
-          .byType(CircularProgressIndicator)
-          .evaluate()
-          .isNotEmpty;
-      final hasError = find.text('Failed to load posts').evaluate().isNotEmpty;
-      final hasEmpty = find.text('No posts available').evaluate().isNotEmpty;
+      final hasPosts = find.byType(FeedCard).evaluate().isNotEmpty;
+      final hasLoading =
+          find.byType(SkeletonFeedCard).evaluate().isNotEmpty ||
+          find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
+      final hasError = find.text('게시글을 불러올 수 없습니다.').evaluate().isNotEmpty;
+      final hasEmpty = find.text('게시글이 없습니다.').evaluate().isNotEmpty;
 
       expect(
         hasPosts || hasLoading || hasError || hasEmpty,
@@ -35,16 +36,13 @@ void main() {
         await tester.pumpWidget(const ProviderScope(child: HumorUnivApp()));
         await tester.pump(const Duration(seconds: 15));
 
-        final postCards = find.byType(ListTile);
+        final postCards = find.byType(FeedCard);
         if (postCards.evaluate().isNotEmpty) {
           await tester.tap(postCards.first);
           await tester.pump(const Duration(seconds: 15));
 
           final hasContent = find.byType(ScrollView).evaluate().isNotEmpty;
-          final hasError = find
-              .text('Failed to load post')
-              .evaluate()
-              .isNotEmpty;
+          final hasError = find.text('게시글을 불러올 수 없습니다.').evaluate().isNotEmpty;
           final hasLoading = find
               .byType(CircularProgressIndicator)
               .evaluate()

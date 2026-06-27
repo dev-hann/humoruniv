@@ -81,7 +81,7 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: HumorUnivApp()));
     await tester.pumpAndSettle();
 
-    expect(find.text('종합베스트'), findsOneWidget);
+    expect(find.text('웃긴자료'), findsOneWidget);
     expect(find.byType(MainTabsScreen), findsOneWidget);
   });
 }

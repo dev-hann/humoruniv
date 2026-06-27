@@ -12,23 +12,9 @@ void main() {
       );
 
       expect(find.text('홈'), findsOneWidget);
-      expect(find.text('게시판'), findsOneWidget);
       expect(find.text('검색'), findsOneWidget);
       expect(find.text('설정'), findsOneWidget);
-    });
-
-    testWidgets('should call onTap with index when tab tapped', (tester) async {
-      var tappedIndex = -1;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: BottomNavBar(currentIndex: 0, onTap: (i) => tappedIndex = i),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('게시판'));
-      expect(tappedIndex, 1);
+      expect(find.text('게시판'), findsNothing);
     });
 
     testWidgets('should display NavigationBar', (tester) async {
@@ -55,7 +41,7 @@ void main() {
       expect(tappedIndex, 0);
     });
 
-    testWidgets('should call onTap with 2 when 검색 tapped', (tester) async {
+    testWidgets('should call onTap with 1 when 검색 tapped', (tester) async {
       var tappedIndex = -1;
       await tester.pumpWidget(
         MaterialApp(
@@ -66,10 +52,10 @@ void main() {
       );
 
       await tester.tap(find.text('검색'));
-      expect(tappedIndex, 2);
+      expect(tappedIndex, 1);
     });
 
-    testWidgets('should call onTap with 3 when 설정 tapped', (tester) async {
+    testWidgets('should call onTap with 2 when 설정 tapped', (tester) async {
       var tappedIndex = -1;
       await tester.pumpWidget(
         MaterialApp(
@@ -80,7 +66,7 @@ void main() {
       );
 
       await tester.tap(find.text('설정'));
-      expect(tappedIndex, 3);
+      expect(tappedIndex, 2);
     });
   });
 }

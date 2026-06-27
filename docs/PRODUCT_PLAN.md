@@ -60,22 +60,23 @@ Rationale:
 
 ## 4. Information Architecture
 
-4 bottom tabs:
+3 bottom tabs (Phase 1 IA — updated, see `.opencode/plans/2026-06-28-instagram-feed.md`):
 
 ```
-┌──────────┬──────────┬──────────┬──────────┐
-│   홈     │  게시판   │   검색   │   설정   │
-│ (House)  │ (Grid)   │ (Search) │ (Gear)   │
-│ 종합베스트│ 보드선택  │          │          │
-└──────────┴──────────┴──────────┴──────────┘
+┌──────────┬──────────┬──────────┐
+│   홈     │   검색   │   설정   │
+│ (House)  │ (Search) │ (Gear)   │
+│ 웃긴자료  │          │          │
+└──────────┴──────────┴──────────┘
 ```
 
 | Position | Icon (normal → selected) | Label | AppBar Title | Screen |
 |----------|--------------------------|-------|-------------|--------|
-| 0 | `home_outlined` → `home` | 홈 | 종합베스트 | HomeScreen |
-| 1 | `dashboard_outlined` → `dashboard` | 게시판 | 웃긴자료 (P1) / board name (P3) | BoardDetailScreen (P1) / BoardListScreen (P3) |
-| 2 | `search_outlined` → `search` | 검색 | 검색 | SearchScreen |
-| 3 | `settings_outlined` → `settings` | 설정 | 설정 | SettingsScreen |
+| 0 | `home_outlined` → `home` | 홈 | 웃긴자료 | HomeScreen (Instagram-style vertical feed of pds, chronological, no filter) |
+| 1 | `search_outlined` → `search` | 검색 | 검색 | SearchScreen |
+| 2 | `settings_outlined` → `settings` | 설정 | 설정 | SettingsScreen |
+
+**Phase 1 IA change**: Home and Board tabs merged. Home is now a single Instagram-style vertical feed of 웃긴자료 (pds) posts — full-bleed media cards for image posts, brand-color typography cards for text-only posts, single chronological order (no sort/filter UI). The separate Board tab is removed for the single-board phase; multi-board exploration (BoardListScreen → BoardDetailScreen) returns in Phase 3. The 종합베스트 / "오늘의 1위" hero concept is dropped.
 
 ### Home Tab (종합 베스트 피드)
 
@@ -133,15 +134,11 @@ Rationale:
 
 ```
 App
-├── MainTabs (BottomNavBar)
-│   ├── HomeTab
+├── MainTabs (BottomNavBar — 3 tabs)
+│   ├── HomeTab (웃긴자료 Instagram-style feed)
 │   │   └── PostDetailScreen
 │   │       ├── ImageViewerScreen
 │   │       └── CommentSection (inline)
-│   ├── BoardTab
-│   │   ├── Phase 1: BoardDetailScreen (pds directly)
-│   │   ├── Phase 3: BoardListScreen → BoardDetailScreen
-│   │   └── BoardDetailScreen → PostDetailScreen → (shared)
 │   ├── SearchTab
 │   │   └── PostDetailScreen → (shared)
 │   └── SettingsTab
@@ -150,6 +147,8 @@ App
 │       └── ReadHistoryScreen
 └── NsfwWarningDialog (first launch overlay)
 ```
+
+> **Phase 3**: a BoardTab returns (BoardListScreen → BoardDetailScreen) when multi-board support lands.
 
 Navigation rules:
 - Bottom tabs: instant switch, no back stack.
@@ -197,20 +196,20 @@ Navigation rules:
 ```
 App Open → Splash (logo) → NSFW Warning Dialog
   → "Acknowledge" → HomeTab (cached or empty state)
-  → Background fetch → Best posts appear
+  → Background fetch → 웃긴자료 feed appears
 ```
 
 ### Flow 2: Content Consumption
 
 ```
-HomeTab → See hero card → Tap → PostDetailScreen
+HomeTab → Scroll 웃긴자료 feed → Tap a post → PostDetailScreen
   → Read text → Tap image → ImageViewerScreen
   → Swipe through images → Back → PostDetailScreen
   → Scroll to comments → Read best comments
   → Back → HomeTab
 ```
 
-### Flow 3: Board Exploration
+### Flow 3: Board Exploration (Phase 3 — not in Phase 1)
 
 ```
 BoardTab → See board list → Tap a board → BoardDetailScreen
