@@ -132,7 +132,7 @@ class _InlineVideoPlayerState extends State<InlineVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.hideNsfw && !_revealed) {
+    if (widget.hideNsfw && widget.block.isNsfw && !_revealed) {
       return const SizedBox.shrink();
     }
 
