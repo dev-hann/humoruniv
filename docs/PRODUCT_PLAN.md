@@ -60,21 +60,21 @@ Rationale:
 
 ## 4. Information Architecture
 
-3 bottom tabs (Phase 1 IA — updated, see `.opencode/plans/2026-06-28-instagram-feed.md`):
+Single-screen IA (Phase 1 — single-board scope; see `.opencode/plans/2026-06-28-instagram-feed.md`):
 
 ```
-┌──────────┬──────────┬──────────┐
-│   홈     │   검색   │   설정   │
-│ (House)  │ (Search) │ (Gear)   │
-│ 웃긴자료  │          │          │
-└──────────┴──────────┴──────────┘
+┌─────────────────────────────────────────────┐
+│  홈  (웃긴자료 feed)            ⚙️ 설정      │
+│  AppBar title: 웃긴자료        → push /settings │
+└─────────────────────────────────────────────┘
 ```
 
-| Position | Icon (normal → selected) | Label | AppBar Title | Screen |
-|----------|--------------------------|-------|-------------|--------|
-| 0 | `home_outlined` → `home` | 홈 | 웃긴자료 | HomeScreen (Instagram-style vertical feed of pds, chronological, no filter) |
-| 1 | `search_outlined` → `search` | 검색 | 검색 | SearchScreen |
-| 2 | `settings_outlined` → `settings` | 설정 | 설정 | SettingsScreen |
+| Entry | Icon | Label | AppBar Title | Screen |
+|-------|------|-------|-------------|--------|
+| Root `/` | `home` | — | 웃긴자료 | HomeScreen (Instagram-style vertical feed of pds, chronological, no filter) |
+| AppBar action | `settings_outlined` (tooltip: 설정) | 설정 | 설정 | SettingsScreen (pushed route `/settings`, back to Home) |
+
+**No bottom navigation bar.** Single-board scope has only one primary destination (Home), so a bottom tab bar is chrome that doesn't justify itself (DESIGN.md principle: Content First). Settings is reached from the Home AppBar gear icon. Search is not yet implemented (P1); when it lands it will be a pushed route or an in-feed affordance, not a permanent bottom tab.
 
 **Phase 1 IA change**: Home and Board tabs merged. Home is now a single Instagram-style vertical feed of 웃긴자료 (pds) posts — full-bleed media cards for image posts, brand-color typography cards for text-only posts, single chronological order (no sort/filter UI). The separate Board tab is removed for the single-board phase; multi-board exploration (BoardListScreen → BoardDetailScreen) returns in Phase 3. The 종합베스트 / "오늘의 1위" hero concept is dropped.
 
@@ -134,24 +134,22 @@ Rationale:
 
 ```
 App
-├── MainTabs (BottomNavBar — 3 tabs)
-│   ├── HomeTab (웃긴자료 Instagram-style feed)
-│   │   └── PostDetailScreen
+├── HomeScreen (root `/`, AppBar: 웃긴자료 + ⚙️ settings action)
+│   │   └── Instagram-style vertical feed of 웃긴자료 (pds)
+│   └── PostDetailScreen (push)
 │   │       ├── ImageViewerScreen
 │   │       └── CommentSection (inline)
-│   ├── SearchTab
-│   │   └── PostDetailScreen → (shared)
-│   └── SettingsTab
+│   └── SettingsScreen (push `/settings`, from AppBar gear)
 │       ├── LoginScreen (WebView)
 │       ├── ScrapListScreen
 │       └── ReadHistoryScreen
 └── NsfwWarningDialog (first launch overlay)
 ```
 
-> **Phase 3**: a BoardTab returns (BoardListScreen → BoardDetailScreen) when multi-board support lands.
+> **Phase 3**: a BoardTab returns (BoardListScreen → BoardDetailScreen) when multi-board support lands, at which point a bottom tab bar may be reintroduced.
 
 Navigation rules:
-- Bottom tabs: instant switch, no back stack.
+- AppBar gear (Home) → SettingsScreen (push), back returns to Home.
 - Post tap → PostDetailScreen (push).
 - Image tap → ImageViewerScreen (push, shared element transition).
 - Back → pop to previous screen.

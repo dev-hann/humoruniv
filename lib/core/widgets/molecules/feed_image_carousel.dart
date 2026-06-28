@@ -33,7 +33,7 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
   }
 
   void _measureAll() {
-    for (int i = 0; i < widget.imageUrls.length; i++) {
+    for (var i = 0; i < widget.imageUrls.length; i++) {
       _measure(i, widget.imageUrls[i]);
     }
   }
@@ -49,10 +49,10 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
           _aspects[index] =
               info.image.width.toDouble() / info.image.height.toDouble();
         });
-        stream.removeListener(listener!);
+        stream.removeListener(listener);
       },
       onError: (exception, stackTrace) {
-        if (listener != null) stream.removeListener(listener!);
+        if (listener != null) stream.removeListener(listener);
       },
     );
     stream.addListener(listener);

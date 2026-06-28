@@ -1,6 +1,6 @@
-import 'package:dartz/dartz.dart';
 import 'dart:async';
 
+import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/errors/failures.dart';
@@ -35,7 +35,6 @@ void main() {
   group('UpdateState', () {
     test('copyWith updates status only', () {
       const state = UpdateState(
-        status: UpdateCheckStatus.idle,
         release: AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
       );
       final copied = state.copyWith(status: UpdateCheckStatus.checking);
@@ -45,7 +44,7 @@ void main() {
     });
 
     test('copyWith updates release only', () {
-      const state = UpdateState(status: UpdateCheckStatus.idle);
+      const state = UpdateState();
       const newRelease = AppRelease(
         version: '2.0.0',
         htmlUrl: 'https://example.com/v2',
@@ -68,7 +67,7 @@ void main() {
     });
 
     test('copyWith updates both fields', () {
-      const state = UpdateState(status: UpdateCheckStatus.idle);
+      const state = UpdateState();
       const newRelease = AppRelease(
         version: '2.0.0',
         htmlUrl: 'https://example.com/v2',

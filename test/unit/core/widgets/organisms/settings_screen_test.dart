@@ -44,14 +44,29 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       expect(find.text('화면 설정'), findsOneWidget);
       expect(find.text('콘텐츠'), findsOneWidget);
       expect(find.text('앱 정보'), findsOneWidget);
+    });
+
+    testWidgets('should display AppBar with 설정 title', (tester) async {
+      when(() => mockRepository.getLatestRelease()).thenAnswer(
+        (_) async => const Right(
+          AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
+        ),
+      );
+
+      await tester.pumpWidget(
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
+      );
+      await tester.pumpAndSettle();
+
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      final title = (appBar.title! as Text).data;
+      expect(title, '설정');
     });
 
     testWidgets('should display dark mode selector', (tester) async {
@@ -62,9 +77,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       expect(find.byType(DarkModeSelector), findsOneWidget);
@@ -78,9 +91,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       expect(find.text('성인 콘텐츠 경고'), findsOneWidget);
@@ -95,9 +106,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       expect(find.text('버전'), findsOneWidget);
@@ -111,9 +120,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       expect(find.text('업데이트 확인'), findsOneWidget);
@@ -127,9 +134,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       final switchWidget = tester.widget<Switch>(find.byType(Switch));
@@ -152,9 +157,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(home: Scaffold(body: SettingsScreen())),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       await tester.tap(find.text('업데이트 확인'));
@@ -176,7 +179,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: Scaffold(body: SettingsScreen())),
+          child: const MaterialApp(home: SettingsScreen()),
         ),
       );
 
@@ -200,7 +203,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: Scaffold(body: SettingsScreen())),
+          child: const MaterialApp(home: SettingsScreen()),
         ),
       );
 
@@ -221,7 +224,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: Scaffold(body: SettingsScreen())),
+          child: const MaterialApp(home: SettingsScreen()),
         ),
       );
 
@@ -244,7 +247,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: Scaffold(body: SettingsScreen())),
+          child: const MaterialApp(home: SettingsScreen()),
         ),
       );
 

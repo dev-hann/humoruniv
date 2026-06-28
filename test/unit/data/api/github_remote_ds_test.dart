@@ -84,11 +84,8 @@ void main() {
       when(
         () => mockDio.get<String>(any(), options: any(named: 'options')),
       ).thenAnswer(
-        (_) async => Response<String>(
-          data: null,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
+        (_) async =>
+            Response<String>(statusCode: 200, requestOptions: RequestOptions()),
       );
 
       expect(() => remoteDs.fetchLatestRelease(), throwsA(isA<Exception>()));

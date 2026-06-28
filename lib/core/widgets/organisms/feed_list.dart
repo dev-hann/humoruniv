@@ -7,7 +7,6 @@ import 'package:humoruniv/core/widgets/states/empty_state_view.dart';
 import 'package:humoruniv/core/widgets/states/error_state_view.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
-import 'package:humoruniv/domain/entities/post_detail.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
 import 'package:humoruniv/presentation/screens/image_viewer_screen.dart';
 import 'package:humoruniv/presentation/widgets/feed_comments_sheet.dart';
@@ -20,7 +19,7 @@ class FeedCardItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncDetail = ref.watch(postDetailProvider(post.url));
-    final PostDetail? detail = asyncDetail.whenOrNull(
+    final detail = asyncDetail.whenOrNull(
       data: (either) => either.fold((_) => null, (d) => d),
     );
     final hasImages = detail != null && detail.imageUrls.isNotEmpty;
@@ -35,7 +34,7 @@ class FeedCardItem extends ConsumerWidget {
           : (i) => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ImageViewerScreen(
-                  imageUrls: detail!.imageUrls,
+                  imageUrls: detail.imageUrls,
                   initialIndex: i,
                 ),
                 fullscreenDialog: true,
@@ -45,7 +44,7 @@ class FeedCardItem extends ConsumerWidget {
           ? null
           : () => showFeedCommentsSheet(
               context,
-              detail!.comments,
+              detail.comments,
               detail.commentCount,
             ),
     );
@@ -130,9 +129,9 @@ class _FeedListState extends State<FeedList> {
     if (widget.posts.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          const SizedBox(height: 120),
-          const EmptyStateView(message: '게시글이 없습니다.'),
+        children: const [
+          SizedBox(height: 120),
+          EmptyStateView(message: '게시글이 없습니다.'),
         ],
       );
     }

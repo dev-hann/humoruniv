@@ -12,7 +12,7 @@ import 'package:humoruniv/domain/usecases/get_best_posts.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 import 'package:humoruniv/domain/usecases/get_post_detail.dart';
 import 'package:humoruniv/main.dart';
-import 'package:humoruniv/presentation/screens/main_tabs_screen.dart';
+import 'package:humoruniv/presentation/screens/home_screen.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'helpers/package_info_helper.dart';
@@ -82,6 +82,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('웃긴자료'), findsOneWidget);
-    expect(find.byType(MainTabsScreen), findsOneWidget);
+    expect(find.byType(HomeScreen), findsOneWidget);
   });
 }

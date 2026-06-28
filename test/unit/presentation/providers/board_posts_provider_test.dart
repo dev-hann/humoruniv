@@ -60,7 +60,7 @@ void main() {
     });
 
     test('hasMore is false with zero pages', () {
-      const state = BoardPostsState(currentPage: 0, totalPage: 0);
+      const state = BoardPostsState();
 
       expect(state.hasMore, isFalse);
     });

@@ -105,7 +105,7 @@ The component library lives in `lib/core/widgets/`.
 
 **Molecules**: PostCard (thumbnail on/off × read/unread), HeroCard, CommentTile, SectionHeader, SearchBar, FilterBar, UserInfoRow, BottomSheet, Toast.
 
-**Organisms**: HomeFeed, PostList (with FilterBar + pagination), CommentSection (best pinned + list + input), ImageGallery (fullscreen, swipe, zoom), BottomNavBar.
+**Organisms**: HomeFeed, PostList (with FilterBar + pagination), CommentSection (best pinned + list + input), ImageGallery (fullscreen, swipe, zoom).
 
 **State widgets**: SkeletonPostList, SkeletonPostDetail, EmptyStateView, ErrorStateView, ContentWarningOverlay, LoadingOverlay, NsfwWarningDialog.
 

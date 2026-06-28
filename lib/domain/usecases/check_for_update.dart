@@ -14,7 +14,7 @@ class CheckForUpdate {
   Future<Either<Failure, UpdateCheckResult>> call() async {
     final result = await repository.getLatestRelease();
 
-    return result.fold((failure) => Left(failure), (release) {
+    return result.fold(Left.new, (release) {
       final isNewer = _isNewerVersion(release.version, currentVersion);
       return Right(
         UpdateCheckResult(

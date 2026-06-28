@@ -81,7 +81,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: overrides(),
-        child: const MaterialApp(home: Scaffold(body: HomeScreen())),
+        child: const MaterialApp(home: HomeScreen()),
       ),
     );
     await tester.pumpAndSettle();
@@ -100,7 +100,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: overrides(),
-        child: const MaterialApp(home: Scaffold(body: HomeScreen())),
+        child: const MaterialApp(home: HomeScreen()),
       ),
     );
     await tester.pumpAndSettle();
@@ -117,7 +117,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: overrides(),
-        child: const MaterialApp(home: Scaffold(body: HomeScreen())),
+        child: const MaterialApp(home: HomeScreen()),
       ),
     );
 
@@ -135,7 +135,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: overrides(),
-        child: const MaterialApp(home: Scaffold(body: HomeScreen())),
+        child: const MaterialApp(home: HomeScreen()),
       ),
     );
     await tester.pumpAndSettle();
@@ -151,11 +151,47 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: overrides(),
-        child: const MaterialApp(home: Scaffold(body: HomeScreen())),
+        child: const MaterialApp(home: HomeScreen()),
       ),
     );
     await tester.pumpAndSettle();
 
     expect(find.text('게시글을 불러올 수 없습니다.'), findsOneWidget);
+  });
+
+  testWidgets('should display AppBar with 웃긴자료 title', (tester) async {
+    when(() => mockRepository.getBoardPosts(any(), any(), any())).thenAnswer(
+      (_) async =>
+          const Right(BoardListResult(posts: [], currentPage: 0, totalPage: 0)),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: overrides(),
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final appBar = tester.widget<AppBar>(find.byType(AppBar));
+    final title = (appBar.title! as Text).data;
+    expect(title, '웃긴자료');
+  });
+
+  testWidgets('should display settings gear action', (tester) async {
+    when(() => mockRepository.getBoardPosts(any(), any(), any())).thenAnswer(
+      (_) async =>
+          const Right(BoardListResult(posts: [], currentPage: 0, totalPage: 0)),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: overrides(),
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('설정'), findsOneWidget);
   });
 }

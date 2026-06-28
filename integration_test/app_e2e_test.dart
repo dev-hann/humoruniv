@@ -14,7 +14,7 @@ import 'package:humoruniv/presentation/screens/home_screen.dart';
 import 'package:humoruniv/presentation/screens/post_detail_screen.dart';
 import 'package:integration_test/integration_test.dart';
 
-final _testPosts = const [
+const _testPosts = [
   BoardPost(
     id: 100,
     title: 'E2E 테스트 게시글 1',
@@ -67,12 +67,12 @@ final _testPostDetail = PostDetail(
 );
 
 class _FakeFeedNotifier extends BoardPostsNotifier {
-  final List<BoardPost> posts;
   _FakeFeedNotifier(this.posts);
+  final List<BoardPost> posts;
 
   @override
   Future<BoardPostsState> build() async =>
-      BoardPostsState(posts: posts, currentPage: 0, totalPage: 1);
+      BoardPostsState(posts: posts, totalPage: 1);
 }
 
 class _ErrorFeedNotifier extends BoardPostsNotifier {
@@ -127,9 +127,7 @@ void main() {
     testWidgets('should show error state when provider fails', (tester) async {
       await tester.pumpWidget(
         _buildTestApp(
-          overrides: [
-            boardPostsProvider.overrideWith(() => _ErrorFeedNotifier()),
-          ],
+          overrides: [boardPostsProvider.overrideWith(_ErrorFeedNotifier.new)],
         ),
       );
       await tester.pumpAndSettle();

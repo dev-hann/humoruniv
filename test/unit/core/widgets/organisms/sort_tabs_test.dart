@@ -77,7 +77,7 @@ void main() {
           home: Scaffold(
             body: SortTabs(
               currentSort: SortOption.all,
-              onChanged: (s) => selected.add(s),
+              onChanged: selected.add,
             ),
           ),
         ),

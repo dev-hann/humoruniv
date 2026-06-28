@@ -19,66 +19,69 @@ class SettingsScreen extends ConsumerWidget {
     final nsfwEnabled = ref.watch(nsfwProvider);
     final updateState = ref.watch(updateProvider);
 
-    return ListView(
-      children: [
-        SettingsGroup(
-          title: '화면 설정',
-          children: [
-            SettingsTile(
-              title: '다크 모드',
-              trailing: DarkModeSelector(
-                currentMode: themeMode,
-                onChanged: (option) {
-                  ref.read(themeProvider.notifier).setThemeMode(option);
+    return Scaffold(
+      appBar: AppBar(title: const Text('설정')),
+      body: ListView(
+        children: [
+          SettingsGroup(
+            title: '화면 설정',
+            children: [
+              SettingsTile(
+                title: '다크 모드',
+                trailing: DarkModeSelector(
+                  currentMode: themeMode,
+                  onChanged: (option) {
+                    ref.read(themeProvider.notifier).setThemeMode(option);
+                  },
+                ),
+              ),
+            ],
+          ),
+          SettingsGroup(
+            title: '콘텐츠',
+            children: [
+              SettingsTile(
+                title: '성인 콘텐츠 경고',
+                trailing: Switch(
+                  value: nsfwEnabled,
+                  onChanged: (v) {
+                    ref.read(nsfwProvider.notifier).setEnabled(v);
+                  },
+                ),
+              ),
+            ],
+          ),
+          SettingsGroup(
+            title: '앱 정보',
+            children: [
+              FutureBuilder<PackageInfo>(
+                future: PackageInfo.fromPlatform(),
+                builder: (context, snapshot) {
+                  final version = snapshot.hasData
+                      ? 'v${snapshot.data!.version}'
+                      : 'v1.1.0';
+                  return SettingsTile(title: '버전', subtitle: version);
                 },
               ),
-            ),
-          ],
-        ),
-        SettingsGroup(
-          title: '콘텐츠',
-          children: [
-            SettingsTile(
-              title: '성인 콘텐츠 경고',
-              trailing: Switch(
-                value: nsfwEnabled,
-                onChanged: (v) {
-                  ref.read(nsfwProvider.notifier).setEnabled(v);
+              UpdateBanner(
+                status: updateState.status,
+                newVersion: updateState.release?.version,
+                onCheck: () {
+                  ref.read(updateProvider.notifier).checkForUpdate();
+                },
+                onUpdate: () {
+                  final url =
+                      updateState.release?.downloadUrl ??
+                      updateState.release?.htmlUrl;
+                  if (url != null && url.isNotEmpty) {
+                    _openUpdateUrl(url);
+                  }
                 },
               ),
-            ),
-          ],
-        ),
-        SettingsGroup(
-          title: '앱 정보',
-          children: [
-            FutureBuilder<PackageInfo>(
-              future: PackageInfo.fromPlatform(),
-              builder: (context, snapshot) {
-                final version = snapshot.hasData
-                    ? 'v${snapshot.data!.version}'
-                    : 'v1.1.0';
-                return SettingsTile(title: '버전', subtitle: version);
-              },
-            ),
-            UpdateBanner(
-              status: updateState.status,
-              newVersion: updateState.release?.version,
-              onCheck: () {
-                ref.read(updateProvider.notifier).checkForUpdate();
-              },
-              onUpdate: () {
-                final url =
-                    updateState.release?.downloadUrl ??
-                    updateState.release?.htmlUrl;
-                if (url != null && url.isNotEmpty) {
-                  _openUpdateUrl(url);
-                }
-              },
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 

@@ -13,8 +13,9 @@ import 'package:humoruniv/domain/usecases/check_for_update.dart';
 import 'package:humoruniv/domain/usecases/get_best_posts.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 import 'package:humoruniv/domain/usecases/get_post_detail.dart';
-import 'package:humoruniv/presentation/screens/main_tabs_screen.dart';
+import 'package:humoruniv/presentation/screens/home_screen.dart';
 import 'package:humoruniv/presentation/screens/post_detail_screen.dart';
+import 'package:humoruniv/presentation/screens/settings_screen.dart';
 import 'package:humoruniv/routes/app_router.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -64,7 +65,7 @@ void main() {
   tearDown(di.sl.reset);
 
   group('appRouter', () {
-    testWidgets('route / should render MainTabsScreen', (tester) async {
+    testWidgets('route / should render HomeScreen', (tester) async {
       when(
         () => mockPostRepo.getBestPosts(),
       ).thenAnswer((_) async => const Right([]));
@@ -84,7 +85,23 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(MainTabsScreen), findsOneWidget);
+      expect(find.byType(HomeScreen), findsOneWidget);
+    });
+
+    testWidgets('route /settings should render SettingsScreen', (tester) async {
+      when(() => mockUpdateRepo.getLatestRelease()).thenAnswer(
+        (_) async => const Right(
+          AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
+        ),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp.router(routerConfig: appRouter)),
+      );
+      appRouter.push('/settings');
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsScreen), findsOneWidget);
     });
 
     testWidgets('route /post renders PostDetailScreen', (tester) async {
