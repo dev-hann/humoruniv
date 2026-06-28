@@ -6,12 +6,10 @@ class FeedImageCarousel extends StatefulWidget {
   const FeedImageCarousel({
     required this.imageUrls,
     this.onImageTap,
-    this.height,
     super.key,
   });
   final List<String> imageUrls;
   final ValueChanged<int>? onImageTap;
-  final double? height;
 
   @override
   State<FeedImageCarousel> createState() => _FeedImageCarouselState();
@@ -20,6 +18,13 @@ class FeedImageCarousel extends StatefulWidget {
 class _FeedImageCarouselState extends State<FeedImageCarousel> {
   final PageController _controller = PageController();
   int _page = 0;
+  final Map<int, double> _aspects = {};
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureAll());
+  }
 
   @override
   void dispose() {
@@ -27,13 +32,42 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
     super.dispose();
   }
 
+  void _measureAll() {
+    for (int i = 0; i < widget.imageUrls.length; i++) {
+      _measure(i, widget.imageUrls[i]);
+    }
+  }
+
+  void _measure(int index, String url) {
+    if (_aspects.containsKey(index)) return;
+    final stream = NetworkImage(url).resolve(const ImageConfiguration());
+    ImageStreamListener? listener;
+    listener = ImageStreamListener(
+      (info, _) {
+        if (!mounted || listener == null) return;
+        setState(() {
+          _aspects[index] =
+              info.image.width.toDouble() / info.image.height.toDouble();
+        });
+        stream.removeListener(listener!);
+      },
+      onError: (exception, stackTrace) {
+        if (listener != null) stream.removeListener(listener!);
+      },
+    );
+    stream.addListener(listener);
+  }
+
   @override
   Widget build(BuildContext context) {
     final urls = widget.imageUrls;
     final multiple = urls.length > 1;
-    final height = widget.height ?? AppSizes.feedMediaMaxHeight;
+    final screenW = MediaQuery.sizeOf(context).width;
+    final aspect = _aspects[_page] ?? 1.0;
+    final height = (screenW / aspect).clamp(120.0, AppSizes.feedMediaMaxHeight);
 
-    return SizedBox(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
       width: double.infinity,
       height: height,
       child: Stack(
