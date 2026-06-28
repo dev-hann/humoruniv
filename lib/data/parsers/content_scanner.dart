@@ -345,7 +345,7 @@ abstract final class ContentScanner {
     final onclick = el.attributes['onclick'] ?? el.attributes['OnClick'] ?? '';
     if (onclick.contains('comment_mp4_expand')) {
       final mp4Match = RegExp(
-        r"comment_mp4_expand\('[^']*','([^']+)'",
+        r"comment_mp4_expand\('[^']*',\s*'([^']+)'",
       ).firstMatch(onclick);
       if (mp4Match != null) {
         entries.add(_UrlEntry(url: mp4Match.group(1)!));
