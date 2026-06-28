@@ -83,8 +83,23 @@ void main() {
       );
 
       for (final post in withThumb) {
-        expect(post.thumbnailUrl, contains('https://timg.humoruniv.com'));
+        expect(post.thumbnailUrl, contains('down.humoruniv.com'));
+        expect(post.thumbnailUrl, isNot(contains('thumb.php')));
+        expect(post.thumbnailUrl, isNot(contains('SIZE=')));
       }
+    });
+
+    test('should extract full-size original from thumb.php url param', () {
+      final result = BoardListParser.parse(fixtureHtml);
+
+      final withThumb = result.posts
+          .where((p) => p.thumbnailUrl.isNotEmpty)
+          .toList();
+      expect(withThumb, isNotEmpty);
+
+      final sample = withThumb.first.thumbnailUrl;
+      expect(sample, startsWith('https://down.humoruniv.com/'));
+      expect(sample, isNot(contains('?SIZE=')));
     });
 
     test('should return empty thumbnail for no_image posts', () {

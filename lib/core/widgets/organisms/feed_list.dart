@@ -9,16 +9,12 @@ import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/post_detail.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
+import 'package:humoruniv/presentation/screens/image_viewer_screen.dart';
+import 'package:humoruniv/presentation/widgets/feed_comments_sheet.dart';
 
 class FeedCardItem extends ConsumerWidget {
-  const FeedCardItem({
-    required this.post,
-    required this.onTap,
-    this.isRead = false,
-    super.key,
-  });
+  const FeedCardItem({required this.post, this.isRead = false, super.key});
   final BoardPost post;
-  final VoidCallback onTap;
   final bool isRead;
 
   @override
@@ -27,14 +23,38 @@ class FeedCardItem extends ConsumerWidget {
     final PostDetail? detail = asyncDetail.whenOrNull(
       data: (either) => either.fold((_) => null, (d) => d),
     );
-    return FeedCard(post: post, detail: detail, onTap: onTap, isRead: isRead);
+    final hasImages = detail != null && detail.imageUrls.isNotEmpty;
+    final hasComments = detail != null && detail.comments.isNotEmpty;
+    return FeedCard(
+      post: post,
+      detail: detail,
+      detailLoading: asyncDetail.isLoading,
+      isRead: isRead,
+      onImageTap: !hasImages
+          ? null
+          : (i) => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => ImageViewerScreen(
+                  imageUrls: detail!.imageUrls,
+                  initialIndex: i,
+                ),
+                fullscreenDialog: true,
+              ),
+            ),
+      onCommentsTap: !hasComments
+          ? null
+          : () => showFeedCommentsSheet(
+              context,
+              detail!.comments,
+              detail.commentCount,
+            ),
+    );
   }
 }
 
 class FeedList extends StatefulWidget {
   const FeedList({
     required this.posts,
-    required this.onPostTap,
     super.key,
     this.isLoading = false,
     this.hasError = false,
@@ -57,7 +77,6 @@ class FeedList extends StatefulWidget {
   final Object? loadMoreError;
   final VoidCallback? onLoadMore;
   final VoidCallback? onRetryLoadMore;
-  final ValueChanged<BoardPost> onPostTap;
   final Set<int> readIds;
 
   @override
@@ -140,10 +159,9 @@ class _FeedListState extends State<FeedList> {
           return const SizedBox.shrink();
         }
         final post = widget.posts[index];
-        return FeedCard(
+        return FeedCardItem(
           post: post,
           isRead: widget.readIds.contains(post.id),
-          onTap: () => widget.onPostTap(post),
         );
       },
     );

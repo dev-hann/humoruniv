@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:humoruniv/core/widgets/organisms/feed_list.dart';
-import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/presentation/providers/board_posts_provider.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
 
@@ -17,13 +15,11 @@ class HomeScreen extends ConsumerWidget {
     return RefreshIndicator(
       onRefresh: () async => ref.invalidate(boardPostsProvider),
       child: postsAsync.when(
-        loading: () =>
-            const FeedList(posts: [], isLoading: true, onPostTap: _noop),
+        loading: () => const FeedList(posts: [], isLoading: true),
         error: (_, __) => FeedList(
           posts: const [],
           hasError: true,
           onRetry: () => ref.invalidate(boardPostsProvider),
-          onPostTap: _noop,
         ),
         data: (state) => FeedList(
           posts: state.posts,
@@ -34,12 +30,8 @@ class HomeScreen extends ConsumerWidget {
               ref.read(boardPostsProvider.notifier).fetchNextPage(),
           onRetryLoadMore: () =>
               ref.read(boardPostsProvider.notifier).fetchNextPage(),
-          onPostTap: (BoardPost post) =>
-              context.push('/post?url=${Uri.encodeComponent(post.url)}'),
         ),
       ),
     );
   }
 }
-
-void _noop(BoardPost _) {}

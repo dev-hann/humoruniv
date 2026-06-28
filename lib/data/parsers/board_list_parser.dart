@@ -76,8 +76,17 @@ class BoardListParser {
     if (img == null) return '';
     final src = img.attributes['src'] ?? '';
     if (src.contains('no_image')) return '';
-    if (src.startsWith('//')) return 'https:$src';
-    return src;
+    final normalized = src.startsWith('//') ? 'https:$src' : src;
+    return _fullSizeFromThumb(normalized);
+  }
+
+  static String _fullSizeFromThumb(String url) {
+    final match = RegExp(r'thumb\.php\?url=([^&]+)').firstMatch(url);
+    if (match == null) return url;
+    var original = Uri.decodeComponent(match.group(1)!);
+    final sizeIdx = original.indexOf('?SIZE=');
+    if (sizeIdx != -1) original = original.substring(0, sizeIdx);
+    return original;
   }
 
   static int _extractStatNumber(dom.Element? parent, String selector) {

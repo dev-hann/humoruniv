@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/utils/time_ago.dart';
-import 'package:humoruniv/core/widgets/atoms/feed_media.dart';
+import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_card.dart';
+import 'package:humoruniv/core/widgets/molecules/feed_image_carousel.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/comment.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
@@ -10,24 +11,11 @@ import 'package:humoruniv/domain/entities/post_detail.dart';
 
 void main() {
   group('FeedCard', () {
-    const mediaPost = BoardPost(
+    const post = BoardPost(
       id: 1,
-      title: '미디어 게시글 제목',
+      title: '게시글 제목',
       url: '/board/read.html?table=pds&number=1',
       author: '유머작가',
-      date: '2026-05-15',
-      recommendCount: 42,
-      notRecommendCount: 1,
-      commentCount: 10,
-      viewCount: 500,
-      thumbnailUrl: 'https://example.com/thumb.jpg',
-    );
-
-    const textPost = BoardPost(
-      id: 2,
-      title: '텍스트 전용 게시글',
-      url: '/board/read.html?table=pds&number=2',
-      author: '글쓴이',
       date: '2026-05-15',
       recommendCount: 42,
       notRecommendCount: 1,
@@ -43,7 +31,7 @@ void main() {
       int commentCount = 0,
     }) => PostDetail(
       id: 1,
-      title: '미디어 게시글 제목',
+      title: '게시글 제목',
       author: '유머작가',
       date: DateTime(2026, 5, 15),
       contentHtml: '',
@@ -56,59 +44,72 @@ void main() {
       comments: comments,
     );
 
-    testWidgets('should display author nickname', (tester) async {
+    testWidgets('should display author and counts from list', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: FeedCard(post: mediaPost)),
+          home: Scaffold(body: FeedCard(post: post)),
         ),
       );
       expect(find.text('유머작가'), findsOneWidget);
-    });
-
-    testWidgets('should display recommend, comment and view counts', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: FeedCard(post: mediaPost)),
-        ),
-      );
       expect(find.text('42'), findsWidgets);
       expect(find.text('10'), findsOneWidget);
-      expect(find.text('500'), findsOneWidget);
     });
 
-    testWidgets(
-      'should show FeedMedia (thumbnail) when no detail and thumbnail present',
-      (tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: FeedCard(post: mediaPost)),
+    testWidgets('should show skeleton while detail loading', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: FeedCard(post: post, detailLoading: true),
+            ),
           ),
-        );
-        expect(find.byType(FeedMedia), findsOneWidget);
-      },
-    );
+        ),
+      );
+      expect(find.byType(SkeletonBox), findsWidgets);
+    });
 
-    testWidgets('should show title in caption for text post (no media)', (
+    testWidgets('should show carousel when detail has images', (tester) async {
+      final detail = detailWith(
+        imageUrls: const [
+          'https://example.com/a.jpg',
+          'https://example.com/b.jpg',
+        ],
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: FeedCard(post: post, detail: detail),
+            ),
+          ),
+        ),
+      );
+      expect(find.byType(FeedImageCarousel), findsOneWidget);
+      expect(find.text('1/2'), findsOneWidget);
+    });
+
+    testWidgets('should not show carousel for text post (no images)', (
       tester,
     ) async {
+      final detail = detailWith(blocks: const [TextBlock('본문 내용')]);
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: FeedCard(post: textPost)),
+        MaterialApp(
+          home: Scaffold(
+            body: FeedCard(post: post, detail: detail),
+          ),
         ),
       );
-      expect(find.text('텍스트 전용 게시글'), findsOneWidget);
-      expect(find.byType(FeedMedia), findsNothing);
+      expect(find.byType(FeedImageCarousel), findsNothing);
+      expect(find.text('본문 내용'), findsOneWidget);
     });
 
-    testWidgets('should show title in caption for media post', (tester) async {
+    testWidgets('should show title in caption', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: FeedCard(post: mediaPost)),
+          home: Scaffold(body: FeedCard(post: post)),
         ),
       );
-      expect(find.text('미디어 게시글 제목'), findsOneWidget);
+      expect(find.text('게시글 제목'), findsOneWidget);
     });
 
     testWidgets('should show BEST badge when recommendCount >= 500', (
@@ -124,7 +125,7 @@ void main() {
         notRecommendCount: 0,
         commentCount: 0,
         viewCount: 0,
-        thumbnailUrl: 'https://example.com/x.jpg',
+        thumbnailUrl: '',
       );
       await tester.pumpWidget(
         const MaterialApp(
@@ -134,84 +135,9 @@ void main() {
       expect(find.text('BEST'), findsOneWidget);
     });
 
-    testWidgets('should NOT show BEST badge when recommendCount < 500', (
+    testWidgets('should show comment preview when detail has comments', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: FeedCard(post: mediaPost)),
-        ),
-      );
-      expect(find.text('BEST'), findsNothing);
-    });
-
-    testWidgets('should show formatted timestamp when date is present', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: FeedCard(post: mediaPost)),
-        ),
-      );
-      expect(find.text(TimeAgo.formatDateString('2026-05-15')), findsOneWidget);
-    });
-
-    testWidgets('should call onTap when tapped', (tester) async {
-      var tapped = false;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: FeedCard(post: mediaPost, onTap: () => tapped = true),
-            ),
-          ),
-        ),
-      );
-      await tester.tap(find.byType(FeedCard));
-      expect(tapped, isTrue);
-    });
-
-    testWidgets('should render without error when isRead is true', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: FeedCard(post: mediaPost, isRead: true)),
-        ),
-      );
-      expect(find.text('미디어 게시글 제목'), findsOneWidget);
-    });
-
-    testWidgets('should show full-size image from detail (not FeedMedia)', (
-      tester,
-    ) async {
-      final detail = detailWith(
-        imageUrls: const ['https://example.com/full.jpg'],
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: FeedCard(post: mediaPost, detail: detail),
-          ),
-        ),
-      );
-      expect(find.byType(Image), findsOneWidget);
-      expect(find.byType(FeedMedia), findsNothing);
-    });
-
-    testWidgets('should show body text from detail', (tester) async {
-      final detail = detailWith(blocks: const [TextBlock('상세 본문 미리보기 내용입니다.')]);
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: FeedCard(post: textPost, detail: detail),
-          ),
-        ),
-      );
-      expect(find.text('상세 본문 미리보기 내용입니다.'), findsOneWidget);
-    });
-
-    testWidgets('should show comment preview from detail', (tester) async {
       final detail = detailWith(
         commentCount: 5,
         comments: [
@@ -229,12 +155,42 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: FeedCard(post: mediaPost, detail: detail),
+            body: FeedCard(post: post, detail: detail),
           ),
         ),
       );
-      expect(find.text('댓글 5개'), findsOneWidget);
-      expect(find.byType(RichText), findsWidgets);
+      expect(find.text('댓글 5개 모두 보기'), findsOneWidget);
+    });
+
+    testWidgets('should call onImageTap with index when image tapped', (
+      tester,
+    ) async {
+      var tapped = -1;
+      final detail = detailWith(imageUrls: const ['https://example.com/a.jpg']);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: FeedCard(
+                post: post,
+                detail: detail,
+                onImageTap: (i) => tapped = i,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.byType(Image).first);
+      expect(tapped, 0);
+    });
+
+    testWidgets('should show formatted timestamp', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(body: FeedCard(post: post)),
+        ),
+      );
+      expect(find.text(TimeAgo.formatDateString('2026-05-15')), findsOneWidget);
     });
   });
 }

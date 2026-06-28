@@ -5,7 +5,8 @@ import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/core/utils/time_ago.dart';
 import 'package:humoruniv/core/widgets/atoms/avatar.dart';
 import 'package:humoruniv/core/widgets/atoms/count_badge.dart';
-import 'package:humoruniv/core/widgets/atoms/feed_media.dart';
+import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
+import 'package:humoruniv/core/widgets/molecules/feed_image_carousel.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:humoruniv/domain/entities/post_detail.dart';
@@ -14,78 +15,62 @@ class FeedCard extends StatelessWidget {
   const FeedCard({
     required this.post,
     super.key,
-    this.onTap,
-    this.isRead = false,
-    this.screenHeight,
     this.detail,
+    this.detailLoading = false,
+    this.onImageTap,
+    this.onCommentsTap,
+    this.isRead = false,
   });
   final BoardPost post;
-  final VoidCallback? onTap;
-  final bool isRead;
-  final double? screenHeight;
   final PostDetail? detail;
+  final bool detailLoading;
+  final ValueChanged<int>? onImageTap;
+  final VoidCallback? onCommentsTap;
+  final bool isRead;
 
-  String? get _fullImage => (detail != null && detail!.imageUrls.isNotEmpty)
-      ? detail!.imageUrls.first
-      : null;
+  bool get _hasImages => detail != null && detail!.imageUrls.isNotEmpty;
 
   String? get _bodyText {
     final d = detail;
-    if (d == null) return post.previewText;
-    for (final block in d.contentBlocks) {
-      if (block is TextBlock && block.text.trim().isNotEmpty) return block.text;
-    }
-    return post.previewText;
+    if (d == null) return null;
+    final texts = d.contentBlocks
+        .whereType<TextBlock>()
+        .map((b) => b.text.trim())
+        .where((t) => t.isNotEmpty)
+        .toList();
+    return texts.isEmpty ? null : texts.join('\n');
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final hasThumbnail = post.thumbnailUrl.isNotEmpty;
-    final fullImage = _fullImage;
 
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _header(textTheme, colorScheme),
-          if (fullImage != null)
-            ColoredBox(
-              color: colorScheme.surfaceContainerHighest,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: AppSizes.feedMediaMaxHeight,
-                ),
-                child: Image.network(
-                  fullImage,
-                  width: double.infinity,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => hasThumbnail
-                      ? FeedMedia(
-                          imageUrl: post.thumbnailUrl,
-                          screenHeight: screenHeight,
-                        )
-                      : const SizedBox.shrink(),
-                ),
-              ),
-            )
-          else if (hasThumbnail)
-            FeedMedia(imageUrl: post.thumbnailUrl, screenHeight: screenHeight),
-          _actions(),
-          _caption(textTheme, colorScheme),
-          if (detail != null && detail!.comments.isNotEmpty)
-            _commentPreview(textTheme, colorScheme),
-          if (post.date.isNotEmpty) _timestamp(textTheme, colorScheme),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: colorScheme.outline.withOpacity(0.12),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _header(textTheme, colorScheme),
+        if (detailLoading && !_hasImages)
+          const SkeletonBox(
+            width: double.infinity,
+            height: AppSizes.feedMediaMaxHeight,
+          )
+        else if (_hasImages)
+          FeedImageCarousel(
+            imageUrls: detail!.imageUrls,
+            onImageTap: onImageTap,
           ),
-        ],
-      ),
+        _actions(),
+        _caption(textTheme, colorScheme),
+        if (detail != null && detail!.comments.isNotEmpty)
+          _commentPreview(textTheme, colorScheme),
+        if (post.date.isNotEmpty) _timestamp(textTheme, colorScheme),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: colorScheme.outline.withOpacity(0.12),
+        ),
+      ],
     );
   }
 
@@ -149,14 +134,7 @@ class FeedCard extends StatelessWidget {
           ),
           if (body != null && body.isNotEmpty) ...[
             AppSpacing.sbH4,
-            Text(
-              body,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
+            _ExpandableText(body, maxLines: _hasImages ? 3 : 8),
           ],
         ],
       ),
@@ -164,36 +142,39 @@ class FeedCard extends StatelessWidget {
   }
 
   Widget _commentPreview(TextTheme textTheme, ColorScheme colorScheme) {
-    final comments = detail!.comments;
-    final first = comments.first;
-    return Padding(
-      padding: AppSpacing.edgeH16,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '댓글 ${detail!.commentCount}개',
-            style: textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
+    final first = detail!.comments.first;
+    return GestureDetector(
+      onTap: onCommentsTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: AppSpacing.edgeH16,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '댓글 ${detail!.commentCount}개 모두 보기',
+              style: textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
-          AppSpacing.sbH4,
-          RichText(
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: '${first.author} ',
-                  style: textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
+            AppSpacing.sbH4,
+            RichText(
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: '${first.author} ',
+                    style: textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                TextSpan(text: first.content, style: textTheme.labelSmall),
-              ],
+                  TextSpan(text: first.content, style: textTheme.labelSmall),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -211,6 +192,61 @@ class FeedCard extends StatelessWidget {
           color: colorScheme.onSurfaceVariant,
         ),
       ),
+    );
+  }
+}
+
+class _ExpandableText extends StatefulWidget {
+  const _ExpandableText(this.text, {this.maxLines = 3});
+  final String text;
+  final int maxLines;
+
+  @override
+  State<_ExpandableText> createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<_ExpandableText> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final painter = TextPainter(
+          text: TextSpan(text: widget.text, style: style),
+          maxLines: widget.maxLines,
+          textDirection: TextDirection.ltr,
+        )..layout(maxWidth: constraints.maxWidth);
+        final overflow = painter.didExceedMaxLines;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.text,
+              style: style,
+              maxLines: _expanded ? null : widget.maxLines,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (overflow)
+              GestureDetector(
+                onTap: () => setState(() => _expanded = !_expanded),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    _expanded ? '접기' : '더보기',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
