@@ -136,6 +136,66 @@ void main() {
     );
 
     test(
+      'should cache PostDetail and skip remoteDs on second call with same url',
+      () async {
+        final detail = PostDetail(
+          id: 123,
+          title: '캐시',
+          author: '작성자',
+          date: DateTime(2026, 5, 15),
+          contentHtml: '<p>x</p>',
+          contentBlocks: const [TextBlock('x')],
+          imageUrls: const [],
+          recommendCount: 1,
+          notRecommendCount: 0,
+          viewCount: 1,
+          commentCount: 0,
+          comments: const [],
+        );
+        when(
+          () => mockRemoteDs.fetchPostDetail(any()),
+        ).thenAnswer((_) async => detail);
+
+        await repository.getPostDetail('/board/read.html?table=pds&number=123');
+        await repository.getPostDetail('/board/read.html?table=pds&number=123');
+
+        verify(() => mockRemoteDs.fetchPostDetail(any())).called(1);
+      },
+    );
+
+    test(
+      'should dedup concurrent getPostDetail calls to a single remoteDs call',
+      () async {
+        final detail = PostDetail(
+          id: 123,
+          title: '동시',
+          author: '작성자',
+          date: DateTime(2026, 5, 15),
+          contentHtml: '<p>x</p>',
+          contentBlocks: const [TextBlock('x')],
+          imageUrls: const [],
+          recommendCount: 1,
+          notRecommendCount: 0,
+          viewCount: 1,
+          commentCount: 0,
+          comments: const [],
+        );
+        when(() => mockRemoteDs.fetchPostDetail(any())).thenAnswer((_) async {
+          await Future.delayed(const Duration(milliseconds: 50));
+          return detail;
+        });
+
+        final results = await Future.wait([
+          repository.getPostDetail('/board/read.html?table=pds&number=123'),
+          repository.getPostDetail('/board/read.html?table=pds&number=123'),
+        ]);
+
+        verify(() => mockRemoteDs.fetchPostDetail(any())).called(1);
+        expect(results.every((r) => r.isRight()), isTrue);
+      },
+    );
+
+    test(
       'should return Right with BoardListResult when getBoardPosts succeeds',
       () async {
         const dsResult = BoardListDsResult(

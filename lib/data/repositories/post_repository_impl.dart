@@ -8,8 +8,10 @@ import 'package:humoruniv/domain/entities/sort_option.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 
 class PostRepositoryImpl implements PostRepository {
-  const PostRepositoryImpl({required this.remoteDs});
+  PostRepositoryImpl({required this.remoteDs});
   final HumorunivRemoteDs remoteDs;
+  final Map<String, PostDetail> _detailCache = {};
+  final Map<String, Future<Either<Failure, PostDetail>>> _inFlight = {};
 
   @override
   Future<Either<Failure, List<Post>>> getBestPosts() async {
@@ -24,6 +26,24 @@ class PostRepositoryImpl implements PostRepository {
 
   @override
   Future<Either<Failure, PostDetail>> getPostDetail(String url) async {
+    final cached = _detailCache[url];
+    if (cached != null) return Right(cached);
+
+    final existing = _inFlight[url];
+    if (existing != null) return existing;
+
+    final future = _fetchDetail(url);
+    _inFlight[url] = future;
+    try {
+      final result = await future;
+      result.fold((_) => null, (detail) => _detailCache[url] = detail);
+      return result;
+    } finally {
+      _inFlight.remove(url);
+    }
+  }
+
+  Future<Either<Failure, PostDetail>> _fetchDetail(String url) async {
     try {
       final detail = await remoteDs.fetchPostDetail(url);
       return Right(detail);

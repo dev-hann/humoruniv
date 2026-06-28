@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:humoruniv/core/widgets/atoms/loading_indicator.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_card.dart';
@@ -6,6 +7,29 @@ import 'package:humoruniv/core/widgets/states/empty_state_view.dart';
 import 'package:humoruniv/core/widgets/states/error_state_view.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
+import 'package:humoruniv/domain/entities/post_detail.dart';
+import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
+
+class FeedCardItem extends ConsumerWidget {
+  const FeedCardItem({
+    required this.post,
+    required this.onTap,
+    this.isRead = false,
+    super.key,
+  });
+  final BoardPost post;
+  final VoidCallback onTap;
+  final bool isRead;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncDetail = ref.watch(postDetailProvider(post.url));
+    final PostDetail? detail = asyncDetail.whenOrNull(
+      data: (either) => either.fold((_) => null, (d) => d),
+    );
+    return FeedCard(post: post, detail: detail, onTap: onTap, isRead: isRead);
+  }
+}
 
 class FeedList extends StatefulWidget {
   const FeedList({

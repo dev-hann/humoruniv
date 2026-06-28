@@ -11,6 +11,7 @@ import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/sort_option.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
+import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
 import 'package:humoruniv/presentation/screens/home_screen.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -38,6 +39,10 @@ void main() {
   });
 
   tearDown(di.sl.reset);
+
+  List<Override> overrides() => [
+    feedPrefetchProvider.overrideWith((ref) async {}),
+  ];
 
   List<BoardPost> samplePosts() => const [
     BoardPost(
@@ -74,8 +79,9 @@ void main() {
     );
 
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(home: Scaffold(body: HomeScreen())),
+      ProviderScope(
+        overrides: overrides(),
+        child: const MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
     await tester.pumpAndSettle();
@@ -92,8 +98,9 @@ void main() {
     );
 
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(home: Scaffold(body: HomeScreen())),
+      ProviderScope(
+        overrides: overrides(),
+        child: const MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
     await tester.pumpAndSettle();
@@ -108,8 +115,9 @@ void main() {
     );
 
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(home: Scaffold(body: HomeScreen())),
+      ProviderScope(
+        overrides: overrides(),
+        child: const MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
 
@@ -125,8 +133,9 @@ void main() {
     );
 
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(home: Scaffold(body: HomeScreen())),
+      ProviderScope(
+        overrides: overrides(),
+        child: const MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
     await tester.pumpAndSettle();
@@ -140,8 +149,9 @@ void main() {
     ).thenAnswer((_) async => const Left(ServerFailure('Network error')));
 
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(home: Scaffold(body: HomeScreen())),
+      ProviderScope(
+        overrides: overrides(),
+        child: const MaterialApp(home: Scaffold(body: HomeScreen())),
       ),
     );
     await tester.pumpAndSettle();
