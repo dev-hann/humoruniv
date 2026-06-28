@@ -9,13 +9,8 @@ import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:video_player/video_player.dart';
 
 class InlineVideoPlayer extends StatefulWidget {
-  const InlineVideoPlayer({
-    required this.block,
-    this.hideNsfw = false,
-    super.key,
-  });
+  const InlineVideoPlayer({required this.block, super.key});
   final VideoBlock block;
-  final bool hideNsfw;
 
   @override
   State<InlineVideoPlayer> createState() => _InlineVideoPlayerState();
@@ -26,7 +21,6 @@ class _InlineVideoPlayerState extends State<InlineVideoPlayer> {
   bool _isInitialized = false;
   bool _hasError = false;
   bool _showPlayButton = true;
-  bool _revealed = false;
   bool _showControls = true;
   bool _isMuted = true;
   Timer? _hideTimer;
@@ -132,10 +126,6 @@ class _InlineVideoPlayerState extends State<InlineVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.hideNsfw && widget.block.isNsfw && !_revealed) {
-      return const SizedBox.shrink();
-    }
-
     final isGif = widget.block.isGifConversion;
     final position = _controller?.value.position ?? Duration.zero;
     final duration = _controller?.value.duration ?? Duration.zero;

@@ -69,28 +69,6 @@ void main() {
       expect(find.text('+1'), findsNothing);
     });
 
-    testWidgets('should show NSFW overlay when isNsfw is true', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: FeedMedia(imageUrl: 'x', isNsfw: true)),
-        ),
-      );
-
-      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
-    });
-
-    testWidgets('should not show NSFW overlay when isNsfw is false', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: FeedMedia(imageUrl: 'x')),
-        ),
-      );
-
-      expect(find.byIcon(Icons.visibility_off), findsNothing);
-    });
-
     testWidgets('should call onTap when tapped', (tester) async {
       var tapped = false;
       await tester.pumpWidget(

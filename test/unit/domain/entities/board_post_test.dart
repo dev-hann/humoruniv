@@ -169,23 +169,7 @@ void main() {
       expect(post.previewText, isNull);
     });
 
-    test('isNsfw should default to false when not provided', () {
-      const post = BoardPost(
-        id: 1,
-        title: 't',
-        url: 'u',
-        author: 'a',
-        date: 'd',
-        recommendCount: 0,
-        notRecommendCount: 0,
-        commentCount: 0,
-        viewCount: 0,
-        thumbnailUrl: '',
-      );
-      expect(post.isNsfw, isFalse);
-    });
-
-    test('should allow optional previewText and isNsfw', () {
+    test('should allow optional previewText', () {
       const post = BoardPost(
         id: 1,
         title: 't',
@@ -198,39 +182,8 @@ void main() {
         viewCount: 0,
         thumbnailUrl: '',
         previewText: '미리보기',
-        isNsfw: true,
       );
       expect(post.previewText, '미리보기');
-      expect(post.isNsfw, isTrue);
-    });
-
-    test('should not be equal when isNsfw differs', () {
-      const a = BoardPost(
-        id: 1,
-        title: 't',
-        url: 'u',
-        author: 'a',
-        date: 'd',
-        recommendCount: 0,
-        notRecommendCount: 0,
-        commentCount: 0,
-        viewCount: 0,
-        thumbnailUrl: '',
-      );
-      const b = BoardPost(
-        id: 1,
-        title: 't',
-        url: 'u',
-        author: 'a',
-        date: 'd',
-        recommendCount: 0,
-        notRecommendCount: 0,
-        commentCount: 0,
-        viewCount: 0,
-        thumbnailUrl: '',
-        isNsfw: true,
-      );
-      expect(a, isNot(equals(b)));
     });
 
     test('should not be equal when previewText differs', () {

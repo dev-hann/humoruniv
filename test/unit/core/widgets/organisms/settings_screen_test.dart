@@ -56,7 +56,6 @@ void main() {
       await tester.pumpWidget(buildApp());
 
       expect(find.text('화면 설정'), findsOneWidget);
-      expect(find.text('콘텐츠'), findsOneWidget);
       expect(find.text('앱 정보'), findsOneWidget);
     });
 
@@ -87,19 +86,6 @@ void main() {
       expect(find.byType(DarkModeSelector), findsOneWidget);
     });
 
-    testWidgets('should display NSFW toggle', (tester) async {
-      when(() => mockRepository.getLatestRelease()).thenAnswer(
-        (_) async => const Right(
-          AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
-        ),
-      );
-
-      await tester.pumpWidget(buildApp());
-
-      expect(find.text('성인 콘텐츠 경고'), findsOneWidget);
-      expect(find.byType(Switch), findsOneWidget);
-    });
-
     testWidgets('should display version info', (tester) async {
       when(() => mockRepository.getLatestRelease()).thenAnswer(
         (_) async => const Right(
@@ -122,25 +108,6 @@ void main() {
       await tester.pumpWidget(buildApp());
 
       expect(find.text('업데이트 확인'), findsOneWidget);
-    });
-
-    testWidgets('should toggle NSFW switch', (tester) async {
-      when(() => mockRepository.getLatestRelease()).thenAnswer(
-        (_) async => const Right(
-          AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
-        ),
-      );
-
-      await tester.pumpWidget(buildApp());
-
-      final switchWidget = tester.widget<Switch>(find.byType(Switch));
-      expect(switchWidget.value, true);
-
-      await tester.tap(find.byType(Switch));
-      await tester.pumpAndSettle();
-
-      final updatedSwitch = tester.widget<Switch>(find.byType(Switch));
-      expect(updatedSwitch.value, false);
     });
 
     testWidgets('should trigger checkForUpdate when check button tapped', (

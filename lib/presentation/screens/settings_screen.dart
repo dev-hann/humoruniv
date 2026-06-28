@@ -4,7 +4,6 @@ import 'package:humoruniv/core/widgets/molecules/dark_mode_selector.dart';
 import 'package:humoruniv/core/widgets/molecules/settings_group.dart';
 import 'package:humoruniv/core/widgets/molecules/settings_tile.dart';
 import 'package:humoruniv/core/widgets/molecules/update_banner.dart';
-import 'package:humoruniv/presentation/providers/nsfw_provider.dart';
 import 'package:humoruniv/presentation/providers/theme_provider.dart';
 import 'package:humoruniv/presentation/providers/update_provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -16,7 +15,6 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
-    final nsfwEnabled = ref.watch(nsfwProvider);
     final updateState = ref.watch(updateProvider);
 
     return Scaffold(
@@ -32,20 +30,6 @@ class SettingsScreen extends ConsumerWidget {
                   currentMode: themeMode,
                   onChanged: (option) {
                     ref.read(themeProvider.notifier).setThemeMode(option);
-                  },
-                ),
-              ),
-            ],
-          ),
-          SettingsGroup(
-            title: '콘텐츠',
-            children: [
-              SettingsTile(
-                title: '성인 콘텐츠 경고',
-                trailing: Switch(
-                  value: nsfwEnabled,
-                  onChanged: (v) {
-                    ref.read(nsfwProvider.notifier).setEnabled(v);
                   },
                 ),
               ),

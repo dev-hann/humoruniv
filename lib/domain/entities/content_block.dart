@@ -22,10 +22,9 @@ class TextBlock extends ContentBlock {
 
 @immutable
 class ImageBlock extends ContentBlock {
-  const ImageBlock({required this.url, this.thumbnailUrl, this.isNsfw = false});
+  const ImageBlock({required this.url, this.thumbnailUrl});
   final String url;
   final String? thumbnailUrl;
-  final bool isNsfw;
 
   @override
   bool operator ==(Object other) =>
@@ -33,11 +32,10 @@ class ImageBlock extends ContentBlock {
       other is ImageBlock &&
           runtimeType == other.runtimeType &&
           url == other.url &&
-          thumbnailUrl == other.thumbnailUrl &&
-          isNsfw == other.isNsfw;
+          thumbnailUrl == other.thumbnailUrl;
 
   @override
-  int get hashCode => Object.hash(url, thumbnailUrl, isNsfw);
+  int get hashCode => Object.hash(url, thumbnailUrl);
 }
 
 @immutable
@@ -48,14 +46,12 @@ class VideoBlock extends ContentBlock {
     this.width,
     this.height,
     this.isGifConversion = false,
-    this.isNsfw = false,
   });
   final String url;
   final String? thumbnailUrl;
   final int? width;
   final int? height;
   final bool isGifConversion;
-  final bool isNsfw;
 
   @override
   bool operator ==(Object other) =>
@@ -66,12 +62,11 @@ class VideoBlock extends ContentBlock {
           thumbnailUrl == other.thumbnailUrl &&
           width == other.width &&
           height == other.height &&
-          isGifConversion == other.isGifConversion &&
-          isNsfw == other.isNsfw;
+          isGifConversion == other.isGifConversion;
 
   @override
   int get hashCode =>
-      Object.hash(url, thumbnailUrl, width, height, isGifConversion, isNsfw);
+      Object.hash(url, thumbnailUrl, width, height, isGifConversion);
 }
 
 @immutable

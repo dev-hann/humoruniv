@@ -17,7 +17,6 @@ class PostDetail {
     required this.viewCount,
     required this.commentCount,
     required this.comments,
-    this.isNsfw = false,
   });
   final int id;
   final String title;
@@ -31,7 +30,6 @@ class PostDetail {
   final int viewCount;
   final int commentCount;
   final List<Comment> comments;
-  final bool isNsfw;
 
   @override
   bool operator ==(Object other) =>
@@ -46,8 +44,7 @@ class PostDetail {
           recommendCount == other.recommendCount &&
           notRecommendCount == other.notRecommendCount &&
           viewCount == other.viewCount &&
-          commentCount == other.commentCount &&
-          isNsfw == other.isNsfw;
+          commentCount == other.commentCount;
 
   @override
   int get hashCode => Object.hash(
@@ -60,6 +57,5 @@ class PostDetail {
     notRecommendCount,
     viewCount,
     commentCount,
-    isNsfw,
   );
 }

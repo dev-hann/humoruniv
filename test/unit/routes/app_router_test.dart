@@ -34,7 +34,7 @@ void main() {
   });
 
   setUp(() async {
-    SharedPreferences.setMockInitialValues({'nsfwAcknowledged': true});
+    SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
     mockPostRepo = MockPostRepository();
     mockUpdateRepo = MockUpdateRepository();

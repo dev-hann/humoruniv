@@ -9,13 +9,11 @@ class FeedMedia extends StatelessWidget {
     required this.imageUrl,
     super.key,
     this.onTap,
-    this.isNsfw = false,
     this.additionalImageCount = 0,
     this.screenHeight,
   });
   final String imageUrl;
   final VoidCallback? onTap;
-  final bool isNsfw;
   final int additionalImageCount;
   final double? screenHeight;
 
@@ -36,7 +34,6 @@ class FeedMedia extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             _content(context, colorScheme),
-            if (isNsfw) _nsfwOverlay(context),
             if (additionalImageCount > 0) _multiBadge(context),
           ],
         ),
@@ -72,18 +69,6 @@ class FeedMedia extends StatelessWidget {
           size: AppSizes.iconLarge * 2,
           color: colorScheme.onSurfaceVariant,
         ),
-      ),
-    );
-  }
-
-  Widget _nsfwOverlay(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: const BoxDecoration(color: Colors.black54),
-      child: Icon(
-        Icons.visibility_off,
-        color: colorScheme.onPrimary,
-        size: AppSizes.iconLarge * 2,
       ),
     );
   }

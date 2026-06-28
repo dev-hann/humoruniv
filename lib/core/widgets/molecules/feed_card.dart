@@ -7,7 +7,6 @@ import 'package:humoruniv/core/widgets/atoms/avatar.dart';
 import 'package:humoruniv/core/widgets/atoms/count_badge.dart';
 import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_image_carousel.dart';
-import 'package:humoruniv/core/widgets/molecules/inline_video_player.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:humoruniv/domain/entities/post_detail.dart';
@@ -19,17 +18,17 @@ class FeedCard extends StatelessWidget {
     this.detail,
     this.detailLoading = false,
     this.onImageTap,
+    this.onVideoTap,
     this.onCommentsTap,
     this.isRead = false,
-    this.hideNsfw = true,
   });
   final BoardPost post;
   final PostDetail? detail;
   final bool detailLoading;
   final ValueChanged<int>? onImageTap;
+  final ValueChanged<int>? onVideoTap;
   final VoidCallback? onCommentsTap;
   final bool isRead;
-  final bool hideNsfw;
 
   bool get _hasImages => detail != null && detail!.imageUrls.isNotEmpty;
 
@@ -80,15 +79,14 @@ class FeedCard extends StatelessWidget {
         ),
       ];
     }
+    if (!_hasImages && _videoBlocks.isEmpty) return [];
     return [
-      ..._videoBlocks.map(
-        (v) => Padding(
-          padding: AppSpacing.edgeOnlyBottom8,
-          child: InlineVideoPlayer(block: v, hideNsfw: hideNsfw),
-        ),
+      FeedImageCarousel(
+        imageUrls: detail?.imageUrls ?? const [],
+        videoBlocks: _videoBlocks,
+        onImageTap: onImageTap,
+        onVideoTap: onVideoTap,
       ),
-      if (_hasImages)
-        FeedImageCarousel(imageUrls: detail!.imageUrls, onImageTap: onImageTap),
     ];
   }
 

@@ -115,25 +115,6 @@ void main() {
       expect(a, equals(b));
     });
 
-    test('should have isNsfw default to false', () {
-      const block = ImageBlock(url: 'http://x.com/a.jpg');
-
-      expect(block.isNsfw, isFalse);
-    });
-
-    test('should create with isNsfw true', () {
-      const block = ImageBlock(url: 'http://x.com/a.jpg', isNsfw: true);
-
-      expect(block.isNsfw, isTrue);
-    });
-
-    test('should not be equal when isNsfw differs', () {
-      const a = ImageBlock(url: 'http://x.com/a.jpg');
-      const b = ImageBlock(url: 'http://x.com/a.jpg', isNsfw: true);
-
-      expect(a, isNot(equals(b)));
-    });
-
     test('should not be equal to TextBlock', () {
       const image = ImageBlock(url: 'http://x.com/a.jpg');
       const text = TextBlock('http://x.com/a.jpg');
@@ -196,25 +177,6 @@ void main() {
     test('should not be equal when isGifConversion differs', () {
       const a = VideoBlock(url: 'http://x.com/v.mp4');
       const b = VideoBlock(url: 'http://x.com/v.mp4', isGifConversion: true);
-
-      expect(a, isNot(equals(b)));
-    });
-
-    test('should have isNsfw default to false', () {
-      const block = VideoBlock(url: 'http://x.com/v.mp4');
-
-      expect(block.isNsfw, isFalse);
-    });
-
-    test('should create with isNsfw true', () {
-      const block = VideoBlock(url: 'http://x.com/v.mp4', isNsfw: true);
-
-      expect(block.isNsfw, isTrue);
-    });
-
-    test('should not be equal when isNsfw differs', () {
-      const a = VideoBlock(url: 'http://x.com/v.mp4');
-      const b = VideoBlock(url: 'http://x.com/v.mp4', isNsfw: true);
 
       expect(a, isNot(equals(b)));
     });

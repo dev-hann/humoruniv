@@ -46,7 +46,6 @@ class PostDetailParser {
       viewCount: viewCount,
       commentCount: commentCount,
       comments: comments,
-      isNsfw: scanResult.hasNsfw,
     );
   }
 

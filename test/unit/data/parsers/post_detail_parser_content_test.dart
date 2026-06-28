@@ -63,53 +63,6 @@ void main() {
       );
     });
 
-    group('racy_hidden images', () {
-      test(
-        'should extract image from racy_hidden inside simple_attach_img_div',
-        () {
-          const html = '''
-        <html><head><title>Racy Test</title></head><body>
-        <div id="read_profile_td"><span class="hu_nick_txt">user</span></div>
-        <div id="read_profile_desc"><span class="etc">작성 2026-05-17 11:00:00</span></div>
-        <div class="body_editor">
-          <div class="simple_attach_img_div">
-            <div id="racy_show_6475_123" style="text-align:center;">
-              <a href="javascript:show_hidden_img('6475_123');">
-                <img src="/images/ai/ansim_man_hupago.gif?tmp=4" width="240">
-              </a>
-              <div class="gray">
-                <br>이미지를 표시하려면 초기화를 클릭하세요.
-              </div>
-            </div>
-            <div id="racy_hidden_6475_123" style="display:none;text-align:center;">
-              <table><tr><td>
-                <div id="comment_file_editor_file_1_456">
-                  <img src="//timg.humoruniv.com/thumb.php?url=https://down.humoruniv.com//hwiparambbs/test.jpg?SIZE=800x600?WEBP"
-                       img_file_url="https://down.humoruniv.com//hwiparambbs/data/editor/pdswait/test.jpg"
-                       class="img_compress" />
-                </div>
-              </td></tr></table>
-            </div>
-          </div>
-        </div>
-        </body></html>
-        ''';
-
-          final result = PostDetailParser.parse(html);
-
-          final imageBlocks = result.contentBlocks
-              .whereType<ImageBlock>()
-              .toList();
-          expect(imageBlocks, isNotEmpty);
-          expect(imageBlocks.first.url, contains('hwiparambbs/data/editor'));
-          expect(imageBlocks.first.url, isNot(contains('ansim_man')));
-          expect(imageBlocks.first.isNsfw, isTrue);
-          expect(result.isNsfw, isTrue);
-          expect(result.imageUrls, isNotEmpty);
-        },
-      );
-    });
-
     group('download.php images', () {
       test('should extract image URLs from download.php links', () {
         const html = '''

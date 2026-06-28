@@ -97,21 +97,5 @@ void main() {
         expect(find.byIcon(Icons.play_arrow), findsOneWidget);
       },
     );
-
-    testWidgets('should render nothing when hideNsfw is true', (tester) async {
-      const block = VideoBlock(
-        url: 'https://example.com/nsfw.mp4',
-        isNsfw: true,
-      );
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: InlineVideoPlayer(block: block, hideNsfw: true)),
-        ),
-      );
-      await tester.pump();
-
-      expect(find.byIcon(Icons.play_arrow), findsNothing);
-    });
   });
 }

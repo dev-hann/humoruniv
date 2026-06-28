@@ -5,14 +5,9 @@ import 'package:humoruniv/core/utils/media_classifier.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 
 class ContentScanResult {
-  const ContentScanResult({
-    required this.blocks,
-    required this.imageUrls,
-    this.hasNsfw = false,
-  });
+  const ContentScanResult({required this.blocks, required this.imageUrls});
   final List<ContentBlock> blocks;
   final List<String> imageUrls;
-  final bool hasNsfw;
 }
 
 abstract final class ContentScanner {
@@ -23,15 +18,7 @@ abstract final class ContentScanner {
 
     _walkNodes(container.nodes, blocks, seenKeys, imageUrls);
 
-    final hasNsfw = blocks.any(
-      (b) => (b is ImageBlock && b.isNsfw) || (b is VideoBlock && b.isNsfw),
-    );
-
-    return ContentScanResult(
-      blocks: blocks,
-      imageUrls: imageUrls,
-      hasNsfw: hasNsfw,
-    );
+    return ContentScanResult(blocks: blocks, imageUrls: imageUrls);
   }
 
   static ContentScanResult scanFull(dom.Document doc, dom.Element contentEl) {
@@ -89,15 +76,7 @@ abstract final class ContentScanner {
       }
     }
 
-    final hasNsfw = blocks.any(
-      (b) => (b is ImageBlock && b.isNsfw) || (b is VideoBlock && b.isNsfw),
-    );
-
-    return ContentScanResult(
-      blocks: blocks,
-      imageUrls: imageUrls,
-      hasNsfw: hasNsfw,
-    );
+    return ContentScanResult(blocks: blocks, imageUrls: imageUrls);
   }
 
   static List<ContentBlock> scanCompact(dom.Element container) {
@@ -154,9 +133,8 @@ abstract final class ContentScanner {
     List<dom.Node> nodes,
     List<ContentBlock> blocks,
     Set<String> seenKeys,
-    List<String> imageUrls, {
-    bool nsfw = false,
-  }) {
+    List<String> imageUrls,
+  ) {
     for (final node in nodes) {
       if (node is dom.Text) {
         final text = node.text.trim();
@@ -164,7 +142,7 @@ abstract final class ContentScanner {
           blocks.add(TextBlock(text));
         }
       } else if (node is dom.Element) {
-        _scanElement(node, blocks, seenKeys, imageUrls, nsfw: nsfw);
+        _scanElement(node, blocks, seenKeys, imageUrls);
       }
     }
   }
@@ -173,15 +151,9 @@ abstract final class ContentScanner {
     dom.Element el,
     List<ContentBlock> blocks,
     Set<String> seenKeys,
-    List<String> imageUrls, {
-    bool nsfw = false,
-  }) {
+    List<String> imageUrls,
+  ) {
     if (_isNoiseElement(el)) return;
-
-    final elId = el.id ?? '';
-    if (_isRacyShow(elId)) return;
-
-    final isNsfwContext = nsfw || _isRacyHidden(elId);
 
     final extracted = _extractUrlsFromElement(el);
     if (extracted.isNotEmpty) {
@@ -195,26 +167,13 @@ abstract final class ContentScanner {
         final thumb = entry.thumbUrl != null
             ? UrlNormalizer.normalize(entry.thumbUrl!)
             : null;
-        final blockIsNsfw = isNsfwContext || entry.isInsideRacyHidden;
 
         switch (mediaType) {
           case MediaType.image:
-            blocks.add(
-              ImageBlock(
-                url: normalized,
-                thumbnailUrl: thumb,
-                isNsfw: blockIsNsfw,
-              ),
-            );
+            blocks.add(ImageBlock(url: normalized, thumbnailUrl: thumb));
             imageUrls.add(normalized);
           case MediaType.video:
-            blocks.add(
-              VideoBlock(
-                url: normalized,
-                thumbnailUrl: thumb,
-                isNsfw: blockIsNsfw,
-              ),
-            );
+            blocks.add(VideoBlock(url: normalized, thumbnailUrl: thumb));
           case MediaType.audio:
             blocks.add(HtmlBlock('<a href="$normalized">$normalized</a>'));
           case MediaType.youtube:
@@ -223,7 +182,6 @@ abstract final class ContentScanner {
               VideoBlock(
                 url: 'https://www.youtube.com/watch?v=$ytId',
                 thumbnailUrl: 'https://img.youtube.com/vi/$ytId/hqdefault.jpg',
-                isNsfw: blockIsNsfw,
               ),
             );
           case MediaType.link:
@@ -235,13 +193,13 @@ abstract final class ContentScanner {
             break;
         }
       }
-      _walkNodes(el.nodes, blocks, seenKeys, imageUrls, nsfw: isNsfwContext);
+      _walkNodes(el.nodes, blocks, seenKeys, imageUrls);
       return;
     }
 
     if (el.localName == 'video' || el.querySelector('video') != null) {
       final videoEl = el.localName == 'video' ? el : el.querySelector('video')!;
-      final block = _parseVideoElement(videoEl, isNsfw: isNsfwContext);
+      final block = _parseVideoElement(videoEl);
       if (block != null) {
         final normalized = UrlNormalizer.normalize(block.url);
         if (seenKeys.add(_dedupKey(normalized))) {
@@ -267,7 +225,7 @@ abstract final class ContentScanner {
       return;
     }
 
-    _walkNodes(el.nodes, blocks, seenKeys, imageUrls, nsfw: isNsfwContext);
+    _walkNodes(el.nodes, blocks, seenKeys, imageUrls);
   }
 
   static List<_UrlEntry> _extractUrlsFromElement(dom.Element el) {
@@ -278,13 +236,7 @@ abstract final class ContentScanner {
       if (src.isNotEmpty && !src.contains('/images/')) {
         final url = el.attributes['img_file_url'] ?? src;
         if (url.isNotEmpty) {
-          entries.add(
-            _UrlEntry(
-              url: url,
-              thumbUrl: src != url ? src : null,
-              isInsideRacyHidden: _isInsideRacyHidden(el),
-            ),
-          );
+          entries.add(_UrlEntry(url: url, thumbUrl: src != url ? src : null));
         }
       }
       return entries;
@@ -300,11 +252,7 @@ abstract final class ContentScanner {
           final innerUrl = match.group(1)!;
           final thumbImg = el.querySelector('img');
           entries.add(
-            _UrlEntry(
-              url: innerUrl,
-              thumbUrl: thumbImg?.attributes['src'],
-              isInsideRacyHidden: _isInsideRacyHidden(el),
-            ),
+            _UrlEntry(url: innerUrl, thumbUrl: thumbImg?.attributes['src']),
           );
         }
         return entries;
@@ -322,24 +270,16 @@ abstract final class ContentScanner {
 
     final imgs = el.querySelectorAll('img');
     for (final img in imgs) {
-      if (_isInsideRacyShow(img)) continue;
       final src = img.attributes['src'] ?? '';
       if (src.isEmpty || src.contains('/images/')) continue;
       final url = img.attributes['img_file_url'] ?? src;
       if (url.isNotEmpty) {
-        entries.add(
-          _UrlEntry(
-            url: url,
-            thumbUrl: src != url ? src : null,
-            isInsideRacyHidden: _isInsideRacyHidden(img),
-          ),
-        );
+        entries.add(_UrlEntry(url: url, thumbUrl: src != url ? src : null));
       }
     }
 
     final downloadLinks = el.querySelectorAll('a[href*="download.php?url="]');
     for (final link in downloadLinks) {
-      if (_isInsideRacyShow(link)) continue;
       final href = link.attributes['href'] ?? '';
       final match = RegExp(
         r'download\.php\?url=(https?://[^&]+)',
@@ -348,11 +288,7 @@ abstract final class ContentScanner {
         final innerUrl = match.group(1)!;
         final thumbImg = link.querySelector('img');
         entries.add(
-          _UrlEntry(
-            url: innerUrl,
-            thumbUrl: thumbImg?.attributes['src'],
-            isInsideRacyHidden: _isInsideRacyHidden(link),
-          ),
+          _UrlEntry(url: innerUrl, thumbUrl: thumbImg?.attributes['src']),
         );
       }
     }
@@ -388,10 +324,7 @@ abstract final class ContentScanner {
     }
   }
 
-  static VideoBlock? _parseVideoElement(
-    dom.Element video, {
-    bool isNsfw = false,
-  }) {
+  static VideoBlock? _parseVideoElement(dom.Element video) {
     final source = video.querySelector('source');
     final src = source?.attributes['src'] ?? video.attributes['src'] ?? '';
     if (src.isEmpty || src.startsWith("'") || src.contains('"+')) return null;
@@ -405,7 +338,6 @@ abstract final class ContentScanner {
       thumbnailUrl: poster.isNotEmpty ? UrlNormalizer.normalize(poster) : null,
       width: widthStr != null ? int.tryParse(widthStr) : null,
       height: heightStr != null ? int.tryParse(heightStr) : null,
-      isNsfw: isNsfw,
     );
   }
 
@@ -414,32 +346,6 @@ abstract final class ContentScanner {
         el.classes.contains('comment_crop_href') ||
         el.classes.contains('comment_crop_href_mp4') ||
         el.localName == 'iframe';
-  }
-
-  static bool _isRacyShow(String id) {
-    return id.startsWith('racy_show_');
-  }
-
-  static bool _isRacyHidden(String id) {
-    return id.startsWith('racy_hidden_');
-  }
-
-  static bool _isInsideRacyShow(dom.Element el) {
-    var parent = el.parent;
-    while (parent != null) {
-      if (_isRacyShow(parent.id ?? '')) return true;
-      parent = parent.parent;
-    }
-    return false;
-  }
-
-  static bool _isInsideRacyHidden(dom.Element el) {
-    var parent = el.parent;
-    while (parent != null) {
-      if (_isRacyHidden(parent.id ?? '')) return true;
-      parent = parent.parent;
-    }
-    return false;
   }
 
   static bool _isSimpleTextElement(dom.Element el) {
@@ -472,14 +378,8 @@ abstract final class ContentScanner {
 }
 
 class _UrlEntry {
-  const _UrlEntry({
-    required this.url,
-    this.thumbUrl,
-    this.text,
-    this.isInsideRacyHidden = false,
-  });
+  const _UrlEntry({required this.url, this.thumbUrl, this.text});
   final String url;
   final String? thumbUrl;
   final String? text;
-  final bool isInsideRacyHidden;
 }
