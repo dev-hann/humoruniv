@@ -74,6 +74,21 @@ abstract final class ContentScanner {
       }
     }
 
+    final mp4Divs = doc.querySelectorAll('[onclick*="comment_mp4_expand"]');
+    for (final div in mp4Divs) {
+      if (contentEl.contains(div)) continue;
+      final onclick = div.attributes['onclick'] ?? '';
+      final m = RegExp(
+        r"comment_mp4_expand\('[^']*',\s*'([^']+)'",
+      ).firstMatch(onclick);
+      if (m != null) {
+        final url = UrlNormalizer.normalize(m.group(1)!);
+        if (seenKeys.add(_dedupKey(url))) {
+          blocks.add(VideoBlock(url: url));
+        }
+      }
+    }
+
     final hasNsfw = blocks.any(
       (b) => (b is ImageBlock && b.isNsfw) || (b is VideoBlock && b.isNsfw),
     );
