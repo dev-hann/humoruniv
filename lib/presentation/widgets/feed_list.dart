@@ -7,28 +7,42 @@ import 'package:humoruniv/core/widgets/states/empty_state_view.dart';
 import 'package:humoruniv/core/widgets/states/error_state_view.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
+import 'package:humoruniv/domain/entities/post_detail.dart';
+import 'package:humoruniv/presentation/providers/nsfw_provider.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
 import 'package:humoruniv/presentation/screens/image_viewer_screen.dart';
 import 'package:humoruniv/presentation/widgets/feed_comments_sheet.dart';
 
-class FeedCardItem extends ConsumerWidget {
+class FeedCardItem extends ConsumerStatefulWidget {
   const FeedCardItem({required this.post, this.isRead = false, super.key});
   final BoardPost post;
   final bool isRead;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final asyncDetail = ref.watch(postDetailProvider(post.url));
+  ConsumerState<FeedCardItem> createState() => _FeedCardItemState();
+}
+
+class _FeedCardItemState extends ConsumerState<FeedCardItem>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    final asyncDetail = ref.watch(postDetailProvider(widget.post.url));
+    final hideNsfw = ref.watch(nsfwProvider);
     final detail = asyncDetail.whenOrNull(
       data: (either) => either.fold((_) => null, (d) => d),
     );
     final hasImages = detail != null && detail.imageUrls.isNotEmpty;
     final hasComments = detail != null && detail.comments.isNotEmpty;
     return FeedCard(
-      post: post,
+      post: widget.post,
       detail: detail,
       detailLoading: asyncDetail.isLoading,
-      isRead: isRead,
+      isRead: widget.isRead,
+      hideNsfw: hideNsfw,
       onImageTap: !hasImages
           ? null
           : (i) => Navigator.of(context).push(

@@ -1,7 +1,23 @@
 # Design: Instagram-style Feed (웃긴자료 Home)
 
+> **⚠️ SUPERSEDED (2026-06-28, later same day).** This plan described a **3-tab**
+> IA (홈/검색/설정) with bottom nav and **card tap → PostDetailScreen**. The
+> direction has since moved further:
+> - **No bottom navigation bar.** Single `HomeScreen` at `/`; Settings reached
+>   via AppBar gear → pushed `/settings`. See `docs/PRODUCT_PLAN.md` §4/§5.
+> - **No `PostDetailScreen`.** The feed renders content fully **inline**
+>   (image carousel + inline video player + expandable body + comment sheet).
+>   `post_detail_screen.dart` and the `/post` route were deleted.
+> - `board_screen.dart` / `BoardPostCard` / `SortTabs` / `filter_bar` deleted
+>   (Phase 1 is single-board; BoardTab returns only in Phase 3).
+>
+> The widget inventory (FeedCard, FeedImageCarousel, TextPostCard, SkeletonFeedCard)
+> and the inline-feed philosophy below remain accurate; only the IA shape and the
+> detail-screen assumption are outdated. Treat the 3-tab / PostDetailScreen
+> references as historical.
+
 - **Date**: 2026-06-28
-- **Status**: Implemented & GREEN — `make check` passes (666 tests, 0 errors). See "Build Outcome" below.
+- **Status**: SUPERSEDED — see banner above. Original implementation was GREEN.
 - **Scope**: Phase 1 read-only, 웃긴자료 (pds) board only
 
 ## Build Outcome (2026-06-28)

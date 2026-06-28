@@ -23,16 +23,16 @@ Rationale:
 
 ### Casual Viewer
 
-- **Behavior**: Commute, spare time. Consumes best posts.
-- **Core Need**: Fast scroll through top content.
-- **Scenario**: Opens app on subway. Sees today's hero post immediately. Scrolls through best 25. Closes app after 5 minutes. No login needed.
+- **Behavior**: Commute, spare time. Consumes recent posts.
+- **Core Need**: Fast scroll through content.
+- **Scenario**: Opens app on subway. Sees the 웃긴자료 feed immediately and scrolls through posts inline — images open fullscreen, comments open as a sheet. Closes app after 5 minutes. No login needed.
 - **Frequency**: 2-3 times per week.
 
 ### Regular
 
 - **Behavior**: Visits daily. Reads broadly.
-- **Core Need**: Full post list with filters.
-- **Scenario**: Opens app during lunch break. Goes to Board tab, selects a board, checks latest posts, then switches to weekly best filter. Reads 10-15 posts including comments. Occasionally bookmarks.
+- **Core Need**: Full feed with search.
+- **Scenario**: Opens app during lunch break. Scrolls the 웃긴자료 feed, expands long bodies, opens comment sheets on hot posts. Uses search (P1) to find older posts. Occasionally bookmarks (P2).
 - **Frequency**: Daily.
 
 ### Active User
@@ -78,95 +78,62 @@ Single-screen IA (Phase 1 — single-board scope; see `.opencode/plans/2026-06-2
 
 **Phase 1 IA change**: Home and Board tabs merged. Home is now a single Instagram-style vertical feed of 웃긴자료 (pds) posts — full-bleed media cards for image posts, brand-color typography cards for text-only posts, single chronological order (no sort/filter UI). The separate Board tab is removed for the single-board phase; multi-board exploration (BoardListScreen → BoardDetailScreen) returns in Phase 3. The 종합베스트 / "오늘의 1위" hero concept is dropped.
 
-### Home Tab (종합 베스트 피드)
+### Home (루트 `/`)
 
-- All boards' best posts aggregated into a single feed.
-- Hero card: today's #1 post with thumbnail, title, recommend count.
-- Best posts list: top posts by recommend count across all boards.
-- Pull-to-refresh.
-- Read posts shown in muted color.
-- Cached data shown when offline.
-- Currently shows pds best only (Phase 1); will aggregate all boards in Phase 3.
+- Instagram-style vertical feed of 웃긴자료 (pds) posts, single chronological order (latest-first), no sort/filter UI.
+- Each card renders content **inline**: author header → full-bleed media (image carousel or inline video player) → counts row → caption (title + expandable body) → comment preview → timestamp.
+- **No detail screen.** All reading happens in the feed. Image tap → `ImageViewerScreen`; comment preview tap → comments bottom sheet.
+- Read posts shown in muted color (Phase: F-06).
+- Cached data shown when offline, with a "Last updated X minutes ago" banner (Phase: F-08).
+- Pull-to-refresh + infinite scroll.
 
-### Board Tab (게시판 탐색)
-
-**Phase 1 (single board — pds only)**:
-- Skips BoardListScreen entirely. Shows BoardDetailScreen directly for pds.
-- AppBar title: "웃긴자료".
-- No board selector UI (clean, no placeholders).
-
-**Phase 3 (multi-board)**:
-- BoardListScreen first: favorites + all boards with icons.
-- Tapping a board navigates to BoardDetailScreen.
-- BoardDetailScreen AppBar shows current board name with chevron/dropdown to switch.
-
-**BoardDetailScreen (shared by both phases)**:
-- Full post list in chronological order.
-- Filter bar: horizontal scrollable chip row below AppBar.
-  - Chips: 전체(default), 일간베스트, 주간베스트, 월간베스트, 연간베스트, 추천500+.
-  - "전체" shows chronological order — same experience as old "최신" tab.
-  - Selected chip uses `primary` container color.
-  - 44pt minimum touch target per chip.
-- Infinite scroll with pagination.
-- Pull-to-refresh.
-- Write button (FAB) when logged in (Phase 2).
-
-### Search Tab
+### Search (P1 — pushed route or in-feed affordance)
 
 - Search bar with debounce.
-- Board filter: search within specific board or all boards.
 - Period filter: 1 day / 1 week / 1 month / 6 months / 1 year / all.
 - Search history (stored locally).
-- Results shown as post cards.
+- Results shown as feed cards (same inline treatment as Home).
+- Not implemented in current phase; when it lands it is NOT a permanent bottom tab (single-screen IA).
 
-### Settings Tab
+### Settings (pushed route `/settings`, from Home AppBar gear)
 
-- Login / logout status.
-- Scrap list.
-- Read history.
-- Favorite boards management (for future Phase 3 expansion).
-- Dark mode toggle (system-aware).
-- Font size adjustment.
-- NSFW content warning toggle.
-- App version and legal info.
+- Dark mode toggle (system-aware) — persisted locally.
+- NSFW content warning toggle — persisted locally.
+- App version and update check.
+- Future (Phase 2+): login status, scrap list, read history, font size, color themes.
 
 ## 5. Screen Map
 
 ```
 App
 ├── HomeScreen (root `/`, AppBar: 웃긴자료 + ⚙️ settings action)
-│   │   └── Instagram-style vertical feed of 웃긴자료 (pds)
-│   └── PostDetailScreen (push)
-│   │       ├── ImageViewerScreen
-│   │       └── CommentSection (inline)
+│   │   └── Instagram-style vertical feed of 웃긴자료 (pds) — inline content
+│   │       ├── ImageViewerScreen (push, on image tap)
+│   │       └── FeedCommentsSheet (bottom sheet, on comment-preview tap)
 │   └── SettingsScreen (push `/settings`, from AppBar gear)
-│       ├── LoginScreen (WebView)
-│       ├── ScrapListScreen
-│       └── ReadHistoryScreen
-└── NsfwWarningDialog (first launch overlay)
+│       └── (Phase 2+) LoginScreen, ScrapListScreen, ReadHistoryScreen
+└── NsfwWarningDialog (first-launch overlay, shown over HomeScreen)
 ```
 
+> **No `PostDetailScreen`.** Phase 1 is an inline feed — all reading happens in the feed card itself. A dedicated detail screen returns only if Phase 2 (comment write / recommend) needs a focused surface.
 > **Phase 3**: a BoardTab returns (BoardListScreen → BoardDetailScreen) when multi-board support lands, at which point a bottom tab bar may be reintroduced.
 
 Navigation rules:
 - AppBar gear (Home) → SettingsScreen (push), back returns to Home.
-- Post tap → PostDetailScreen (push).
-- Image tap → ImageViewerScreen (push, shared element transition).
+- Image tap (in feed) → ImageViewerScreen (push, shared element transition).
+- Comment-preview tap (in feed) → comments bottom sheet.
 - Back → pop to previous screen.
 
 ## 6. Screen Requirements
 
-### PostDetailScreen — Phase: P0
+### HomeScreen (inline feed) — Phase: P0
 
-- Body: text + inline images + inline video.
-- Images: tap to open fullscreen viewer (shared element transition).
-- Video: in-app playback with fullscreen toggle.
-- Actions: recommend / not-recommend buttons + counts (P2, login required).
-- Author info: nickname, icon, timestamp.
-- Comments: best comments pinned at top, then full list.
-- Comment input (P2, login required).
-- Scrap/bookmark button.
-- Share post link (P2).
+- Body: per-post `FeedCard` rendered inline — author header + media (image carousel OR inline video player) + counts row + caption (title + expandable body, `더보기`/`접기`) + comment preview + timestamp.
+- Inline images: tap to open fullscreen viewer (shared element transition).
+- Inline video: in-card player with play/pause/mute/fullscreen controls; tap thumbnail in comment media opens fullscreen.
+- Comments: tap the "댓글 N개 모두 보기" preview to open a bottom sheet with best-pinned + full list.
+- Counts: recommend / comment / view — display-only in Phase 1 (no recommend action until Phase 2).
+- No navigation to a detail screen.
 
 ### ImageViewerScreen — Phase: P0
 
@@ -184,7 +151,7 @@ Navigation rules:
 
 ### SearchResult — Phase: P1
 
-- Same post cards as BoardDetailScreen.
+- Same inline feed-card treatment as Home.
 - Empty state: "No results found" with suggestion to adjust filter.
 
 ## 7. User Flows
@@ -200,18 +167,19 @@ App Open → Splash (logo) → NSFW Warning Dialog
 ### Flow 2: Content Consumption
 
 ```
-HomeTab → Scroll 웃긴자료 feed → Tap a post → PostDetailScreen
-  → Read text → Tap image → ImageViewerScreen
-  → Swipe through images → Back → PostDetailScreen
-  → Scroll to comments → Read best comments
-  → Back → HomeTab
+Home → Scroll 웃긴자료 feed → read inline (title + body + media)
+  → Tap image → ImageViewerScreen → swipe → back
+  → Tap "댓글 N개 모두 보기" → comments bottom sheet → back
+  → Continue scrolling feed
 ```
+
+> No separate detail screen in Phase 1 — everything is read inline.
 
 ### Flow 3: Board Exploration (Phase 3 — not in Phase 1)
 
 ```
 BoardTab → See board list → Tap a board → BoardDetailScreen
-  → See post list with filters → Tap post → PostDetailScreen
+  → See post list with filters → Tap post → post detail (Phase 3 may reintroduce a focused detail screen)
   → Back → BoardDetailScreen → Change filter (daily/weekly/monthly)
   → Back → BoardTab
 ```
@@ -219,45 +187,45 @@ BoardTab → See board list → Tap a board → BoardDetailScreen
 ### Flow 4: Search
 
 ```
-SearchTab → Tap search bar → Type query (debounced)
-  → Select period filter → Results appear
-  → Tap result → PostDetailScreen → Back → SearchTab
+Home → (search entry: pushed route or in-feed affordance) → Type query (debounced)
+  → Select period filter → Results appear (inline feed cards)
+  → Tap result's image → ImageViewerScreen → Back → Search results
 ```
 
 ### Flow 5: Login + Interaction (P2)
 
 ```
-SettingsTab → Tap "Login" → LoginScreen (WebView)
-  → Enter credentials → Success → SettingsTab (shows logged-in state)
-  → Navigate to PostDetailScreen → Tap "Recommend"
-  → POST request → Success → Count updates
+Home → AppBar gear → Settings → Tap "Login" → LoginScreen (WebView)
+  → Enter credentials → Success → Settings (shows logged-in state)
+  → Back to Home → (recommend/scrap actions become available, Phase 2)
 ```
 
 ## 8. Interaction Patterns
 
 ### Screen Transitions
 
-- Tab switch: instant, no animation.
 - Forward navigation: platform default (slide on iOS, fade on Android).
 - Back navigation: system back gesture/button.
 - Image viewer: shared element transition (hero animation).
+- Comments: bottom sheet (material).
 
 ### Gestures
 
-- Pull-to-refresh: all list screens (Home, BoardDetail, Search results).
-- Infinite scroll: BoardDetail, Search results (pagination trigger at 80% scroll).
+- Pull-to-refresh: Home feed (and Search results when implemented).
+- Infinite scroll: Home feed (pagination triggers near the end of the loaded list).
+- Expand/collapse: post body text (`더보기`/`접기`).
 - Swipe: image viewer left/right navigation.
 - Pinch-to-zoom: image viewer.
 - Double-tap: image viewer reset zoom.
 
 ### Feedback Patterns
 
-- Recommend/Not-recommend: optimistic count update, revert on error.
-- Loading: skeleton/shimmer for list screens, spinner for detail.
+- Recommend/Not-recommend: optimistic count update, revert on error (Phase 2).
+- Loading: skeleton/shimmer feed cards.
 - Error: inline error message with retry button, never blank screen.
 - Empty state: illustration + message + suggested action.
 - Offline: cached content with "Last updated X minutes ago" banner.
-- NSFW: first launch warning dialog, settings toggle for ongoing control.
+- NSFW: first-launch warning dialog (persisted acknowledgement), settings toggle for ongoing blur control.
 
 ## 9. Feature Roadmap
 
@@ -268,7 +236,7 @@ Prove the architecture works end-to-end with one full TDD cycle.
 - [x] Install all dependencies (riverpod, dio, html, charset_converter, dartz, go_router, get_it).
 - [x] Set up DI container (`di/injection.dart`).
 - [x] Build `HtmlClient` with EUC-KR decoding via `charset_converter`.
-- [x] Build `HumorUnivRemoteDs` with rate limiting (minimum 2s between requests).
+- [x] Build `HumorUnivRemoteDs` with rate limiting (minimum 2s between requests). *(Later relaxed to allow parallel inline-feed prefetch — see F-09 / §10.)*
 - [x] Write `PdsParser.parseBestPosts()` with fixture HTML.
 - [x] Complete one full TDD cycle: test -> parser -> use case -> repository -> provider -> screen.
 - [ ] Spike: attempt a POST request for recommend to assess write operation feasibility.
@@ -281,18 +249,18 @@ Read-only humor content viewer.
 
 | ID | Feature | Priority |
 |----|---------|----------|
-| F-01 | Home: best posts list with hero card | P0 |
-| F-02 | Board: board list + full post list with filters and pagination | P0 |
-| F-03 | Post detail: text + images + video + comments (read) | P0 |
+| F-01 | Home: inline 웃긴자료 feed (image carousel + video + comments preview) | P0 |
+| F-02 | (Phase 3) Board: board list + full post list with filters and pagination | P3 |
+| F-03 | Inline feed rendering: text + images + video + comments (read) | P0 |
 | F-04 | Image viewer: fullscreen, swipe, pinch-zoom | P0 |
 | F-05 | Search: keyword + period filter | P1 |
 | F-06 | Read post tracking (local storage) | P1 |
-| F-07 | Dark mode (system-aware) | P1 |
+| F-07 | Dark mode (system-aware, persisted) | P1 |
 | F-08 | In-memory caching with TTL | P1 |
-| F-09 | Rate limiting / polite scraping (min 2s between requests) | P0 |
+| F-09 | Polite scraping: parallel detail prefetch + memoizing cache + browser UA (rate-limit relaxed; see §10) | P0 |
 | F-10 | Error states: network error, parse error, empty state | P0 |
-| F-11 | NSFW content warning on first launch + settings toggle | P0 |
-| F-12 | Pull-to-refresh on all list screens | P1 |
+| F-11 | NSFW content warning on first launch (persisted) + settings toggle (persisted) | P0 |
+| F-12 | Pull-to-refresh on feed | P1 |
 
 **MVP exit criteria**: App is listed on store. User can browse, read, and search humor posts with a better experience than mobile web.
 
@@ -336,7 +304,7 @@ Login and active participation. Write operations are high-risk and may be cut.
 | Login cookie expiry | Auth features stop working | Auto-detect expiry + prompt re-login. Show clear session-expired UI. |
 | App store rejection | Cannot distribute | App is not a web wrapper: native image viewer, caching, offline support, search. Non-commercial use stated. |
 | Content copyright issues | Legal risk | App is a viewer. Content belongs to original authors. App does not modify or create content. |
-| Aggressive scraping triggers IP ban | App stops working | Rate limiting (min 2s between requests). Cache aggressively. Respect the source site. |
+| Aggressive scraping triggers IP ban | App stops working | Parallel detail prefetch (one detail request per feed post on page load) raises request volume. Mitigations: memoizing cache dedups in-flight + repeated requests, standard mobile-browser User-Agent, single list request per page. Re-introduce a hard 2s rate-limit if the source site signals throttling. |
 
 ## 11. Success Metrics
 

@@ -12,8 +12,10 @@ import 'package:humoruniv/domain/usecases/get_best_posts.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 import 'package:humoruniv/domain/usecases/get_post_detail.dart';
 import 'package:humoruniv/main.dart';
+import 'package:humoruniv/presentation/providers/shared_preferences_provider.dart';
 import 'package:humoruniv/presentation/screens/home_screen.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'helpers/package_info_helper.dart';
 
@@ -24,6 +26,7 @@ class MockUpdateRepository extends Mock implements UpdateRepository {}
 void main() {
   late MockPostRepository mockPostRepo;
   late MockUpdateRepository mockUpdateRepo;
+  late SharedPreferences prefs;
 
   setUpAll(() async {
     await setupPackageInfoMock();
@@ -31,6 +34,8 @@ void main() {
   });
 
   setUp(() async {
+    SharedPreferences.setMockInitialValues({'nsfwAcknowledged': true});
+    prefs = await SharedPreferences.getInstance();
     mockPostRepo = MockPostRepository();
     mockUpdateRepo = MockUpdateRepository();
     await di.configureDependencies();
@@ -78,7 +83,12 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(const ProviderScope(child: HumorUnivApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        child: const HumorUnivApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('웃긴자료'), findsOneWidget);

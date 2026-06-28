@@ -7,6 +7,7 @@ import 'package:humoruniv/core/widgets/atoms/avatar.dart';
 import 'package:humoruniv/core/widgets/atoms/count_badge.dart';
 import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_image_carousel.dart';
+import 'package:humoruniv/core/widgets/molecules/inline_video_player.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:humoruniv/domain/entities/post_detail.dart';
@@ -20,6 +21,7 @@ class FeedCard extends StatelessWidget {
     this.onImageTap,
     this.onCommentsTap,
     this.isRead = false,
+    this.hideNsfw = true,
   });
   final BoardPost post;
   final PostDetail? detail;
@@ -27,8 +29,12 @@ class FeedCard extends StatelessWidget {
   final ValueChanged<int>? onImageTap;
   final VoidCallback? onCommentsTap;
   final bool isRead;
+  final bool hideNsfw;
 
   bool get _hasImages => detail != null && detail!.imageUrls.isNotEmpty;
+
+  List<VideoBlock> get _videoBlocks =>
+      detail?.contentBlocks.whereType<VideoBlock>().toList() ?? const [];
 
   String? get _bodyText {
     final d = detail;
@@ -50,16 +56,7 @@ class FeedCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _header(textTheme, colorScheme),
-        if (detailLoading && !_hasImages)
-          const SkeletonBox(
-            width: double.infinity,
-            height: AppSizes.feedMediaMaxHeight,
-          )
-        else if (_hasImages)
-          FeedImageCarousel(
-            imageUrls: detail!.imageUrls,
-            onImageTap: onImageTap,
-          ),
+        ..._media(),
         _actions(),
         _caption(textTheme, colorScheme),
         if (detail != null && detail!.comments.isNotEmpty)
@@ -72,6 +69,27 @@ class FeedCard extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  List<Widget> _media() {
+    if (detailLoading && !_hasImages && _videoBlocks.isEmpty) {
+      return [
+        const SkeletonBox(
+          width: double.infinity,
+          height: AppSizes.feedMediaMaxHeight,
+        ),
+      ];
+    }
+    return [
+      ..._videoBlocks.map(
+        (v) => Padding(
+          padding: AppSpacing.edgeOnlyBottom8,
+          child: InlineVideoPlayer(block: v, hideNsfw: hideNsfw),
+        ),
+      ),
+      if (_hasImages)
+        FeedImageCarousel(imageUrls: detail!.imageUrls, onImageTap: onImageTap),
+    ];
   }
 
   Widget _header(TextTheme textTheme, ColorScheme colorScheme) {

@@ -13,11 +13,12 @@ import 'package:humoruniv/domain/usecases/check_for_update.dart';
 import 'package:humoruniv/domain/usecases/get_best_posts.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 import 'package:humoruniv/domain/usecases/get_post_detail.dart';
+import 'package:humoruniv/presentation/providers/shared_preferences_provider.dart';
 import 'package:humoruniv/presentation/screens/home_screen.dart';
-import 'package:humoruniv/presentation/screens/post_detail_screen.dart';
 import 'package:humoruniv/presentation/screens/settings_screen.dart';
 import 'package:humoruniv/routes/app_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockPostRepository extends Mock implements PostRepository {}
 
@@ -26,12 +27,15 @@ class MockUpdateRepository extends Mock implements UpdateRepository {}
 void main() {
   late MockPostRepository mockPostRepo;
   late MockUpdateRepository mockUpdateRepo;
+  late SharedPreferences prefs;
 
   setUpAll(() {
     registerFallbackValue(SortOption.all);
   });
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({'nsfwAcknowledged': true});
+    prefs = await SharedPreferences.getInstance();
     mockPostRepo = MockPostRepository();
     mockUpdateRepo = MockUpdateRepository();
     if (di.sl.isRegistered<PostRepository>()) {
@@ -81,7 +85,10 @@ void main() {
       );
 
       await tester.pumpWidget(
-        ProviderScope(child: MaterialApp.router(routerConfig: appRouter)),
+        ProviderScope(
+          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+          child: MaterialApp.router(routerConfig: appRouter),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -96,42 +103,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-        ProviderScope(child: MaterialApp.router(routerConfig: appRouter)),
+        ProviderScope(
+          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+          child: MaterialApp.router(routerConfig: appRouter),
+        ),
       );
       appRouter.push('/settings');
       await tester.pumpAndSettle();
 
       expect(find.byType(SettingsScreen), findsOneWidget);
-    });
-
-    testWidgets('route /post renders PostDetailScreen', (tester) async {
-      when(
-        () => mockPostRepo.getPostDetail(any()),
-      ).thenAnswer((_) async => const Left(ServerFailure('')));
-
-      await tester.pumpWidget(
-        ProviderScope(child: MaterialApp.router(routerConfig: appRouter)),
-      );
-      appRouter.push('/post?url=http%3A%2F%2Fexample.com');
-      await tester.pumpAndSettle();
-
-      expect(find.byType(PostDetailScreen), findsOneWidget);
-    });
-
-    testWidgets('route /post without url param passes empty string', (
-      tester,
-    ) async {
-      when(
-        () => mockPostRepo.getPostDetail(any()),
-      ).thenAnswer((_) async => const Left(ServerFailure('')));
-
-      await tester.pumpWidget(
-        ProviderScope(child: MaterialApp.router(routerConfig: appRouter)),
-      );
-      appRouter.push('/post');
-      await tester.pumpAndSettle();
-
-      expect(find.byType(PostDetailScreen), findsOneWidget);
     });
   });
 }

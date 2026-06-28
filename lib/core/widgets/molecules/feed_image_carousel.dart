@@ -18,7 +18,7 @@ class FeedImageCarousel extends StatefulWidget {
 class _FeedImageCarouselState extends State<FeedImageCarousel> {
   final PageController _controller = PageController();
   int _page = 0;
-  final Map<int, double> _aspects = {};
+  static final Map<String, double> _aspectCache = {};
 
   @override
   void initState() {
@@ -39,14 +39,14 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
   }
 
   void _measure(int index, String url) {
-    if (_aspects.containsKey(index)) return;
+    if (_aspectCache.containsKey(url)) return;
     final stream = NetworkImage(url).resolve(const ImageConfiguration());
     ImageStreamListener? listener;
     listener = ImageStreamListener(
       (info, _) {
         if (!mounted || listener == null) return;
         setState(() {
-          _aspects[index] =
+          _aspectCache[url] =
               info.image.width.toDouble() / info.image.height.toDouble();
         });
         stream.removeListener(listener);
@@ -63,7 +63,7 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
     final urls = widget.imageUrls;
     final multiple = urls.length > 1;
     final screenW = MediaQuery.sizeOf(context).width;
-    final aspect = _aspects[_page] ?? 1.0;
+    final aspect = _aspectCache[urls[_page]] ?? 1.0;
     final height = (screenW / aspect).clamp(120.0, AppSizes.feedMediaMaxHeight);
 
     return AnimatedContainer(

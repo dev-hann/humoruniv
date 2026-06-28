@@ -1,15 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:humoruniv/core/widgets/organisms/feed_list.dart';
+import 'package:humoruniv/core/widgets/states/nsfw_warning_dialog.dart';
 import 'package:humoruniv/presentation/providers/board_posts_provider.dart';
+import 'package:humoruniv/presentation/providers/nsfw_provider.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
+import 'package:humoruniv/presentation/widgets/feed_list.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final acknowledged = ref.read(nsfwAcknowledgedProvider);
+      if (!acknowledged) {
+        NsfwWarningDialog.show(
+          context,
+          onAcknowledge: () =>
+              ref.read(nsfwAcknowledgedProvider.notifier).acknowledge(),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final postsAsync = ref.watch(boardPostsProvider);
     ref.watch(feedPrefetchProvider);
 

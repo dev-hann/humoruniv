@@ -12,19 +12,24 @@ import 'package:humoruniv/domain/entities/sort_option.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
+import 'package:humoruniv/presentation/providers/shared_preferences_provider.dart';
 import 'package:humoruniv/presentation/screens/home_screen.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockPostRepository extends Mock implements PostRepository {}
 
 void main() {
   late MockPostRepository mockRepository;
+  late SharedPreferences prefs;
 
   setUpAll(() {
     registerFallbackValue(SortOption.all);
   });
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({'nsfwAcknowledged': true});
+    prefs = await SharedPreferences.getInstance();
     mockRepository = MockPostRepository();
     if (di.sl.isRegistered<PostRepository>()) {
       di.sl.unregister<PostRepository>();
@@ -41,6 +46,7 @@ void main() {
   tearDown(di.sl.reset);
 
   List<Override> overrides() => [
+    sharedPreferencesProvider.overrideWithValue(prefs),
     feedPrefetchProvider.overrideWith((ref) async {}),
   ];
 

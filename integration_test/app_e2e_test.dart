@@ -11,7 +11,6 @@ import 'package:humoruniv/domain/entities/post_detail.dart';
 import 'package:humoruniv/presentation/providers/board_posts_provider.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
 import 'package:humoruniv/presentation/screens/home_screen.dart';
-import 'package:humoruniv/presentation/screens/post_detail_screen.dart';
 import 'package:integration_test/integration_test.dart';
 
 const _testPosts = [
@@ -82,16 +81,7 @@ class _ErrorFeedNotifier extends BoardPostsNotifier {
 }
 
 GoRouter _createTestRouter() => GoRouter(
-  routes: [
-    GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
-    GoRoute(
-      path: '/post',
-      builder: (context, state) {
-        final url = state.uri.queryParameters['url'] ?? '';
-        return PostDetailScreen(postUrl: url);
-      },
-    ),
-  ],
+  routes: [GoRoute(path: '/', builder: (context, state) => const HomeScreen())],
 );
 
 Widget _buildTestApp({List<Override> overrides = const []}) {
@@ -136,8 +126,8 @@ void main() {
     });
   });
 
-  group('E2E: post detail navigation', () {
-    testWidgets('should navigate to post detail and display content', (
+  group('E2E: inline feed detail enrichment', () {
+    testWidgets('should render post body and comment preview inline', (
       tester,
     ) async {
       await tester.pumpWidget(
@@ -154,12 +144,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('E2E 테스트 게시글 1'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(PostDetailScreen), findsOneWidget);
-      expect(find.text('테스트작성자'), findsWidgets);
-      expect(find.text('테스트 본문 내용입니다.'), findsOneWidget);
+      expect(find.text('테스트 본문 내용입니다.'), findsWidgets);
       expect(find.text('댓글러'), findsOneWidget);
     });
   });

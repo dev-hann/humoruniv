@@ -10,16 +10,21 @@ import 'package:humoruniv/di/injection.dart' as di;
 import 'package:humoruniv/domain/entities/app_release.dart';
 import 'package:humoruniv/domain/repositories/update_repository.dart';
 import 'package:humoruniv/domain/usecases/check_for_update.dart';
+import 'package:humoruniv/presentation/providers/shared_preferences_provider.dart';
 import 'package:humoruniv/presentation/providers/update_provider.dart';
 import 'package:humoruniv/presentation/screens/settings_screen.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockUpdateRepository extends Mock implements UpdateRepository {}
 
 void main() {
   late MockUpdateRepository mockRepository;
+  late SharedPreferences prefs;
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
     mockRepository = MockUpdateRepository();
     if (di.sl.isRegistered<UpdateRepository>()) {
       di.sl.unregister<UpdateRepository>();
@@ -35,6 +40,11 @@ void main() {
 
   tearDown(di.sl.reset);
 
+  Widget buildApp() => ProviderScope(
+    overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+    child: const MaterialApp(home: SettingsScreen()),
+  );
+
   group('SettingsScreen', () {
     testWidgets('should display all section titles', (tester) async {
       when(() => mockRepository.getLatestRelease()).thenAnswer(
@@ -43,9 +53,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
-      );
+      await tester.pumpWidget(buildApp());
 
       expect(find.text('화면 설정'), findsOneWidget);
       expect(find.text('콘텐츠'), findsOneWidget);
@@ -59,9 +67,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
-      );
+      await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();
 
       final appBar = tester.widget<AppBar>(find.byType(AppBar));
@@ -76,9 +82,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
-      );
+      await tester.pumpWidget(buildApp());
 
       expect(find.byType(DarkModeSelector), findsOneWidget);
     });
@@ -90,9 +94,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
-      );
+      await tester.pumpWidget(buildApp());
 
       expect(find.text('성인 콘텐츠 경고'), findsOneWidget);
       expect(find.byType(Switch), findsOneWidget);
@@ -105,9 +107,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
-      );
+      await tester.pumpWidget(buildApp());
 
       expect(find.text('버전'), findsOneWidget);
     });
@@ -119,9 +119,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
-      );
+      await tester.pumpWidget(buildApp());
 
       expect(find.text('업데이트 확인'), findsOneWidget);
     });
@@ -133,9 +131,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
-      );
+      await tester.pumpWidget(buildApp());
 
       final switchWidget = tester.widget<Switch>(find.byType(Switch));
       expect(switchWidget.value, true);
@@ -156,9 +152,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
-      );
+      await tester.pumpWidget(buildApp());
 
       await tester.tap(find.text('업데이트 확인'));
       await tester.pumpAndSettle();
@@ -173,7 +167,9 @@ void main() {
         ),
       );
 
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
       addTearDown(container.dispose);
 
       await tester.pumpWidget(
@@ -197,7 +193,9 @@ void main() {
         ),
       );
 
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
       addTearDown(container.dispose);
 
       await tester.pumpWidget(
@@ -218,7 +216,9 @@ void main() {
         () => mockRepository.getLatestRelease(),
       ).thenAnswer((_) async => const Left(UpdateFailure('Network error')));
 
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
       addTearDown(container.dispose);
 
       await tester.pumpWidget(
@@ -241,7 +241,9 @@ void main() {
         () => mockRepository.getLatestRelease(),
       ).thenAnswer((_) => completer.future);
 
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
       addTearDown(container.dispose);
 
       await tester.pumpWidget(

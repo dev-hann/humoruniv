@@ -51,11 +51,8 @@ class CommentTile extends StatelessWidget {
           const SizedBox(height: 4),
           Text(comment.content, style: Theme.of(context).textTheme.bodyMedium),
           ...comment.mediaBlocks.map(
-            (block) => ContentBlockView(
-              block: block,
-              allImageUrls: allImageUrls,
-              mode: ContentBlockViewMode.compact,
-            ),
+            (block) =>
+                ContentBlockView(block: block, allImageUrls: allImageUrls),
           ),
           if (comment.replies.isNotEmpty)
             ...comment.replies.map(
@@ -96,7 +93,6 @@ class CommentTile extends StatelessWidget {
                         (block) => ContentBlockView(
                           block: block,
                           allImageUrls: reply.imageUrls,
-                          mode: ContentBlockViewMode.compact,
                         ),
                       ),
                     ],

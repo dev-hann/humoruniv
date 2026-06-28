@@ -5,15 +5,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/core/widgets/atoms/loading_indicator.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_card.dart';
-import 'package:humoruniv/core/widgets/organisms/feed_list.dart';
 import 'package:humoruniv/core/widgets/states/empty_state_view.dart';
 import 'package:humoruniv/core/widgets/states/error_state_view.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
+import 'package:humoruniv/presentation/providers/shared_preferences_provider.dart';
+import 'package:humoruniv/presentation/widgets/feed_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  late SharedPreferences prefs;
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
+  });
+
   List<Override> overrides() => [
+    sharedPreferencesProvider.overrideWithValue(prefs),
     postDetailProvider.overrideWith(
       (ref, url) async => const Left(ServerFailure('')),
     ),

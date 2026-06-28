@@ -4,6 +4,7 @@ import 'package:humoruniv/core/utils/time_ago.dart';
 import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_card.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_image_carousel.dart';
+import 'package:humoruniv/core/widgets/molecules/inline_video_player.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/comment.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
@@ -191,6 +192,42 @@ void main() {
         ),
       );
       expect(find.text(TimeAgo.formatDateString('2026-05-15')), findsOneWidget);
+    });
+
+    testWidgets('should render InlineVideoPlayer when detail has VideoBlock',
+      (tester) async {
+      final detail = detailWith(
+        blocks: const [VideoBlock(url: 'https://example.com/v.mp4')],
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: FeedCard(post: post, detail: detail),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.byType(InlineVideoPlayer), findsOneWidget);
+    });
+
+    testWidgets('should not render video player when detail has no VideoBlock',
+      (tester) async {
+      final detail = detailWith(
+        imageUrls: const ['https://example.com/a.jpg'],
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: FeedCard(post: post, detail: detail),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.byType(InlineVideoPlayer), findsNothing);
     });
   });
 }

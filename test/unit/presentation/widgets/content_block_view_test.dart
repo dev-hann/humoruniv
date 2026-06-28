@@ -4,8 +4,8 @@ import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:humoruniv/presentation/widgets/content_block_view.dart';
 
 void main() {
-  group('ContentBlockView', () {
-    testWidgets('should display text for TextBlock', (tester) async {
+  group('ContentBlockView (compact — comment media)', () {
+    testWidgets('should render nothing for TextBlock', (tester) async {
       const block = TextBlock('Hello World');
 
       await tester.pumpWidget(
@@ -16,7 +16,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Hello World'), findsOneWidget);
+      expect(find.text('Hello World'), findsNothing);
     });
 
     testWidgets('should render nothing for empty TextBlock', (tester) async {
@@ -30,10 +30,12 @@ void main() {
         ),
       );
 
-      expect(find.byType(SizedBox), findsWidgets);
+      expect(find.text(''), findsNothing);
     });
 
-    testWidgets('should display image for ImageBlock', (tester) async {
+    testWidgets('should render compact image thumbnail for ImageBlock', (
+      tester,
+    ) async {
       const block = ImageBlock(url: 'https://example.com/test.jpg');
 
       await tester.pumpWidget(
@@ -51,7 +53,9 @@ void main() {
       expect(find.byType(Image), findsOneWidget);
     });
 
-    testWidgets('should render SizedBox for VideoBlock', (tester) async {
+    testWidgets('should render compact video thumbnail for VideoBlock', (
+      tester,
+    ) async {
       const block = VideoBlock(url: 'https://example.com/video.mp4');
 
       await tester.pumpWidget(
@@ -62,117 +66,8 @@ void main() {
         ),
       );
 
-      expect(find.byType(SizedBox), findsWidgets);
-    });
-
-    group('VideoBlock controls', () {
-      testWidgets('should show play icon for non-GIF VideoBlock', (
-        tester,
-      ) async {
-        const block = VideoBlock(url: 'https://example.com/video.mp4');
-
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: ContentBlockView(block: block, allImageUrls: []),
-            ),
-          ),
-        );
-        await tester.pump();
-
-        expect(find.byIcon(Icons.play_arrow), findsWidgets);
-      });
-
-      testWidgets('should show muted icon by default for VideoBlock', (
-        tester,
-      ) async {
-        const block = VideoBlock(url: 'https://example.com/video.mp4');
-
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: ContentBlockView(block: block, allImageUrls: []),
-            ),
-          ),
-        );
-        await tester.pump();
-
-        expect(find.byIcon(Icons.volume_off), findsOneWidget);
-      });
-
-      testWidgets('should show fullscreen icon for VideoBlock', (tester) async {
-        const block = VideoBlock(url: 'https://example.com/video.mp4');
-
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: ContentBlockView(block: block, allImageUrls: []),
-            ),
-          ),
-        );
-        await tester.pump();
-
-        expect(find.byIcon(Icons.fullscreen), findsOneWidget);
-      });
-
-      testWidgets('should show time display for VideoBlock', (tester) async {
-        const block = VideoBlock(url: 'https://example.com/video.mp4');
-
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: ContentBlockView(block: block, allImageUrls: []),
-            ),
-          ),
-        );
-        await tester.pump();
-
-        expect(find.text('0:00 / 0:00'), findsOneWidget);
-      });
-
-      testWidgets(
-        'should not show control bar for isGifConversion VideoBlock',
-        (tester) async {
-          const block = VideoBlock(
-            url: 'https://example.com/clip.mp4',
-            isGifConversion: true,
-          );
-
-          await tester.pumpWidget(
-            const MaterialApp(
-              home: Scaffold(
-                body: ContentBlockView(block: block, allImageUrls: []),
-              ),
-            ),
-          );
-          await tester.pump();
-
-          expect(find.byIcon(Icons.volume_off), findsNothing);
-          expect(find.byIcon(Icons.fullscreen), findsNothing);
-          expect(find.text('0:00 / 0:00'), findsNothing);
-        },
-      );
-
-      testWidgets(
-        'should show center play button for isGifConversion VideoBlock',
-        (tester) async {
-          const block = VideoBlock(
-            url: 'https://example.com/clip.mp4',
-            isGifConversion: true,
-          );
-
-          await tester.pumpWidget(
-            const MaterialApp(
-              home: Scaffold(
-                body: ContentBlockView(block: block, allImageUrls: []),
-              ),
-            ),
-          );
-          await tester.pump();
-
-          expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-        },
-      );
+      expect(find.byType(GestureDetector), findsOneWidget);
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
     });
 
     testWidgets(
@@ -273,5 +168,25 @@ void main() {
       expect(find.text('민감한 콘텐츠'), findsNothing);
       expect(find.byType(Image), findsOneWidget);
     });
+
+    testWidgets(
+      'should show NSFW placeholder for NSFW VideoBlock when hideNsfw is true',
+      (tester) async {
+        const block = VideoBlock(
+          url: 'https://example.com/nsfw.mp4',
+          isNsfw: true,
+        );
+
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: ContentBlockView(block: block, allImageUrls: []),
+            ),
+          ),
+        );
+
+        expect(find.text('민감한 콘텐츠'), findsOneWidget);
+      },
+    );
   });
 }
