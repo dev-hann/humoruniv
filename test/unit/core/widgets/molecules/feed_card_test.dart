@@ -194,8 +194,9 @@ void main() {
       expect(find.text(TimeAgo.formatDateString('2026-05-15')), findsOneWidget);
     });
 
-    testWidgets('should render InlineVideoPlayer when detail has VideoBlock',
-      (tester) async {
+    testWidgets('should render InlineVideoPlayer when detail has VideoBlock', (
+      tester,
+    ) async {
       final detail = detailWith(
         blocks: const [VideoBlock(url: 'https://example.com/v.mp4')],
       );
@@ -212,22 +213,24 @@ void main() {
       expect(find.byType(InlineVideoPlayer), findsOneWidget);
     });
 
-    testWidgets('should not render video player when detail has no VideoBlock',
+    testWidgets(
+      'should not render video player when detail has no VideoBlock',
       (tester) async {
-      final detail = detailWith(
-        imageUrls: const ['https://example.com/a.jpg'],
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: FeedCard(post: post, detail: detail),
+        final detail = detailWith(
+          imageUrls: const ['https://example.com/a.jpg'],
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: FeedCard(post: post, detail: detail),
+              ),
             ),
           ),
-        ),
-      );
-      await tester.pump();
-      expect(find.byType(InlineVideoPlayer), findsNothing);
-    });
+        );
+        await tester.pump();
+        expect(find.byType(InlineVideoPlayer), findsNothing);
+      },
+    );
   });
 }
