@@ -25,6 +25,7 @@ abstract final class AppSizes {
   static const double feedMediaHeightRatio = 0.66;
   static const double feedMediaMinHeight = 420;
   static const double feedMediaMaxHeight = 600;
+  static const double feedLongImageCapRatio = 0.8;
 
   static double feedMediaHeight(double screenHeight) {
     final h = screenHeight * feedMediaHeightRatio;
