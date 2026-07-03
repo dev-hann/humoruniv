@@ -26,6 +26,7 @@ dependencies:
   video_player: ^2.11.1
 
   meta: any
+  visibility_detector: ^0.4.0+2
 dev_dependencies:
   flutter_test:
     sdk: flutter
