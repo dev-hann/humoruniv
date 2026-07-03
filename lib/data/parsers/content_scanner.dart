@@ -316,12 +316,88 @@ abstract final class ContentScanner {
   }
 
   static void _collectUrlsRecursive(dom.Element el, List<_UrlEntry> urls) {
-    final extracted = _extractUrlsFromElement(el);
-    urls.addAll(extracted);
+    final mp4Entry = _commentMp4Entry(el);
+    if (mp4Entry != null) {
+      urls.add(mp4Entry);
+      return;
+    }
+
+    urls.addAll(_extractDirectUrls(el));
 
     for (final child in el.children) {
       _collectUrlsRecursive(child, urls);
     }
+  }
+
+  static _UrlEntry? _commentMp4Entry(dom.Element el) {
+    final onclick = el.attributes['onclick'] ?? el.attributes['OnClick'] ?? '';
+    if (!onclick.contains('comment_mp4_expand')) return null;
+    final m = RegExp(
+      r"comment_mp4_expand\('[^']*',\s*'([^']+)'",
+    ).firstMatch(onclick);
+    if (m == null) return null;
+    final url = m.group(1)!;
+
+    String? thumb;
+    final thumbImg = el.querySelector('img.comment_thumb_img');
+    if (thumbImg != null) {
+      thumb = thumbImg.attributes['src'];
+    } else {
+      for (final img in el.querySelectorAll('img')) {
+        final src = img.attributes['src'] ?? '';
+        if (src.isNotEmpty && !src.contains('/images/')) {
+          thumb = src;
+          break;
+        }
+      }
+    }
+    return _UrlEntry(
+      url: url,
+      thumbUrl: (thumb != null && thumb.isNotEmpty) ? thumb : null,
+    );
+  }
+
+  static List<_UrlEntry> _extractDirectUrls(dom.Element el) {
+    final entries = <_UrlEntry>[];
+
+    if (el.localName == 'img') {
+      final src = el.attributes['src'] ?? '';
+      if (src.isNotEmpty && !src.contains('/images/')) {
+        final url = el.attributes['img_file_url'] ?? src;
+        if (url.isNotEmpty) {
+          entries.add(_UrlEntry(url: url, thumbUrl: src != url ? src : null));
+        }
+      }
+      return entries;
+    }
+
+    if (el.localName == 'a') {
+      final href = el.attributes['href'] ?? '';
+      if (href.contains('download.php?url=')) {
+        final match = RegExp(
+          r'download\.php\?url=(https?://[^&]+)',
+        ).firstMatch(href);
+        if (match != null) {
+          final innerUrl = match.group(1)!;
+          final thumbImg = el.querySelector('img');
+          entries.add(
+            _UrlEntry(url: innerUrl, thumbUrl: thumbImg?.attributes['src']),
+          );
+        }
+        return entries;
+      }
+      if (href.startsWith('http')) {
+        final text = el.text.trim();
+        if (text.isNotEmpty && href != text) {
+          entries.add(_UrlEntry(url: href, text: text));
+        } else if (text.isEmpty) {
+          entries.add(_UrlEntry(url: href));
+        }
+      }
+      return entries;
+    }
+
+    return entries;
   }
 
   static VideoBlock? _parseVideoElement(dom.Element video) {

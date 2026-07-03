@@ -250,6 +250,35 @@ void main() {
         expect(video.url, 'http://example.com/video.mp4');
       });
 
+      test('should emit single VideoBlock for comment_mp4_expand container, '
+          'using poster img as thumbnail and no separate ImageBlock', () {
+        final doc = html_parser.parse('''
+            <div class="comment_body">
+              <div class='comment_file'>
+                <div class='comment_img_div pointer' style='width:320px;'
+                    OnClick="javascript:comment_mp4_expand('mp4_714827364_3530_', 'http://down.humoruniv.com/data/comment/video.mp4', 'http://timg.humoruniv.com/thumb.php?url_enc=abc', '320', '320', '', 'MP4', '0.4MB', '', '');">
+                  <img src='http://timg.humoruniv.com/thumb.php?url_enc=abc' width='320' class='comment_thumb_img' style='min-height:80px;'/>
+                  <div class='comment_thumb_notice'>MP4,&nbsp; 0.4MB</div>
+                  <div style='position:absolute;top:12px;left:12px;'><img src='/images/play_trans.png?tmp=3' width='40' height='40'></div>
+                </div>
+              </div>
+              <span class="comment_text">똥이나 처먹어!</span>
+            </div>
+          ''');
+        final container = doc.querySelector('.comment_body')!;
+
+        final result = ContentScanner.scanCompact(container);
+
+        expect(result, hasLength(1));
+        expect(result.whereType<ImageBlock>(), isEmpty);
+        final video = result.whereType<VideoBlock>().single;
+        expect(video.url, 'http://down.humoruniv.com/data/comment/video.mp4');
+        expect(
+          video.thumbnailUrl,
+          'http://timg.humoruniv.com/thumb.php?url_enc=abc',
+        );
+      });
+
       test('should return empty list for text-only comment', () {
         final doc = html_parser.parse('''
           <div class="comment_body">

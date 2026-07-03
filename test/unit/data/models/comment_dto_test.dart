@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/data/models/comment_dto.dart';
+import 'package:humoruniv/domain/entities/content_block.dart';
 
 void main() {
   group('CommentDto', () {
@@ -85,6 +86,29 @@ void main() {
 
       expect(entity.id, 42);
       expect(entity.recommendCount, 999);
+    });
+
+    test('should preserve mediaBlocks when converting to entity', () {
+      final dto = CommentDto(
+        id: 1,
+        author: 'a',
+        content: 'c',
+        date: DateTime(2026),
+        recommendCount: 0,
+        isBest: false,
+        replies: [],
+        mediaBlocks: [
+          const ImageBlock(url: 'https://example.com/img.jpg'),
+          const VideoBlock(url: 'https://example.com/v.mp4'),
+        ],
+      );
+
+      final entity = dto.toEntity();
+
+      expect(entity.mediaBlocks, hasLength(2));
+      expect(entity.mediaBlocks.whereType<ImageBlock>(), hasLength(1));
+      expect(entity.mediaBlocks.whereType<VideoBlock>(), hasLength(1));
+      expect(entity.imageUrls, ['https://example.com/img.jpg']);
     });
   });
 }

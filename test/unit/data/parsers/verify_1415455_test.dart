@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:humoruniv/data/parsers/content_scanner.dart';
+import 'package:humoruniv/data/parsers/post_detail_parser.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 
 void main() {
@@ -36,4 +37,38 @@ void main() {
     expect(videos, isNotEmpty, reason: 'Post 1415455 should have VideoBlocks');
     expect(videos.first.url, contains('.mp4'));
   });
+
+  test(
+    'verify post 1415455: mp4 best comment has clean content and single video',
+    () {
+      final html = File('test/fixtures/pds_1415455.html').readAsStringSync();
+      final detail = PostDetailParser.parse(html);
+
+      final mp4Comment = detail.comments.firstWhere(
+        (c) => c.content.contains('똥이나 처먹어'),
+        orElse: () => throw StateError('mp4 best comment not found'),
+      );
+
+      expect(mp4Comment.content, contains('똥이나 처먹어'));
+      const leaked = ['MP4', '0.4MB', '이동', '추천', '답글', '원본', '추천완료'];
+      for (final token in leaked) {
+        expect(
+          mp4Comment.content,
+          isNot(contains(token)),
+          reason: 'content should not leak UI token "$token"',
+        );
+      }
+
+      expect(
+        mp4Comment.mediaBlocks.whereType<VideoBlock>(),
+        hasLength(1),
+        reason: 'mp4 comment should yield exactly one VideoBlock',
+      );
+      expect(
+        mp4Comment.mediaBlocks.whereType<ImageBlock>(),
+        isEmpty,
+        reason: 'poster must not be emitted as a separate ImageBlock',
+      );
+    },
+  );
 }

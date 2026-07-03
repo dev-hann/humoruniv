@@ -1,4 +1,5 @@
 import 'package:humoruniv/domain/entities/comment.dart';
+import 'package:humoruniv/domain/entities/content_block.dart';
 
 class CommentDto {
   const CommentDto({
@@ -9,6 +10,7 @@ class CommentDto {
     required this.recommendCount,
     required this.isBest,
     required this.replies,
+    this.mediaBlocks = const [],
   });
   final int id;
   final String author;
@@ -17,6 +19,7 @@ class CommentDto {
   final int recommendCount;
   final bool isBest;
   final List<CommentDto> replies;
+  final List<ContentBlock> mediaBlocks;
 
   Comment toEntity() => Comment(
     id: id,
@@ -25,6 +28,7 @@ class CommentDto {
     date: date,
     recommendCount: recommendCount,
     isBest: isBest,
+    mediaBlocks: mediaBlocks,
     replies: replies.map((r) => r.toEntity()).toList(),
   );
 }
