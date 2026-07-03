@@ -18,7 +18,6 @@ class FeedCard extends StatelessWidget {
     this.detail,
     this.detailLoading = false,
     this.onImageTap,
-    this.onVideoTap,
     this.onCommentsTap,
     this.isRead = false,
   });
@@ -26,7 +25,6 @@ class FeedCard extends StatelessWidget {
   final PostDetail? detail;
   final bool detailLoading;
   final ValueChanged<int>? onImageTap;
-  final ValueChanged<int>? onVideoTap;
   final VoidCallback? onCommentsTap;
   final bool isRead;
 
@@ -85,7 +83,7 @@ class FeedCard extends StatelessWidget {
         imageUrls: detail?.imageUrls ?? const [],
         videoBlocks: _videoBlocks,
         onImageTap: onImageTap,
-        onVideoTap: onVideoTap,
+        postId: post.id,
       ),
     ];
   }

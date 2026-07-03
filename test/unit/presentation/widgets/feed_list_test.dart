@@ -5,15 +5,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/core/widgets/atoms/loading_indicator.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_card.dart';
+import 'package:humoruniv/core/widgets/molecules/inline_video_player.dart';
 import 'package:humoruniv/core/widgets/states/empty_state_view.dart';
 import 'package:humoruniv/core/widgets/states/error_state_view.dart';
 import 'package:humoruniv/core/widgets/atoms/scroll_to_top_button.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
+import 'package:humoruniv/domain/entities/content_block.dart';
+import 'package:humoruniv/domain/entities/post_detail.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
 import 'package:humoruniv/presentation/providers/shared_preferences_provider.dart';
 import 'package:humoruniv/presentation/widgets/feed_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 void main() {
   late SharedPreferences prefs;
@@ -21,6 +25,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
+    VisibilityDetectorController.instance.updateInterval = Duration.zero;
   });
 
   List<Override> overrides() => [
@@ -247,5 +252,50 @@ void main() {
         expect(find.byType(ScrollToTopButton), findsNothing);
       },
     );
+
+    testWidgets(
+        'tapping a video play button plays inline without opening fullscreen',
+        (tester) async {
+      final videoDetail = PostDetail(
+        id: 1,
+        title: '비디오 글',
+        author: 'a',
+        date: DateTime(2026, 7, 1),
+        contentHtml: '',
+        contentBlocks: const [
+          VideoBlock(
+            url: 'https://example.com/v.mp4',
+            thumbnailUrl: 'https://example.com/t.jpg',
+          ),
+        ],
+        imageUrls: const [],
+        recommendCount: 0,
+        notRecommendCount: 0,
+        viewCount: 0,
+        commentCount: 0,
+        comments: const [],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            postDetailProvider.overrideWith(
+              (ref, url) async => Right(videoDetail),
+            ),
+          ],
+          child: MaterialApp(
+            home: Scaffold(body: FeedList(posts: [posts[0]])),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(InlineVideoPlayer), findsOneWidget);
+      expect(find.byIcon(Icons.close), findsNothing);
+    });
   });
 }
