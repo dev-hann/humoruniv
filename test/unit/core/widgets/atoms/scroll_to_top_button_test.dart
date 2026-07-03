@@ -35,7 +35,9 @@ void main() {
       );
     });
 
-    testWidgets('should call onTap once when tapped and visible', (tester) async {
+    testWidgets('should call onTap once when tapped and visible', (
+      tester,
+    ) async {
       var taps = 0;
       await tester.pumpWidget(harness(onTap: () => taps++, visible: true));
       await tester.tap(find.byType(ScrollToTopButton));
@@ -51,7 +53,9 @@ void main() {
       expect(taps, 0);
     });
 
-    testWidgets('should expose 맨 위로 semantics label as a button', (tester) async {
+    testWidgets('should expose 맨 위로 semantics label as a button', (
+      tester,
+    ) async {
       await tester.pumpWidget(harness(onTap: () {}));
       expect(
         find.byWidgetPredicate(

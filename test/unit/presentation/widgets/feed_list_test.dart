@@ -158,7 +158,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: overrides(),
-          child: MaterialApp(home: Scaffold(body: FeedList(posts: manyPosts()))),
+          child: MaterialApp(
+            home: Scaffold(body: FeedList(posts: manyPosts())),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -177,7 +179,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: overrides(),
-          child: MaterialApp(home: Scaffold(body: FeedList(posts: manyPosts()))),
+          child: MaterialApp(
+            home: Scaffold(body: FeedList(posts: manyPosts())),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -198,7 +202,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: overrides(),
-          child: MaterialApp(home: Scaffold(body: FeedList(posts: manyPosts()))),
+          child: MaterialApp(
+            home: Scaffold(body: FeedList(posts: manyPosts())),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -234,7 +240,9 @@ void main() {
         expect(find.byType(ScrollToTopButton), findsNothing);
 
         await tester.pumpWidget(
-          const MaterialApp(home: Scaffold(body: FeedList(posts: []))),
+          const MaterialApp(
+            home: Scaffold(body: FeedList(posts: [])),
+          ),
         );
         expect(find.byType(ScrollToTopButton), findsNothing);
       },
