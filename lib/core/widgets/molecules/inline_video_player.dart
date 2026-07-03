@@ -1,22 +1,31 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humoruniv/core/providers/feed_video_playback_provider.dart';
 import 'package:humoruniv/core/themes/app_colors.dart';
 import 'package:humoruniv/core/themes/app_durations.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
-import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
-class InlineVideoPlayer extends StatefulWidget {
-  const InlineVideoPlayer({required this.block, super.key});
+class InlineVideoPlayer extends ConsumerStatefulWidget {
+  const InlineVideoPlayer({
+    required this.block,
+    this.autoplay = false,
+    this.videoId,
+    super.key,
+  });
   final VideoBlock block;
+  final bool autoplay;
+  final VideoId? videoId;
 
   @override
-  State<InlineVideoPlayer> createState() => _InlineVideoPlayerState();
+  ConsumerState<InlineVideoPlayer> createState() => _InlineVideoPlayerState();
 }
 
-class _InlineVideoPlayerState extends State<InlineVideoPlayer> {
+class _InlineVideoPlayerState extends ConsumerState<InlineVideoPlayer> {
   VideoPlayerController? _controller;
   bool _isInitialized = false;
   bool _hasError = false;
@@ -25,10 +34,37 @@ class _InlineVideoPlayerState extends State<InlineVideoPlayer> {
   bool _isMuted = true;
   Timer? _hideTimer;
 
+  static const double _kPauseThreshold = 0.4;
+
   @override
   void initState() {
     super.initState();
+    ref.listenManual<VideoId?>(feedVideoPlaybackProvider, _onActiveChanged);
     _initController();
+  }
+
+  void _onActiveChanged(VideoId? previous, VideoId? next) {
+    final id = widget.videoId;
+    if (id == null) return;
+    if (next != id &&
+        _isInitialized &&
+        _controller != null &&
+        _controller!.value.isPlaying) {
+      _controller!.pause();
+      setState(() => _showPlayButton = true);
+    }
+  }
+
+  void _onVisibilityChanged(VisibilityInfo info) {
+    final id = widget.videoId;
+    if (id == null) return;
+    if (info.visibleFraction < _kPauseThreshold &&
+        _isInitialized &&
+        _controller != null &&
+        _controller!.value.isPlaying) {
+      _controller!.pause();
+      setState(() => _showPlayButton = true);
+    }
   }
 
   void _initController() {
@@ -38,7 +74,17 @@ class _InlineVideoPlayerState extends State<InlineVideoPlayer> {
             if (mounted) {
               setState(() => _isInitialized = true);
               _controller!.setLooping(true);
-              _controller!.setVolume(0);
+              _controller!.setVolume(_isMuted ? 0 : 1);
+              if (widget.autoplay) {
+                _controller!.play();
+                _showPlayButton = false;
+                final id = widget.videoId;
+                if (id != null) {
+                  ref
+                      .read(feedVideoPlaybackProvider.notifier)
+                      .setActive(id);
+                }
+              }
               _startHideTimer();
             }
           })
@@ -92,6 +138,10 @@ class _InlineVideoPlayerState extends State<InlineVideoPlayer> {
       } else {
         _controller!.play();
         _showPlayButton = false;
+        final id = widget.videoId;
+        if (id != null) {
+          ref.read(feedVideoPlaybackProvider.notifier).setActive(id);
+        }
         _startHideTimer();
       }
     });
@@ -130,7 +180,7 @@ class _InlineVideoPlayerState extends State<InlineVideoPlayer> {
     final position = _controller?.value.position ?? Duration.zero;
     final duration = _controller?.value.duration ?? Duration.zero;
 
-    return GestureDetector(
+    final player = GestureDetector(
       onTap: _isInitialized ? _handleVideoTap : null,
       child: AspectRatio(
         aspectRatio: _isInitialized ? _controller!.value.aspectRatio : 16 / 9,
@@ -176,6 +226,14 @@ class _InlineVideoPlayerState extends State<InlineVideoPlayer> {
           ),
         ),
       ),
+    );
+
+    final id = widget.videoId;
+    if (id == null) return player;
+    return VisibilityDetector(
+      key: ValueKey('inline-video-${id.postId}-${id.blockIndex}'),
+      onVisibilityChanged: _onVisibilityChanged,
+      child: player,
     );
   }
 
