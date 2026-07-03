@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:humoruniv/core/widgets/atoms/loading_indicator.dart';
+import 'package:humoruniv/core/widgets/atoms/scroll_to_top_button.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_card.dart';
 import 'package:humoruniv/core/widgets/states/empty_state_view.dart';
 import 'package:humoruniv/core/widgets/states/error_state_view.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
+import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:humoruniv/domain/entities/post_detail.dart';
@@ -117,7 +119,10 @@ class FeedList extends StatefulWidget {
 }
 
 class _FeedListState extends State<FeedList> {
+  static const double _kShowScrollTopOffset = 600.0;
+
   final ScrollController _controller = ScrollController();
+  bool _showScrollTop = false;
 
   @override
   void initState() {
@@ -136,6 +141,10 @@ class _FeedListState extends State<FeedList> {
     final position = _controller.position;
     if (position.pixels >= position.maxScrollExtent * 0.9) {
       widget.onLoadMore?.call();
+    }
+    final shouldShow = position.pixels > _kShowScrollTopOffset;
+    if (shouldShow != _showScrollTop) {
+      setState(() => _showScrollTop = shouldShow);
     }
   }
 
@@ -175,28 +184,44 @@ class _FeedListState extends State<FeedList> {
         ? 1
         : 0;
 
-    return ListView.builder(
-      controller: _controller,
-      itemCount: widget.posts.length + extra,
-      itemBuilder: (context, index) {
-        if (index == widget.posts.length) {
-          if (widget.loadMoreError != null) {
-            return LoadMoreError(
-              message: '불러오기 실패',
-              onRetry: widget.onRetryLoadMore ?? () {},
+    return Stack(
+      children: [
+        ListView.builder(
+          controller: _controller,
+          itemCount: widget.posts.length + extra,
+          itemBuilder: (context, index) {
+            if (index == widget.posts.length) {
+              if (widget.loadMoreError != null) {
+                return LoadMoreError(
+                  message: '불러오기 실패',
+                  onRetry: widget.onRetryLoadMore ?? () {},
+                );
+              }
+              if (widget.isLoadingMore) {
+                return const LoadingIndicator();
+              }
+              return const SizedBox.shrink();
+            }
+            final post = widget.posts[index];
+            return FeedCardItem(
+              post: post,
+              isRead: widget.readIds.contains(post.id),
             );
-          }
-          if (widget.isLoadingMore) {
-            return const LoadingIndicator();
-          }
-          return const SizedBox.shrink();
-        }
-        final post = widget.posts[index];
-        return FeedCardItem(
-          post: post,
-          isRead: widget.readIds.contains(post.id),
-        );
-      },
+          },
+        ),
+        Positioned(
+          right: AppSpacing.p16,
+          bottom: AppSpacing.p16,
+          child: ScrollToTopButton(
+            visible: _showScrollTop,
+            onTap: () {
+              if (_controller.hasClients) {
+                _controller.jumpTo(0);
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 }

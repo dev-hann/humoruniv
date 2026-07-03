@@ -7,6 +7,7 @@ import 'package:humoruniv/core/widgets/atoms/loading_indicator.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_card.dart';
 import 'package:humoruniv/core/widgets/states/empty_state_view.dart';
 import 'package:humoruniv/core/widgets/states/error_state_view.dart';
+import 'package:humoruniv/core/widgets/atoms/scroll_to_top_button.dart';
 import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
@@ -120,5 +121,123 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
       expect(find.byType(LoadingIndicator), findsOneWidget);
     });
+
+    List<BoardPost> manyPosts({int count = 30}) => List.generate(
+      count,
+      (i) => BoardPost(
+        id: 100 + i,
+        title: '글 $i',
+        url: 'u$i',
+        author: 'a',
+        date: '2026-07-04',
+        recommendCount: 0,
+        notRecommendCount: 0,
+        commentCount: 0,
+        viewCount: 0,
+        thumbnailUrl: '',
+      ),
+    );
+
+    Finder feedScrollable() => find.descendant(
+      of: find.byType(FeedList),
+      matching: find.byType(Scrollable),
+    );
+
+    Finder feedOpacity() => find.descendant(
+      of: find.byType(ScrollToTopButton),
+      matching: find.byType(AnimatedOpacity),
+    );
+
+    testWidgets('scroll-to-top button is hidden at top of loaded feed', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides(),
+          child: MaterialApp(home: Scaffold(body: FeedList(posts: manyPosts()))),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ScrollToTopButton), findsOneWidget);
+      expect(tester.widget<AnimatedOpacity>(feedOpacity()).opacity, 0.0);
+    });
+
+    testWidgets('scroll-to-top button appears after scrolling past threshold', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides(),
+          child: MaterialApp(home: Scaffold(body: FeedList(posts: manyPosts()))),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.drag(feedScrollable(), const Offset(0, -700));
+      await tester.pumpAndSettle();
+
+      expect(tester.widget<AnimatedOpacity>(feedOpacity()).opacity, 1.0);
+    });
+
+    testWidgets('tapping scroll-to-top jumps feed back to offset 0', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides(),
+          child: MaterialApp(home: Scaffold(body: FeedList(posts: manyPosts()))),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.drag(feedScrollable(), const Offset(0, -700));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(ScrollToTopButton));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.state<ScrollableState>(feedScrollable()).position.pixels,
+        0,
+      );
+      expect(tester.widget<AnimatedOpacity>(feedOpacity()).opacity, 0.0);
+    });
+
+    testWidgets(
+      'scroll-to-top button is absent in loading/error/empty states',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(body: FeedList(posts: [], isLoading: true)),
+          ),
+        );
+        expect(find.byType(ScrollToTopButton), findsNothing);
+
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(body: FeedList(posts: [], hasError: true)),
+          ),
+        );
+        expect(find.byType(ScrollToTopButton), findsNothing);
+
+        await tester.pumpWidget(
+          const MaterialApp(home: Scaffold(body: FeedList(posts: []))),
+        );
+        expect(find.byType(ScrollToTopButton), findsNothing);
+      },
+    );
   });
 }
