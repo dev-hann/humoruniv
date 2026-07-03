@@ -7,8 +7,8 @@ import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 Widget _wrapped(Widget child) => ProviderScope(
-      child: MaterialApp(home: Scaffold(body: child)),
-    );
+  child: MaterialApp(home: Scaffold(body: child)),
+);
 
 void main() {
   setUp(() {
@@ -23,8 +23,9 @@ void main() {
       expect(find.byIcon(Icons.play_arrow), findsWidgets);
     });
 
-    testWidgets('should show muted icon by default for VideoBlock',
-        (tester) async {
+    testWidgets('should show muted icon by default for VideoBlock', (
+      tester,
+    ) async {
       const block = VideoBlock(url: 'https://example.com/video.mp4');
       await tester.pumpWidget(_wrapped(const InlineVideoPlayer(block: block)));
       await tester.pump();
@@ -45,8 +46,9 @@ void main() {
       expect(find.text('0:00 / 0:00'), findsOneWidget);
     });
 
-    testWidgets('should not show control bar for isGifConversion VideoBlock',
-        (tester) async {
+    testWidgets('should not show control bar for isGifConversion VideoBlock', (
+      tester,
+    ) async {
       const block = VideoBlock(
         url: 'https://example.com/clip.mp4',
         isGifConversion: true,
@@ -59,33 +61,37 @@ void main() {
     });
 
     testWidgets(
-        'should show center play button for isGifConversion VideoBlock',
-        (tester) async {
-      const block = VideoBlock(
-        url: 'https://example.com/clip.mp4',
-        isGifConversion: true,
-      );
-      await tester.pumpWidget(_wrapped(const InlineVideoPlayer(block: block)));
-      await tester.pump();
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-    });
+      'should show center play button for isGifConversion VideoBlock',
+      (tester) async {
+        const block = VideoBlock(
+          url: 'https://example.com/clip.mp4',
+          isGifConversion: true,
+        );
+        await tester.pumpWidget(
+          _wrapped(const InlineVideoPlayer(block: block)),
+        );
+        await tester.pump();
+        expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        'should accept autoplay and videoId without breaking rendering',
-        (tester) async {
-      const block = VideoBlock(url: 'https://example.com/video.mp4');
-      await tester.pumpWidget(
-        _wrapped(
-          const InlineVideoPlayer(
-            block: block,
-            autoplay: true,
-            videoId: VideoId(postId: 1, blockIndex: 0),
+      'should accept autoplay and videoId without breaking rendering',
+      (tester) async {
+        const block = VideoBlock(url: 'https://example.com/video.mp4');
+        await tester.pumpWidget(
+          _wrapped(
+            const InlineVideoPlayer(
+              block: block,
+              autoplay: true,
+              videoId: VideoId(postId: 1, blockIndex: 0),
+            ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.byType(InlineVideoPlayer), findsOneWidget);
-      expect(find.byIcon(Icons.fullscreen), findsOneWidget);
-    });
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(InlineVideoPlayer), findsOneWidget);
+        expect(find.byIcon(Icons.fullscreen), findsOneWidget);
+      },
+    );
   });
 }

@@ -175,8 +175,7 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
           Image(
             image: _providerFor(video.thumbnailUrl!),
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) =>
-                ColoredBox(color: Colors.grey[900]!),
+            errorBuilder: (_, __, ___) => ColoredBox(color: Colors.grey[900]!),
           )
         else
           ColoredBox(color: Colors.grey[900]!),

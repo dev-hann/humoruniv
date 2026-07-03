@@ -254,48 +254,49 @@ void main() {
     );
 
     testWidgets(
-        'tapping a video play button plays inline without opening fullscreen',
-        (tester) async {
-      final videoDetail = PostDetail(
-        id: 1,
-        title: '비디오 글',
-        author: 'a',
-        date: DateTime(2026, 7, 1),
-        contentHtml: '',
-        contentBlocks: const [
-          VideoBlock(
-            url: 'https://example.com/v.mp4',
-            thumbnailUrl: 'https://example.com/t.jpg',
-          ),
-        ],
-        imageUrls: const [],
-        recommendCount: 0,
-        notRecommendCount: 0,
-        viewCount: 0,
-        commentCount: 0,
-        comments: const [],
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            sharedPreferencesProvider.overrideWithValue(prefs),
-            postDetailProvider.overrideWith(
-              (ref, url) async => Right(videoDetail),
+      'tapping a video play button plays inline without opening fullscreen',
+      (tester) async {
+        final videoDetail = PostDetail(
+          id: 1,
+          title: '비디오 글',
+          author: 'a',
+          date: DateTime(2026, 7, 1),
+          contentHtml: '',
+          contentBlocks: const [
+            VideoBlock(
+              url: 'https://example.com/v.mp4',
+              thumbnailUrl: 'https://example.com/t.jpg',
             ),
           ],
-          child: MaterialApp(
-            home: Scaffold(body: FeedList(posts: [posts[0]])),
+          imageUrls: const [],
+          recommendCount: 0,
+          notRecommendCount: 0,
+          viewCount: 0,
+          commentCount: 0,
+          comments: const [],
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(prefs),
+              postDetailProvider.overrideWith(
+                (ref, url) async => Right(videoDetail),
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(body: FeedList(posts: [posts[0]])),
+            ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.play_arrow));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.play_arrow));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(InlineVideoPlayer), findsOneWidget);
-      expect(find.byIcon(Icons.close), findsNothing);
-    });
+        expect(find.byType(InlineVideoPlayer), findsOneWidget);
+        expect(find.byIcon(Icons.close), findsNothing);
+      },
+    );
   });
 }

@@ -80,9 +80,7 @@ class _InlineVideoPlayerState extends ConsumerState<InlineVideoPlayer> {
                 _showPlayButton = false;
                 final id = widget.videoId;
                 if (id != null) {
-                  ref
-                      .read(feedVideoPlaybackProvider.notifier)
-                      .setActive(id);
+                  ref.read(feedVideoPlaybackProvider.notifier).setActive(id);
                 }
               }
               _startHideTimer();

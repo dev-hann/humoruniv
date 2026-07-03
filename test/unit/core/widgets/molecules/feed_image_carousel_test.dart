@@ -73,37 +73,39 @@ void main() {
     });
 
     testWidgets(
-        'pressing play button mounts inline player with autoplay and videoId',
-        (tester) async {
-      const block = VideoBlock(
-        url: 'https://example.com/v.mp4',
-        thumbnailUrl: 'https://example.com/t.jpg',
-      );
-      await tester.pumpWidget(
-        ProviderScope(
-          child: const MaterialApp(
-            home: Scaffold(
-              body: FeedImageCarousel(
-                imageUrls: [],
-                videoBlocks: [block],
-                postId: 7,
+      'pressing play button mounts inline player with autoplay and videoId',
+      (tester) async {
+        const block = VideoBlock(
+          url: 'https://example.com/v.mp4',
+          thumbnailUrl: 'https://example.com/t.jpg',
+        );
+        await tester.pumpWidget(
+          ProviderScope(
+            child: const MaterialApp(
+              home: Scaffold(
+                body: FeedImageCarousel(
+                  imageUrls: [],
+                  videoBlocks: [block],
+                  postId: 7,
+                ),
               ),
             ),
           ),
-        ),
-      );
-      await tester.pump();
+        );
+        await tester.pump();
 
-      expect(find.byType(InlineVideoPlayer), findsNothing);
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+        expect(find.byType(InlineVideoPlayer), findsNothing);
+        expect(find.byIcon(Icons.play_arrow), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.play_arrow));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.play_arrow));
+        await tester.pumpAndSettle();
 
-      final player =
-          tester.widget<InlineVideoPlayer>(find.byType(InlineVideoPlayer));
-      expect(player.autoplay, isTrue);
-      expect(player.videoId, const VideoId(postId: 7, blockIndex: 0));
-    });
+        final player = tester.widget<InlineVideoPlayer>(
+          find.byType(InlineVideoPlayer),
+        );
+        expect(player.autoplay, isTrue);
+        expect(player.videoId, const VideoId(postId: 7, blockIndex: 0));
+      },
+    );
   });
 }

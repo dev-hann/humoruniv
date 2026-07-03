@@ -30,5 +30,5 @@ class FeedVideoPlaybackNotifier extends Notifier<VideoId?> {
 
 final feedVideoPlaybackProvider =
     NotifierProvider<FeedVideoPlaybackNotifier, VideoId?>(
-  FeedVideoPlaybackNotifier.new,
-);
+      FeedVideoPlaybackNotifier.new,
+    );
