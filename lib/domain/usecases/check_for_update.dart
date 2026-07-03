@@ -15,21 +15,25 @@ class CheckForUpdate {
     final result = await repository.getLatestRelease();
 
     return result.fold(Left.new, (release) {
-      final isNewer = _isNewerVersion(release.version, currentVersion);
-      return Right(
-        UpdateCheckResult(
-          type: isNewer
-              ? UpdateStatusType.updateAvailable
-              : UpdateStatusType.upToDate,
-          release: release,
-        ),
-      );
+      try {
+        final isNewer = _isNewerVersion(release.version, currentVersion);
+        return Right(
+          UpdateCheckResult(
+            type: isNewer
+                ? UpdateStatusType.updateAvailable
+                : UpdateStatusType.upToDate,
+            release: release,
+          ),
+        );
+      } catch (_) {
+        return Left(UpdateFailure('Invalid version format'));
+      }
     });
   }
 
   bool _isNewerVersion(String remote, String current) {
-    final remoteParts = remote.split('.').map(int.parse).toList();
-    final currentParts = current.split('.').map(int.parse).toList();
+    final remoteParts = _parseVersion(remote);
+    final currentParts = _parseVersion(current);
 
     for (var i = 0; i < 3; i++) {
       final r = i < remoteParts.length ? remoteParts[i] : 0;
@@ -38,5 +42,13 @@ class CheckForUpdate {
       if (r < c) return false;
     }
     return false;
+  }
+
+  List<int> _parseVersion(String version) {
+    final stripped = version.startsWith('v') || version.startsWith('V')
+        ? version.substring(1)
+        : version;
+    final clean = stripped.split(RegExp(r'[-+]')).first;
+    return clean.split('.').map(int.parse).toList();
   }
 }

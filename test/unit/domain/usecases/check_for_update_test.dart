@@ -241,5 +241,92 @@ void main() {
 
       expect(useCase.currentVersion, '2.5.3');
     });
+
+    group('version robustness', () {
+      test('should treat pre-release suffix as base version', () async {
+        final useCase = CheckForUpdate(
+          repository: mockRepository,
+          currentVersion: '1.0.0',
+        );
+        const release = AppRelease(
+          version: '1.2.0-beta',
+          htmlUrl: 'https://example.com',
+        );
+        when(
+          () => mockRepository.getLatestRelease(),
+        ).thenAnswer((_) async => const Right(release));
+
+        final result = await useCase();
+
+        result.fold(
+          (_) => fail('Should be Right'),
+          (status) => expect(status.isUpdateAvailable, true),
+        );
+      });
+
+      test('should treat build metadata as base version', () async {
+        final useCase = CheckForUpdate(
+          repository: mockRepository,
+          currentVersion: '1.2.0',
+        );
+        const release = AppRelease(
+          version: '1.2.0+5',
+          htmlUrl: 'https://example.com',
+        );
+        when(
+          () => mockRepository.getLatestRelease(),
+        ).thenAnswer((_) async => const Right(release));
+
+        final result = await useCase();
+
+        result.fold(
+          (_) => fail('Should be Right'),
+          (status) => expect(status.isUpdateAvailable, false),
+        );
+      });
+
+      test('should handle uppercase V prefix', () async {
+        final useCase = CheckForUpdate(
+          repository: mockRepository,
+          currentVersion: '1.0.0',
+        );
+        const release = AppRelease(
+          version: 'V1.2.0',
+          htmlUrl: 'https://example.com',
+        );
+        when(
+          () => mockRepository.getLatestRelease(),
+        ).thenAnswer((_) async => const Right(release));
+
+        final result = await useCase();
+
+        result.fold(
+          (_) => fail('Should be Right'),
+          (status) => expect(status.isUpdateAvailable, true),
+        );
+      });
+
+      test('should return UpdateFailure when version is unparsable', () async {
+        final useCase = CheckForUpdate(
+          repository: mockRepository,
+          currentVersion: '1.0.0',
+        );
+        const release = AppRelease(
+          version: 'not-a-version',
+          htmlUrl: 'https://example.com',
+        );
+        when(
+          () => mockRepository.getLatestRelease(),
+        ).thenAnswer((_) async => const Right(release));
+
+        final result = await useCase();
+
+        expect(result.isLeft(), true);
+        result.fold(
+          (f) => expect(f, isA<UpdateFailure>()),
+          (_) => fail('Should be Left'),
+        );
+      });
+    });
   });
 }

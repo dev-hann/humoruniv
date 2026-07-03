@@ -43,7 +43,7 @@ class SettingsScreen extends ConsumerWidget {
                 builder: (context, snapshot) {
                   final version = snapshot.hasData
                       ? 'v${snapshot.data!.version}'
-                      : 'v1.1.0';
+                      : '...';
                   return SettingsTile(title: '버전', subtitle: version);
                 },
               ),
@@ -58,7 +58,7 @@ class SettingsScreen extends ConsumerWidget {
                       updateState.release?.downloadUrl ??
                       updateState.release?.htmlUrl;
                   if (url != null && url.isNotEmpty) {
-                    _openUpdateUrl(url);
+                    _openUpdateUrl(context, url);
                   }
                 },
               ),
@@ -69,10 +69,15 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _openUpdateUrl(String url) async {
+  Future<void> _openUpdateUrl(BuildContext context, String url) async {
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final launched =
+        await canLaunchUrl(uri) &&
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('업데이트 페이지를 열 수 없습니다.')));
     }
   }
 }
