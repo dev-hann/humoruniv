@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:humoruniv/core/themes/app_radius.dart';
+import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/presentation/providers/update_provider.dart';
 
@@ -97,28 +98,33 @@ class UpdateBanner extends StatelessWidget {
         ),
         child: InkWell(
           onTap: onCheck,
-          child: Row(
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 18,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              const SizedBox(width: AppSpacing.p8),
-              Text(
-                '확인 실패',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minHeight: AppSizes.minTouchTarget,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 18,
                   color: Theme.of(context).colorScheme.error,
                 ),
-              ),
-              const SizedBox(width: AppSpacing.p4),
-              Text(
-                '다시 시도',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
+                const SizedBox(width: AppSpacing.p8),
+                Text(
+                  '확인 실패',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: AppSpacing.p4),
+                Text(
+                  '다시 시도',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

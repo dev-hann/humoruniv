@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/widgets/molecules/update_banner.dart';
 import 'package:humoruniv/presentation/providers/update_provider.dart';
 
@@ -105,6 +106,19 @@ void main() {
 
       await tester.tap(find.byType(InkWell));
       expect(checked, true);
+    });
+
+    testWidgets('error retry touch target should be at least 44pt tall', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(body: UpdateBanner(status: UpdateCheckStatus.error)),
+        ),
+      );
+
+      final size = tester.getSize(find.byType(InkWell));
+      expect(size.height, greaterThanOrEqualTo(AppSizes.minTouchTarget));
     });
 
     testWidgets('should call onCheck when check button tapped', (tester) async {

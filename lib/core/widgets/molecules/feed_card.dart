@@ -163,7 +163,7 @@ class FeedCard extends StatelessWidget {
       onTap: onCommentsTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: AppSpacing.edgeH16,
+        padding: AppSpacing.edgeH16V8,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -248,14 +248,22 @@ class _ExpandableTextState extends State<_ExpandableText> {
             ),
             if (overflow)
               GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () => setState(() => _expanded = !_expanded),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Text(
-                    _expanded ? '접기' : '더보기',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w600,
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  constraints: const BoxConstraints(
+                    minHeight: AppSizes.minTouchTarget,
+                    minWidth: AppSizes.minTouchTarget,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      _expanded ? '접기' : '더보기',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),

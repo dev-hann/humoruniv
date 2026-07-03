@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/utils/time_ago.dart';
 import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_card.dart';
@@ -213,5 +214,63 @@ void main() {
         expect(find.byIcon(Icons.play_arrow), findsOneWidget);
       },
     );
+
+    testWidgets(
+      '더보기 toggle touch target should be at least 44pt in both dims',
+      (tester) async {
+        final longBody = List.filled(80, '매우 긴 본문입니다.').join(' ');
+        final detail = detailWith(blocks: [TextBlock(longBody)]);
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: FeedCard(post: post, detail: detail),
+              ),
+            ),
+          ),
+        );
+        final toggleFinder = find.ancestor(
+          of: find.text('더보기'),
+          matching: find.byType(GestureDetector),
+        );
+        final size = tester.getSize(toggleFinder);
+        expect(size.height, greaterThanOrEqualTo(AppSizes.minTouchTarget));
+        expect(size.width, greaterThanOrEqualTo(AppSizes.minTouchTarget));
+      },
+    );
+
+    testWidgets('comment preview touch target should be at least 44pt tall', (
+      tester,
+    ) async {
+      final detail = detailWith(
+        commentCount: 5,
+        comments: [
+          Comment(
+            id: 1,
+            author: '댓글러',
+            content: '웃기다',
+            date: DateTime(2026, 5, 15),
+            recommendCount: 3,
+            isBest: true,
+            replies: const [],
+          ),
+        ],
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: FeedCard(post: post, detail: detail),
+            ),
+          ),
+        ),
+      );
+      final finder = find.ancestor(
+        of: find.text('댓글 5개 모두 보기'),
+        matching: find.byType(GestureDetector),
+      );
+      final size = tester.getSize(finder);
+      expect(size.height, greaterThanOrEqualTo(AppSizes.minTouchTarget));
+    });
   });
 }
