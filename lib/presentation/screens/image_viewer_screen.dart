@@ -6,6 +6,7 @@ import 'package:humoruniv/core/themes/app_colors.dart';
 import 'package:humoruniv/core/themes/app_radius.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
+import 'package:humoruniv/core/utils/long_image.dart';
 
 class ImageViewerScreen extends StatefulWidget {
   const ImageViewerScreen({
@@ -26,6 +27,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   int _currentIndex = 0;
   bool _isZoomed = false;
   double _dragY = 0;
+  final Map<String, double> _aspects = {};
 
   @override
   void initState() {
@@ -42,6 +44,9 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
           });
         }
       });
+    for (final url in widget.imageUrls) {
+      _resolveAspect(url);
+    }
   }
 
   @override
@@ -49,6 +54,25 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     _pageController.dispose();
     _scaleStateController.dispose();
     super.dispose();
+  }
+
+  void _resolveAspect(String url) {
+    if (_aspects.containsKey(url)) return;
+    final stream = NetworkImage(url).resolve(const ImageConfiguration());
+    ImageStreamListener? listener;
+    listener = ImageStreamListener(
+      (info, _) {
+        if (!mounted || listener == null) return;
+        final aspect =
+            info.image.width.toDouble() / info.image.height.toDouble();
+        setState(() => _aspects[url] = aspect);
+        stream.removeListener(listener);
+      },
+      onError: (exception, stackTrace) {
+        if (listener != null) stream.removeListener(listener);
+      },
+    );
+    stream.addListener(listener);
   }
 
   double get _dismissThreshold => MediaQuery.sizeOf(context).height * 0.25;
@@ -68,26 +92,60 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     }
   }
 
+  bool _isLongImage(int index) {
+    if (index < 0 || index >= widget.imageUrls.length) return false;
+    final size = MediaQuery.sizeOf(context);
+    final viewportAspect = size.width / size.height;
+    final imageAspect = _aspects[widget.imageUrls[index]];
+    if (imageAspect == null) return false;
+    return LongImage.fitWidthScale(
+          imageAspect: imageAspect,
+          viewportAspect: viewportAspect,
+        ) !=
+        null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final dismissProgress = (_dragY / _dismissThreshold).clamp(0.0, 1.0);
     final multiple = widget.imageUrls.length > 1;
+    final currentIsLong = _isLongImage(_currentIndex);
 
     final gallery = Transform.translate(
       offset: Offset(0, _dragY),
       child: PhotoViewGallery.builder(
         itemCount: widget.imageUrls.length,
         pageController: _pageController,
-        onPageChanged: (index) => setState(() => _currentIndex = index),
+        onPageChanged: (index) => setState(() {
+          _currentIndex = index;
+          _dragY = 0;
+        }),
         backgroundDecoration: const BoxDecoration(color: Colors.transparent),
-        builder: (context, index) => PhotoViewGalleryPageOptions(
-          imageProvider: NetworkImage(widget.imageUrls[index]),
-          initialScale: PhotoViewComputedScale.contained,
-          minScale: PhotoViewComputedScale.contained * 0.8,
-          maxScale: PhotoViewComputedScale.covered * 3,
-          scaleStateController: _scaleStateController,
-          filterQuality: FilterQuality.medium,
-        ),
+        builder: (context, index) {
+          final size = MediaQuery.sizeOf(context);
+          final viewportAspect = size.width / size.height;
+          final imageAspect = _aspects[widget.imageUrls[index]];
+          final fitScale = imageAspect == null
+              ? null
+              : LongImage.fitWidthScale(
+                  imageAspect: imageAspect,
+                  viewportAspect: viewportAspect,
+                );
+          final isLong = fitScale != null;
+          return PhotoViewGalleryPageOptions(
+            imageProvider: NetworkImage(widget.imageUrls[index]),
+            initialScale: isLong
+                ? PhotoViewComputedScale.contained * fitScale
+                : PhotoViewComputedScale.contained,
+            minScale: isLong
+                ? PhotoViewComputedScale.contained * fitScale
+                : PhotoViewComputedScale.contained * 0.8,
+            maxScale: PhotoViewComputedScale.covered * 3,
+            basePosition: isLong ? Alignment.topCenter : Alignment.center,
+            scaleStateController: _scaleStateController,
+            filterQuality: FilterQuality.medium,
+          );
+        },
         loadingBuilder: (context, event) => Center(
           child: CircularProgressIndicator(
             value: event == null
@@ -99,8 +157,9 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
       ),
     );
 
-    // 줌 상태에선 photo_view가 모든 제스처를 점유; 1x일 때만 닫기 드래그 허용
-    final galleryWithDismiss = _isZoomed
+    // 줌 상태이거나 긴 이미지(세로 팬으로 읽기)에서는 photo_view가 제스처를 점유;
+    // 일반 이미지 1x일 때만 아래로 드래그해 닫기 허용.
+    final galleryWithDismiss = (_isZoomed || currentIsLong)
         ? gallery
         : GestureDetector(
             onVerticalDragUpdate: _onVerticalDragUpdate,
