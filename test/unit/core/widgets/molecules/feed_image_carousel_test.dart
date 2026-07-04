@@ -72,6 +72,67 @@ void main() {
       expect(tapped, 0);
     });
 
+    testWidgets('page indicator is positioned at the top of the carousel', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: FeedImageCarousel(imageUrls: ['a', 'b'], postId: 1),
+          ),
+        ),
+      );
+      final badgeCenter = tester.getCenter(find.text('1/2'));
+      final carouselCenter = tester.getCenter(find.byType(FeedImageCarousel));
+      expect(
+        badgeCenter.dy,
+        lessThan(carouselCenter.dy),
+        reason: 'indicator should sit at the top, away from video controls',
+      );
+    });
+
+    testWidgets('page indicator does not overlap video fullscreen button', (
+      tester,
+    ) async {
+      const block = VideoBlock(
+        url: 'https://example.com/v.mp4',
+        thumbnailUrl: 'https://example.com/t.jpg',
+      );
+      await tester.pumpWidget(
+        ProviderScope(
+          child: const MaterialApp(
+            home: Scaffold(
+              body: FeedImageCarousel(
+                imageUrls: ['img'],
+                videoBlocks: [block],
+                postId: 1,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.fling(find.byType(PageView), const Offset(-500, 0), 1000);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.play_arrow).first);
+      await tester.pumpAndSettle();
+
+      final badge = find.text('2/2');
+      final fullscreen = find.widgetWithIcon(IconButton, Icons.fullscreen);
+      expect(badge, findsOneWidget);
+      expect(fullscreen, findsOneWidget);
+
+      final badgeRect = tester.getRect(badge);
+      final fullscreenRect = tester.getRect(fullscreen);
+      expect(
+        badgeRect.overlaps(fullscreenRect),
+        isFalse,
+        reason: 'indicator must not overlap the fullscreen button',
+      );
+    });
+
     testWidgets(
       'pressing play button mounts inline player with autoplay and videoId',
       (tester) async {
