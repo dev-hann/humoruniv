@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:humoruniv/core/providers/feed_video_playback_provider.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
-import 'package:humoruniv/core/widgets/molecules/feed_media_sizing.dart';
 import 'package:humoruniv/core/widgets/molecules/inline_video_player.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 
@@ -12,14 +11,12 @@ class FeedImageCarousel extends StatefulWidget {
     required this.postId,
     this.videoBlocks = const [],
     this.onImageTap,
-    this.imageProviderBuilder,
     super.key,
   });
   final List<String> imageUrls;
   final int postId;
   final List<VideoBlock> videoBlocks;
   final ValueChanged<int>? onImageTap;
-  final ImageProvider Function(String url)? imageProviderBuilder;
 
   @override
   State<FeedImageCarousel> createState() => _FeedImageCarouselState();
@@ -30,9 +27,6 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
   int _page = 0;
   int? _expandedVideoIndex;
   static final Map<String, double> _aspectCache = {};
-
-  ImageProvider _providerFor(String url) =>
-      widget.imageProviderBuilder?.call(url) ?? NetworkImage(url);
 
   int get _totalCount => widget.imageUrls.length + widget.videoBlocks.length;
 
@@ -46,9 +40,6 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
     }
     return null;
   }
-
-  double _aspectFor(String? url) =>
-      (url != null ? _aspectCache[url] : null) ?? 1.0;
 
   @override
   void initState() {
@@ -73,7 +64,7 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
 
   void _measure(String url) {
     if (_aspectCache.containsKey(url)) return;
-    final stream = _providerFor(url).resolve(ImageConfiguration.empty);
+    final stream = NetworkImage(url).resolve(const ImageConfiguration());
     ImageStreamListener? listener;
     listener = ImageStreamListener(
       (info, _) {
@@ -96,17 +87,14 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
     final total = _totalCount;
     final multiple = total > 1;
     final screenW = MediaQuery.sizeOf(context).width;
-    final screenH = MediaQuery.sizeOf(context).height;
-    final sizing = FeedMediaSizing.resolve(
-      aspect: _aspectFor(_currentMediaUrl),
-      screenW: screenW,
-      screenH: screenH,
-    );
+    final url = _currentMediaUrl;
+    final aspect = (url != null ? _aspectCache[url] : null) ?? 1.0;
+    final height = (screenW / aspect).clamp(120.0, AppSizes.feedMediaMaxHeight);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: double.infinity,
-      height: sizing.height,
+      height: height,
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -118,7 +106,7 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
               onPageChanged: (i) => setState(() => _page = i),
               itemBuilder: (context, index) {
                 if (index < widget.imageUrls.length) {
-                  return _buildImagePage(index, screenW, screenH);
+                  return _buildImagePage(index);
                 }
                 return _buildVideoPage(index - widget.imageUrls.length);
               },
@@ -148,14 +136,22 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
     );
   }
 
-  Widget _buildImagePage(int index, double screenW, double screenH) {
-    final url = widget.imageUrls[index];
-    return _FeedCarouselImagePage(
-      image: _providerFor(url),
-      aspect: _aspectFor(url),
-      screenW: screenW,
-      screenH: screenH,
-      onTap: widget.onImageTap == null ? null : () => widget.onImageTap!(index),
+  Widget _buildImagePage(int index) {
+    return GestureDetector(
+      onTap:
+          widget.onImageTap == null ? null : () => widget.onImageTap!(index),
+      child: Image.network(
+        widget.imageUrls[index],
+        width: double.infinity,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => Center(
+          child: Icon(
+            Icons.broken_image_outlined,
+            size: AppSizes.iconLarge * 2,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ),
     );
   }
 
@@ -172,10 +168,11 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
       fit: StackFit.expand,
       children: [
         if (video.thumbnailUrl != null)
-          Image(
-            image: _providerFor(video.thumbnailUrl!),
+          Image.network(
+            video.thumbnailUrl!,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => ColoredBox(color: Colors.grey[900]!),
+            errorBuilder: (_, __, ___) =>
+                ColoredBox(color: Colors.grey[900]!),
           )
         else
           ColoredBox(color: Colors.grey[900]!),
@@ -202,112 +199,6 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _FeedCarouselImagePage extends StatefulWidget {
-  const _FeedCarouselImagePage({
-    required this.image,
-    required this.aspect,
-    required this.screenW,
-    required this.screenH,
-    this.onTap,
-  });
-  final ImageProvider image;
-  final double aspect;
-  final double screenW;
-  final double screenH;
-  final VoidCallback? onTap;
-
-  @override
-  State<_FeedCarouselImagePage> createState() => _FeedCarouselImagePageState();
-}
-
-class _FeedCarouselImagePageState extends State<_FeedCarouselImagePage> {
-  final ScrollController _scrollController = ScrollController();
-  bool _atBottom = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_handleScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController
-      ..removeListener(_handleScroll)
-      ..dispose();
-    super.dispose();
-  }
-
-  void _handleScroll() {
-    if (!_scrollController.hasClients) return;
-    final position = _scrollController.position;
-    final atBottom = position.pixels >= position.maxScrollExtent - 8;
-    if (atBottom != _atBottom) {
-      setState(() => _atBottom = atBottom);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final sizing = FeedMediaSizing.resolve(
-      aspect: widget.aspect,
-      screenW: widget.screenW,
-      screenH: widget.screenH,
-    );
-    final image = Image(
-      image: widget.image,
-      width: widget.screenW,
-      height: widget.screenW / widget.aspect,
-      fit: BoxFit.fitWidth,
-      errorBuilder: (_, __, ___) => Center(
-        child: Icon(
-          Icons.broken_image_outlined,
-          size: AppSizes.iconLarge * 2,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-      ),
-    );
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: sizing.needsScroll
-          ? Stack(
-              fit: StackFit.expand,
-              children: [
-                SingleChildScrollView(
-                  controller: _scrollController,
-                  child: image,
-                ),
-                if (!_atBottom)
-                  Positioned(
-                    key: const ValueKey('feed_media_scroll_fade'),
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    height: 48,
-                    child: IgnorePointer(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest,
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            )
-          : image,
     );
   }
 }
