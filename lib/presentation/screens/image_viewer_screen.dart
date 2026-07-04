@@ -8,20 +8,29 @@ import 'package:humoruniv/core/utils/long_image.dart';
 
 /// Full-screen image viewer.
 ///
-/// Multiple images are paged horizontally with a [PageView]. Each page picks
-/// its interaction model from the image aspect ratio:
+/// Multiple images are paged horizontally with a [PageView]. Paging works two
+/// ways, so it is always reachable regardless of device gesture nuance:
+///   * **Swipe** left/right between images.
+///   * **Tap** the left/right third of the screen to go to the previous/next
+///     image (handy for reading long comics: scroll down, tap right to
+///     advance).
+///
+/// Each page picks its interaction model from the image aspect ratio:
 ///   * **Long** (taller-than-viewport at fit-width) images render in a vertical
-///     [SingleChildScrollView] so they can be read by scrolling down — no
-///     pinch-zoom, native momentum scrolling, no gesture conflict.
+///     [SingleChildScrollView] so they can be read by scrolling down — native
+///     momentum scrolling, no pinch-zoom.
 ///   * **Normal** images render in an [InteractiveViewer] for pinch-zoom/pan.
 ///
-/// This deliberately avoids `photo_view`: its scale gesture recognizer fought
-/// the horizontal [PageView] and stuttered on long images.
+/// This deliberately avoids `photo_view` and avoids a swipe-down-to-dismiss
+/// [GestureDetector]: a vertical drag recognizer there competed with the
+/// [PageView]'s horizontal paging on real touches and made paging unreliable.
+/// Dismiss is via the close button or the system back gesture instead.
 class ImageViewerScreen extends StatefulWidget {
   const ImageViewerScreen({
     required this.imageUrls,
     this.initialIndex = 0,
     this.knownAspects,
+    this.imageBuilder,
     super.key,
   });
 
@@ -37,6 +46,11 @@ class ImageViewerScreen extends StatefulWidget {
   /// the viewer resolves it itself.
   final Map<String, double>? knownAspects;
 
+  /// Optional override for the image widget shown for each URL. Defaults to
+  /// [Image.network]. Useful for tests to inject deterministic content (e.g. a
+  /// tall placeholder to exercise long-image scrolling).
+  final Widget Function(String url)? imageBuilder;
+
   @override
   State<ImageViewerScreen> createState() => _ImageViewerScreenState();
 }
@@ -47,7 +61,6 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
 
   int _currentIndex = 0;
   bool _isZoomed = false;
-  double _dragY = 0;
   final Map<String, double> _aspects = {};
 
   @override
@@ -75,10 +88,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   void _onTransformChanged() {
     final zoomed = _transformController.value.getMaxScaleOnAxis() > 1.0;
     if (zoomed != _isZoomed) {
-      setState(() {
-        _isZoomed = zoomed;
-        if (zoomed) _dragY = 0;
-      });
+      setState(() => _isZoomed = zoomed);
     }
   }
 
@@ -101,23 +111,6 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     stream.addListener(listener);
   }
 
-  double get _dismissThreshold => MediaQuery.sizeOf(context).height * 0.25;
-
-  void _onVerticalDragUpdate(DragUpdateDetails details) {
-    if (_isZoomed) return;
-    if (details.delta.dy > 0) {
-      setState(() => _dragY += details.delta.dy);
-    }
-  }
-
-  void _onVerticalDragEnd(DragEndDetails details) {
-    if (_dragY > _dismissThreshold) {
-      Navigator.of(context).pop();
-    } else {
-      setState(() => _dragY = 0);
-    }
-  }
-
   bool _isLongImage(int index) {
     if (index < 0 || index >= widget.imageUrls.length) return false;
     final size = MediaQuery.sizeOf(context);
@@ -131,37 +124,53 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
         null;
   }
 
+  void _onTapUp(TapUpDetails details) {
+    // While zoomed in, let the user interact with the zoomed view instead of
+    // paging on tap.
+    if (_isZoomed) return;
+    final width = MediaQuery.sizeOf(context).width;
+    final dx = details.localPosition.dx;
+    if (dx < width / 3) {
+      _goToPage(_currentIndex - 1);
+    } else if (dx > width * 2 / 3) {
+      _goToPage(_currentIndex + 1);
+    }
+  }
+
+  void _goToPage(int index) {
+    if (index < 0 || index >= widget.imageUrls.length) return;
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final dismissProgress = (_dragY / _dismissThreshold).clamp(0.0, 1.0);
     final multiple = widget.imageUrls.length > 1;
-    final currentIsLong = _isLongImage(_currentIndex);
-    // Only allow the swipe-down-to-dismiss on a normal image at 1x. Long images
-    // use a vertical ScrollView; zoomed images pan via InteractiveViewer.
-    final allowDismiss = !currentIsLong && !_isZoomed;
 
     final pageView = PageView.builder(
       controller: _pageController,
       itemCount: widget.imageUrls.length,
       onPageChanged: (index) => setState(() {
         _currentIndex = index;
-        _dragY = 0;
         _transformController.value = Matrix4.identity();
       }),
       itemBuilder: (context, index) => _buildPage(index),
     );
 
-    final body = allowDismiss
-        ? GestureDetector(
-            onVerticalDragUpdate: _onVerticalDragUpdate,
-            onVerticalDragEnd: _onVerticalDragEnd,
-            behavior: HitTestBehavior.opaque,
-            child: pageView,
-          )
-        : pageView;
+    // Tap-to-page overlay. A TapGestureRecognizer loses to drag recognizers in
+    // the gesture arena, so swipes (paging) and vertical scroll (long images)
+    // still reach the PageView/ScrollView; only clean taps page.
+    final body = GestureDetector(
+      onTapUp: _onTapUp,
+      behavior: HitTestBehavior.opaque,
+      child: pageView,
+    );
 
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(1 - dismissProgress * 0.6),
+      backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -173,7 +182,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
       ),
       body: Stack(
         children: [
-          Transform.translate(offset: Offset(0, _dragY), child: body),
+          body,
           if (multiple)
             Positioned(
               bottom: AppSizes.imageViewerIndicatorBottom,
@@ -205,11 +214,9 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     final url = widget.imageUrls[index];
     if (_isLongImage(index)) {
       return SingleChildScrollView(
-        child: Image.network(
-          url,
+        child: SizedBox(
           width: MediaQuery.sizeOf(context).width,
-          loadingBuilder: _loadingBuilder,
-          errorBuilder: _errorBuilder,
+          child: _imageFor(url),
         ),
       );
     }
@@ -217,16 +224,19 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
       transformationController: _transformController,
       maxScale: 4,
       // Pan only once zoomed in; at 1x, single-finger drags fall through to
-      // the swipe-down-to-dismiss handler (and horizontal paging).
+      // horizontal paging.
       panEnabled: _isZoomed,
-      child: Center(
-        child: Image.network(
+      child: Center(child: _imageFor(url)),
+    );
+  }
+
+  Widget _imageFor(String url) {
+    return widget.imageBuilder?.call(url) ??
+        Image.network(
           url,
           loadingBuilder: _loadingBuilder,
           errorBuilder: _errorBuilder,
-        ),
-      ),
-    );
+        );
   }
 
   Widget _loadingBuilder(
