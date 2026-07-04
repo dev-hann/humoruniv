@@ -50,16 +50,35 @@ class SettingsScreen extends ConsumerWidget {
               UpdateBanner(
                 status: updateState.status,
                 newVersion: updateState.release?.version,
+                downloadProgress: updateState.downloadProgress,
+                hasApkDownloadUrl: updateState.release?.downloadUrl != null,
                 onCheck: () {
                   ref.read(updateProvider.notifier).checkForUpdate();
                 },
                 onUpdate: () {
-                  final url =
-                      updateState.release?.downloadUrl ??
-                      updateState.release?.htmlUrl;
-                  if (url != null && url.isNotEmpty) {
-                    _openUpdateUrl(context, url);
+                  final notifier = ref.read(updateProvider.notifier);
+                  if (updateState.release?.downloadUrl != null) {
+                    notifier.downloadUpdate();
+                  } else {
+                    final url = updateState.release?.htmlUrl;
+                    if (url != null && url.isNotEmpty) {
+                      _openUpdateUrl(context, url);
+                    }
                   }
+                },
+                onCancelDownload: () {
+                  ref.read(updateProvider.notifier).cancelDownload();
+                },
+                onInstall: () {
+                  ref.read(updateProvider.notifier).launchInstaller();
+                },
+                onRetryDownload: () {
+                  ref.read(updateProvider.notifier).downloadUpdate();
+                },
+                onOpenPermissionSettings: () {
+                  ref
+                      .read(updateProvider.notifier)
+                      .openInstallPermissionSettings();
                 },
               ),
             ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/widgets/molecules/update_banner.dart';
+import 'package:humoruniv/domain/entities/download_progress.dart';
 import 'package:humoruniv/presentation/providers/update_provider.dart';
 
 void main() {
@@ -156,6 +157,161 @@ void main() {
 
       await tester.tap(find.text('업데이트'));
       expect(updated, true);
+    });
+  });
+
+  group('UpdateBanner in-app update states', () {
+    testWidgets('downloading shows progress percent and cancel affordance', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: UpdateBanner(
+              status: UpdateCheckStatus.downloading,
+              downloadProgress: const DownloadProgress(
+                receivedBytes: 40,
+                totalBytes: 100,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('다운로드 중 40%'), findsOneWidget);
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+      expect(find.text('취소'), findsOneWidget);
+    });
+
+    testWidgets('downloading cancel tap calls onCancelDownload', (
+      tester,
+    ) async {
+      var cancelled = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: UpdateBanner(
+              status: UpdateCheckStatus.downloading,
+              downloadProgress: const DownloadProgress(
+                receivedBytes: 10,
+                totalBytes: 100,
+              ),
+              onCancelDownload: () => cancelled = true,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('취소'));
+      expect(cancelled, true);
+    });
+
+    testWidgets('downloadError shows label and retry', (tester) async {
+      var retried = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: UpdateBanner(
+              status: UpdateCheckStatus.downloadError,
+              onRetryDownload: () => retried = true,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('다운로드 실패'), findsOneWidget);
+      expect(find.text('다시 시도'), findsOneWidget);
+      await tester.tap(find.text('다시 시도'));
+      expect(retried, true);
+    });
+
+    testWidgets('readyToInstall shows complete label and install button', (
+      tester,
+    ) async {
+      var installed = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: UpdateBanner(
+              status: UpdateCheckStatus.readyToInstall,
+              onInstall: () => installed = true,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('다운로드 완료'), findsOneWidget);
+      expect(find.text('설치'), findsOneWidget);
+      await tester.tap(find.text('설치'));
+      expect(installed, true);
+    });
+
+    testWidgets('installPermissionRequired shows settings button', (
+      tester,
+    ) async {
+      var opened = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: UpdateBanner(
+              status: UpdateCheckStatus.installPermissionRequired,
+              onOpenPermissionSettings: () => opened = true,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('설치 권한 필요'), findsOneWidget);
+      expect(find.text('설정 열기'), findsOneWidget);
+      await tester.tap(find.text('설정 열기'));
+      expect(opened, true);
+    });
+
+    testWidgets(
+      'available with no APK download url shows browser-open button',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: UpdateBanner(
+                status: UpdateCheckStatus.available,
+                newVersion: '1.2.0',
+                hasApkDownloadUrl: false,
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('브라우저에서 열기'), findsOneWidget);
+        expect(find.text('업데이트'), findsNothing);
+      },
+    );
+
+    testWidgets('download cancel touch target is at least 44pt tall', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: UpdateBanner(
+              status: UpdateCheckStatus.downloading,
+              downloadProgress: DownloadProgress(
+                receivedBytes: 10,
+                totalBytes: 100,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final cancelFinder = find.text('취소');
+      final size = tester.getSize(cancelFinder);
+      // The chip wrapping the text enforces the 44pt minimum height.
+      final chipSize = tester.getSize(
+        find.ancestor(of: cancelFinder, matching: find.byType(ConstrainedBox)),
+      );
+      expect(chipSize.height, greaterThanOrEqualTo(AppSizes.minTouchTarget));
+      expect(size, isNotNull);
     });
   });
 }

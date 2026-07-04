@@ -8,6 +8,7 @@ import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/core/widgets/molecules/dark_mode_selector.dart';
 import 'package:humoruniv/di/injection.dart' as di;
 import 'package:humoruniv/domain/entities/app_release.dart';
+import 'package:humoruniv/domain/repositories/apk_install_repository.dart';
 import 'package:humoruniv/domain/repositories/update_repository.dart';
 import 'package:humoruniv/domain/usecases/check_for_update.dart';
 import 'package:humoruniv/presentation/providers/shared_preferences_provider.dart';
@@ -20,6 +21,8 @@ import 'package:url_launcher_platform_interface/link.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
 class MockUpdateRepository extends Mock implements UpdateRepository {}
+
+class MockApkInstallRepository extends Mock implements ApkInstallRepository {}
 
 class FakeUrlLauncherPlatform extends UrlLauncherPlatform {
   bool canLaunchResult = true;
@@ -46,6 +49,7 @@ class FakeUrlLauncherPlatform extends UrlLauncherPlatform {
 
 void main() {
   late MockUpdateRepository mockRepository;
+  late MockApkInstallRepository mockApkRepo;
   late SharedPreferences prefs;
   late FakeUrlLauncherPlatform fakeLauncher;
 
@@ -63,16 +67,21 @@ void main() {
     fakeLauncher = FakeUrlLauncherPlatform();
     UrlLauncherPlatform.instance = fakeLauncher;
     mockRepository = MockUpdateRepository();
+    mockApkRepo = MockApkInstallRepository();
     if (di.sl.isRegistered<UpdateRepository>()) {
       di.sl.unregister<UpdateRepository>();
     }
     if (di.sl.isRegistered<CheckForUpdate>()) {
       di.sl.unregister<CheckForUpdate>();
     }
+    if (di.sl.isRegistered<ApkInstallRepository>()) {
+      di.sl.unregister<ApkInstallRepository>();
+    }
     di.sl.registerLazySingleton<UpdateRepository>(() => mockRepository);
     di.sl.registerLazySingleton(
       () => CheckForUpdate(repository: mockRepository, currentVersion: '1.0.0'),
     );
+    di.sl.registerLazySingleton<ApkInstallRepository>(() => mockApkRepo);
   });
 
   tearDown(di.sl.reset);
@@ -183,7 +192,11 @@ void main() {
     testWidgets('should show update available state', (tester) async {
       when(() => mockRepository.getLatestRelease()).thenAnswer(
         (_) async => const Right(
-          AppRelease(version: '1.2.0', htmlUrl: 'https://example.com'),
+          AppRelease(
+            version: '1.2.0',
+            htmlUrl: 'https://example.com',
+            downloadUrl: 'https://example.com/app.apk',
+          ),
         ),
       );
 
@@ -286,40 +299,42 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('should show feedback when update URL cannot be opened', (
-      tester,
-    ) async {
-      when(() => mockRepository.getLatestRelease()).thenAnswer(
-        (_) async => const Right(
-          AppRelease(
-            version: '1.2.0',
-            htmlUrl: 'https://example.com/release',
-            downloadUrl: 'https://example.com/app.apk',
+    testWidgets(
+      'should show feedback when browser fallback URL cannot be opened',
+      (tester) async {
+        // Release WITHOUT an apk asset -> banner shows "브라우저에서 열기" which
+        // falls back to url_launcher. If that launch fails, show a SnackBar.
+        when(() => mockRepository.getLatestRelease()).thenAnswer(
+          (_) async => const Right(
+            AppRelease(
+              version: '1.2.0',
+              htmlUrl: 'https://example.com/release',
+            ),
           ),
-        ),
-      );
-      fakeLauncher.canLaunchResult = false;
+        );
+        fakeLauncher.canLaunchResult = false;
 
-      final container = ProviderContainer(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-      );
-      addTearDown(container.dispose);
+        final container = ProviderContainer(
+          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        );
+        addTearDown(container.dispose);
 
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const MaterialApp(home: SettingsScreen()),
-        ),
-      );
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: const MaterialApp(home: SettingsScreen()),
+          ),
+        );
 
-      container.read(updateProvider.notifier).checkForUpdate();
-      await tester.pumpAndSettle();
+        container.read(updateProvider.notifier).checkForUpdate();
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('업데이트'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('브라우저에서 열기'));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(SnackBar), findsOneWidget);
-      expect(find.text('업데이트 페이지를 열 수 없습니다.'), findsOneWidget);
-    });
+        expect(find.byType(SnackBar), findsOneWidget);
+        expect(find.text('업데이트 페이지를 열 수 없습니다.'), findsOneWidget);
+      },
+    );
   });
 }

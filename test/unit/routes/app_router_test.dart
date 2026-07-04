@@ -7,6 +7,7 @@ import 'package:humoruniv/di/injection.dart' as di;
 import 'package:humoruniv/domain/entities/app_release.dart';
 import 'package:humoruniv/domain/entities/board_list_result.dart';
 import 'package:humoruniv/domain/entities/sort_option.dart';
+import 'package:humoruniv/domain/repositories/apk_install_repository.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 import 'package:humoruniv/domain/repositories/update_repository.dart';
 import 'package:humoruniv/domain/usecases/check_for_update.dart';
@@ -24,9 +25,12 @@ class MockPostRepository extends Mock implements PostRepository {}
 
 class MockUpdateRepository extends Mock implements UpdateRepository {}
 
+class MockApkInstallRepository extends Mock implements ApkInstallRepository {}
+
 void main() {
   late MockPostRepository mockPostRepo;
   late MockUpdateRepository mockUpdateRepo;
+  late MockApkInstallRepository mockApkRepo;
   late SharedPreferences prefs;
 
   setUpAll(() {
@@ -38,6 +42,7 @@ void main() {
     prefs = await SharedPreferences.getInstance();
     mockPostRepo = MockPostRepository();
     mockUpdateRepo = MockUpdateRepository();
+    mockApkRepo = MockApkInstallRepository();
     if (di.sl.isRegistered<PostRepository>()) {
       di.sl.unregister<PostRepository>();
     }
@@ -56,6 +61,9 @@ void main() {
     if (di.sl.isRegistered<CheckForUpdate>()) {
       di.sl.unregister<CheckForUpdate>();
     }
+    if (di.sl.isRegistered<ApkInstallRepository>()) {
+      di.sl.unregister<ApkInstallRepository>();
+    }
     di.sl.registerLazySingleton<PostRepository>(() => mockPostRepo);
     di.sl.registerLazySingleton(() => GetBestPosts(repository: mockPostRepo));
     di.sl.registerLazySingleton(() => GetPostDetail(repository: mockPostRepo));
@@ -64,6 +72,7 @@ void main() {
     di.sl.registerLazySingleton(
       () => CheckForUpdate(repository: mockUpdateRepo, currentVersion: '1.0.0'),
     );
+    di.sl.registerLazySingleton<ApkInstallRepository>(() => mockApkRepo);
   });
 
   tearDown(di.sl.reset);

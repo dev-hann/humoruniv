@@ -1,11 +1,18 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:humoruniv/core/network/html_client_impl.dart';
+import 'package:humoruniv/data/datasources/apk_download_data_source.dart';
+import 'package:humoruniv/data/datasources/apk_download_data_source_impl.dart';
+import 'package:humoruniv/data/datasources/apk_installer_service.dart';
+import 'package:humoruniv/data/datasources/apk_installer_service_impl.dart';
 import 'package:humoruniv/data/datasources/github_remote_ds.dart';
 import 'package:humoruniv/data/datasources/github_remote_ds_impl.dart';
 import 'package:humoruniv/data/datasources/humoruniv_remote_ds.dart';
 import 'package:humoruniv/data/datasources/humoruniv_remote_ds_impl.dart';
+import 'package:humoruniv/data/repositories/apk_install_repository_impl.dart';
 import 'package:humoruniv/data/repositories/post_repository_impl.dart';
 import 'package:humoruniv/data/repositories/update_repository_impl.dart';
+import 'package:humoruniv/domain/repositories/apk_install_repository.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 import 'package:humoruniv/domain/repositories/update_repository.dart';
 import 'package:humoruniv/domain/usecases/check_for_update.dart';
@@ -13,6 +20,7 @@ import 'package:humoruniv/domain/usecases/get_best_posts.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
 import 'package:humoruniv/domain/usecases/get_post_detail.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 
 final sl = GetIt.instance;
 
@@ -48,6 +56,23 @@ Future<void> configureDependencies() async {
     () => CheckForUpdate(
       repository: sl<UpdateRepository>(),
       currentVersion: packageInfo.version,
+    ),
+  );
+
+  sl.registerLazySingleton<ApkDownloadDataSource>(
+    () => ApkDownloadDataSourceImpl(
+      dio: Dio(),
+      resolveSavePath: () async {
+        final dir = await getExternalStorageDirectory();
+        return '${dir?.path ?? ''}/updates/app-update.apk';
+      },
+    ),
+  );
+  sl.registerLazySingleton<ApkInstallerService>(ApkInstallerServiceImpl.new);
+  sl.registerLazySingleton<ApkInstallRepository>(
+    () => ApkInstallRepositoryImpl(
+      downloadDataSource: sl<ApkDownloadDataSource>(),
+      installerService: sl<ApkInstallerService>(),
     ),
   );
 }
