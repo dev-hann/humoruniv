@@ -138,8 +138,7 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
 
   Widget _buildImagePage(int index) {
     return GestureDetector(
-      onTap:
-          widget.onImageTap == null ? null : () => widget.onImageTap!(index),
+      onTap: widget.onImageTap == null ? null : () => widget.onImageTap!(index),
       child: Image.network(
         widget.imageUrls[index],
         width: double.infinity,
@@ -171,8 +170,7 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
           Image.network(
             video.thumbnailUrl!,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) =>
-                ColoredBox(color: Colors.grey[900]!),
+            errorBuilder: (_, __, ___) => ColoredBox(color: Colors.grey[900]!),
           )
         else
           ColoredBox(color: Colors.grey[900]!),
