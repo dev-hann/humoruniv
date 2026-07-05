@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:humoruniv/core/themes/app_elevation.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
@@ -9,20 +10,26 @@ class SkeletonFeedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _header(),
-        SkeletonBox(
-          width: double.infinity,
-          height: AppSizes.feedMediaHeight(
-            screenHeight ?? MediaQuery.sizeOf(context).height,
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    return Material(
+      color: theme.colorScheme.surfaceContainer,
+      elevation: isDark ? AppElevation.level0 : AppElevation.level1,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _header(),
+          SkeletonBox(
+            width: double.infinity,
+            height: AppSizes.feedMediaHeight(
+              screenHeight ?? MediaQuery.sizeOf(context).height,
+            ),
+            borderRadius: BorderRadius.zero,
           ),
-          borderRadius: BorderRadius.zero,
-        ),
-        _actionRow(),
-        _caption(),
-      ],
+          _actionRow(),
+          _caption(),
+        ],
+      ),
     );
   }
 

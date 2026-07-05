@@ -107,7 +107,7 @@ per DESIGN.md.
 |--------|------|----------------|
 | `FeedMedia` | atom (new) | Full-bleed media. States: `loading` (shimmer) / `loaded` / `error` / `nsfw-blurred` / `multi-image` (+N badge). `BoxFit.contain` up to `feedMediaMaxHeight`, then `BoxFit.cover` (center crop). No radius. Tap → ImageViewerScreen (shared element). |
 | `TextPostCard` | molecule (new) | Text-only posts. `colorScheme.primary` background + `headlineSmall` title + `bodyLarge` secondary line. Text color **`colorScheme.onPrimary`** (token-driven, never hardcoded white). |
-| `FeedCard` | molecule (new) | Composes header (avatar + nick + optional badge) + body (`FeedMedia` or `TextPostCard`) + action row (👍/💬/👁, display-only, 44pt targets) + caption (title + optional preview) + **timestamp (bottom)**. Thin divider, no border/shadow. Read-state: dim title + small dot; media/typography area untouched. |
+| `FeedCard` | molecule (new) | Composes header (avatar + nick + optional badge) + body (`FeedMedia` or `TextPostCard`) + action row (👍/💬/👁, display-only, 44pt targets) + caption (title + optional preview) + **timestamp (bottom)**. Wrapped in a `Material(color: surfaceContainer)` card surface with a 12dp inter-card gap; no border/radius/divider (media stays full-bleed square). |
 | `SkeletonFeedCard` | state (new) | Shimmer mirroring `FeedCard` shape (header row + full-width media block + action row + 2 caption lines). |
 | `HomeFeed` | organism (rewrite) | Renders `FeedCard`s with pagination + all states (loading → `SkeletonFeedCard`, empty → `EmptyStateView`, error → `ErrorStateView`, offline → `StaleDataBanner`). |
 | `BottomNavBar` | organism (edit) | Make `destinations` a constructor parameter; pass 3. |
@@ -157,7 +157,9 @@ per DESIGN.md.
 
 | Concern | Token |
 |---------|-------|
-| Card divider | `colorScheme.outline.withOpacity(0.12)`, 1px |
+| Card surface | `colorScheme.surfaceContainer` (tonal contrast vs scaffold; both modes) |
+| Card elevation | `AppElevation.level1` (light) / `level0` tonal-only (dark) |
+| Inter-card gap | `AppSpacing.p12` (12dp); no divider line |
 | Text card background | `colorScheme.primary` |
 | Text card text | `colorScheme.onPrimary` (dark across all 6 schemes; never white) |
 | Text card title | `headlineSmall` (20pt / w600 / h1.35, max 3 lines) |

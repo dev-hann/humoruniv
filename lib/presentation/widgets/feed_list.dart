@@ -127,7 +127,10 @@ class _FeedListState extends State<FeedList> {
       return ListView.builder(
         itemCount: 4,
         physics: const AlwaysScrollableScrollPhysics(),
-        itemBuilder: (_, __) => const SkeletonFeedCard(),
+        itemBuilder: (_, __) => const Padding(
+          padding: EdgeInsets.only(bottom: AppSpacing.p12),
+          child: SkeletonFeedCard(),
+        ),
       );
     }
     if (widget.hasError) {
@@ -176,7 +179,10 @@ class _FeedListState extends State<FeedList> {
               return const SizedBox.shrink();
             }
             final post = widget.posts[index];
-            return FeedCardItem(post: post);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.p12),
+              child: FeedCardItem(post: post),
+            );
           },
         ),
         Positioned(

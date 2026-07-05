@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:humoruniv/core/themes/app_elevation.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/core/utils/time_ago.dart';
@@ -7,6 +8,7 @@ import 'package:humoruniv/core/widgets/atoms/avatar.dart';
 import 'package:humoruniv/core/widgets/atoms/count_badge.dart';
 import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_image_carousel.dart';
+import 'package:humoruniv/core/widgets/molecules/text_post_card.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:humoruniv/domain/entities/post_detail.dart';
@@ -31,6 +33,9 @@ class FeedCard extends StatelessWidget {
   List<VideoBlock> get _videoBlocks =>
       detail?.contentBlocks.whereType<VideoBlock>().toList() ?? const [];
 
+  /// A text-only post (no images, no videos) once its detail has loaded.
+  bool get _isTextPost => detail != null && !_hasImages && _videoBlocks.isEmpty;
+
   String? get _bodyText {
     final d = detail;
     if (d == null) return null;
@@ -44,25 +49,30 @@ class FeedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _header(textTheme, colorScheme),
-        ..._media(),
-        _actions(),
-        _caption(textTheme, colorScheme),
-        if (detail != null && detail!.comments.isNotEmpty)
-          _commentPreview(textTheme, colorScheme),
-        if (post.date.isNotEmpty) _timestamp(textTheme, colorScheme),
-        Divider(
-          height: 1,
-          thickness: 1,
-          color: colorScheme.outline.withOpacity(0.12),
-        ),
-      ],
+    // Card surface: a tonal step above the scaffold (surfaceContainer) gives
+    // real figure-ground contrast in BOTH light and dark. Light mode adds a
+    // hairline elevation; dark mode is tonal-only (DESIGN.md elevation rule).
+    // No radius — keeping media full-bleed square (Visual content priority).
+    return Material(
+      color: colorScheme.surfaceContainer,
+      elevation: isDark ? AppElevation.level0 : AppElevation.level1,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _header(textTheme, colorScheme),
+          ..._media(),
+          _actions(),
+          _caption(textTheme, colorScheme),
+          if (detail != null && detail!.comments.isNotEmpty)
+            _commentPreview(textTheme, colorScheme),
+          if (post.date.isNotEmpty) _timestamp(textTheme, colorScheme),
+        ],
+      ),
     );
   }
 
@@ -75,15 +85,23 @@ class FeedCard extends StatelessWidget {
         ),
       ];
     }
-    if (!_hasImages && _videoBlocks.isEmpty) return [];
-    return [
-      FeedImageCarousel(
-        imageUrls: detail?.imageUrls ?? const [],
-        videoBlocks: _videoBlocks,
-        onImageTap: onImageTap,
-        postId: post.id,
-      ),
-    ];
+    if (_hasImages || _videoBlocks.isNotEmpty) {
+      return [
+        FeedImageCarousel(
+          imageUrls: detail?.imageUrls ?? const [],
+          videoBlocks: _videoBlocks,
+          onImageTap: onImageTap,
+          postId: post.id,
+        ),
+      ];
+    }
+    // Detail loaded, text-only post → brand-color title block as the visual
+    // anchor (mirrors full-bleed media for image posts). The body stays in the
+    // caption below to avoid duplication.
+    if (_isTextPost) {
+      return [TextPostCard(title: post.title)];
+    }
+    return [];
   }
 
   Widget _header(TextTheme textTheme, ColorScheme colorScheme) {
@@ -126,24 +144,26 @@ class FeedCard extends StatelessWidget {
   }
 
   Widget _caption(TextTheme textTheme, ColorScheme colorScheme) {
-    final titleColor = colorScheme.onSurface;
     final body = _bodyText;
     return Padding(
       padding: AppSpacing.edgeH16,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            post.title,
-            style: textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: titleColor,
+          // Text posts show the title inside TextPostCard already; here we only
+          // render the body. Image posts render title + body.
+          if (!_isTextPost)
+            Text(
+              post.title,
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
           if (body != null && body.isNotEmpty) ...[
-            AppSpacing.sbH4,
+            if (!_isTextPost) AppSpacing.sbH4,
             _ExpandableText(body, maxLines: _hasImages ? 3 : 8),
           ],
         ],

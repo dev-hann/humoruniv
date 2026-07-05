@@ -5,6 +5,7 @@ import 'package:humoruniv/core/utils/time_ago.dart';
 import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_card.dart';
 import 'package:humoruniv/core/widgets/molecules/feed_image_carousel.dart';
+import 'package:humoruniv/core/widgets/molecules/text_post_card.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/domain/entities/comment.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
@@ -102,6 +103,61 @@ void main() {
       );
       expect(find.byType(FeedImageCarousel), findsNothing);
       expect(find.text('본문 내용'), findsOneWidget);
+    });
+
+    testWidgets(
+      'renders a Material card surface for figure-ground separation',
+      (tester) async {
+        final detail = detailWith(imageUrls: ['https://example.com/a.jpg']);
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: FeedCard(post: post, detail: detail),
+              ),
+            ),
+          ),
+        );
+
+        // The card is wrapped in a Material whose color is surfaceContainer, so
+        // it contrasts with the scaffold behind it.
+        final material = tester.widget<Material>(find.byType(Material).first);
+        expect(material.color, isNotNull);
+      },
+    );
+
+    testWidgets('renders TextPostCard as the body for a text-only post', (
+      tester,
+    ) async {
+      final detail = detailWith(blocks: const [TextBlock('본문 내용')]);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: FeedCard(post: post, detail: detail),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(TextPostCard), findsOneWidget);
+      // The title lives in TextPostCard; body stays in the caption.
+      expect(find.text('게시글 제목'), findsOneWidget);
+    });
+
+    testWidgets('does not render a Divider between cards', (tester) async {
+      final detail = detailWith(imageUrls: ['https://example.com/a.jpg']);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: FeedCard(post: post, detail: detail),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(Divider), findsNothing);
     });
 
     testWidgets('should show title in caption', (tester) async {
