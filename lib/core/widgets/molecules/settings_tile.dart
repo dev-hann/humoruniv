@@ -9,6 +9,7 @@ class SettingsTile extends StatelessWidget {
     this.trailing,
     this.subtitle,
     this.onTap,
+    this.destructive = false,
   });
   final String title;
   final Widget? leading;
@@ -16,11 +17,24 @@ class SettingsTile extends StatelessWidget {
   final String? subtitle;
   final VoidCallback? onTap;
 
+  /// Renders the title and leading icon in [ColorScheme.error]. Use for
+  /// destructive actions (clear cache, reset history, etc.). Color is never
+  /// the sole signal — pair it with an error-flavored leading icon.
+  final bool destructive;
+
   @override
   Widget build(BuildContext context) {
+    final color = destructive
+        ? Theme.of(context).colorScheme.error
+        : Theme.of(context).colorScheme.onSurface;
     return ListTile(
-      leading: leading,
-      title: Text(title),
+      leading: leading == null
+          ? null
+          : IconTheme.merge(
+              data: IconThemeData(color: color),
+              child: leading!,
+            ),
+      title: Text(title, style: TextStyle(color: color)),
       subtitle: subtitle != null ? Text(subtitle!) : null,
       trailing: trailing,
       onTap: onTap,

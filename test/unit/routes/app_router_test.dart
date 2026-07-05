@@ -10,6 +10,7 @@ import 'package:humoruniv/domain/entities/sort_option.dart';
 import 'package:humoruniv/domain/repositories/apk_install_repository.dart';
 import 'package:humoruniv/domain/repositories/post_repository.dart';
 import 'package:humoruniv/domain/repositories/update_repository.dart';
+import 'package:humoruniv/data/datasources/image_cache_service.dart';
 import 'package:humoruniv/domain/usecases/check_for_update.dart';
 import 'package:humoruniv/domain/usecases/get_best_posts.dart';
 import 'package:humoruniv/domain/usecases/get_board_posts.dart';
@@ -27,10 +28,13 @@ class MockUpdateRepository extends Mock implements UpdateRepository {}
 
 class MockApkInstallRepository extends Mock implements ApkInstallRepository {}
 
+class FakeImageCacheService extends Mock implements ImageCacheService {}
+
 void main() {
   late MockPostRepository mockPostRepo;
   late MockUpdateRepository mockUpdateRepo;
   late MockApkInstallRepository mockApkRepo;
+  late FakeImageCacheService fakeCacheService;
   late SharedPreferences prefs;
 
   setUpAll(() {
@@ -43,6 +47,8 @@ void main() {
     mockPostRepo = MockPostRepository();
     mockUpdateRepo = MockUpdateRepository();
     mockApkRepo = MockApkInstallRepository();
+    fakeCacheService = FakeImageCacheService();
+    when(() => fakeCacheService.getSizeBytes()).thenAnswer((_) async => 0);
     if (di.sl.isRegistered<PostRepository>()) {
       di.sl.unregister<PostRepository>();
     }
@@ -64,6 +70,9 @@ void main() {
     if (di.sl.isRegistered<ApkInstallRepository>()) {
       di.sl.unregister<ApkInstallRepository>();
     }
+    if (di.sl.isRegistered<ImageCacheService>()) {
+      di.sl.unregister<ImageCacheService>();
+    }
     di.sl.registerLazySingleton<PostRepository>(() => mockPostRepo);
     di.sl.registerLazySingleton(() => GetBestPosts(repository: mockPostRepo));
     di.sl.registerLazySingleton(() => GetPostDetail(repository: mockPostRepo));
@@ -73,6 +82,7 @@ void main() {
       () => CheckForUpdate(repository: mockUpdateRepo, currentVersion: '1.0.0'),
     );
     di.sl.registerLazySingleton<ApkInstallRepository>(() => mockApkRepo);
+    di.sl.registerLazySingleton<ImageCacheService>(() => fakeCacheService);
   });
 
   tearDown(di.sl.reset);

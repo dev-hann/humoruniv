@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/core/widgets/molecules/dark_mode_selector.dart';
+import 'package:humoruniv/data/datasources/image_cache_service.dart';
 import 'package:humoruniv/di/injection.dart' as di;
 import 'package:humoruniv/domain/entities/app_release.dart';
 import 'package:humoruniv/domain/repositories/apk_install_repository.dart';
@@ -23,6 +24,8 @@ import 'package:url_launcher_platform_interface/url_launcher_platform_interface.
 class MockUpdateRepository extends Mock implements UpdateRepository {}
 
 class MockApkInstallRepository extends Mock implements ApkInstallRepository {}
+
+class FakeImageCacheService extends Mock implements ImageCacheService {}
 
 class FakeUrlLauncherPlatform extends UrlLauncherPlatform {
   bool canLaunchResult = true;
@@ -50,6 +53,7 @@ class FakeUrlLauncherPlatform extends UrlLauncherPlatform {
 void main() {
   late MockUpdateRepository mockRepository;
   late MockApkInstallRepository mockApkRepo;
+  late FakeImageCacheService fakeCacheService;
   late SharedPreferences prefs;
   late FakeUrlLauncherPlatform fakeLauncher;
 
@@ -68,6 +72,9 @@ void main() {
     UrlLauncherPlatform.instance = fakeLauncher;
     mockRepository = MockUpdateRepository();
     mockApkRepo = MockApkInstallRepository();
+    fakeCacheService = FakeImageCacheService();
+    registerFallbackValue(Uri.parse('https://example.com'));
+    when(() => fakeCacheService.getSizeBytes()).thenAnswer((_) async => 4096);
     if (di.sl.isRegistered<UpdateRepository>()) {
       di.sl.unregister<UpdateRepository>();
     }
@@ -77,11 +84,15 @@ void main() {
     if (di.sl.isRegistered<ApkInstallRepository>()) {
       di.sl.unregister<ApkInstallRepository>();
     }
+    if (di.sl.isRegistered<ImageCacheService>()) {
+      di.sl.unregister<ImageCacheService>();
+    }
     di.sl.registerLazySingleton<UpdateRepository>(() => mockRepository);
     di.sl.registerLazySingleton(
       () => CheckForUpdate(repository: mockRepository, currentVersion: '1.0.0'),
     );
     di.sl.registerLazySingleton<ApkInstallRepository>(() => mockApkRepo);
+    di.sl.registerLazySingleton<ImageCacheService>(() => fakeCacheService);
   });
 
   tearDown(di.sl.reset);
@@ -101,8 +112,9 @@ void main() {
 
       await tester.pumpWidget(buildApp());
 
-      expect(find.text('화면 설정'), findsOneWidget);
-      expect(find.text('앱 정보'), findsOneWidget);
+      expect(find.text('화면'), findsOneWidget);
+      expect(find.text('미디어 & 데이터'), findsOneWidget);
+      expect(find.text('정보'), findsOneWidget);
     });
 
     testWidgets('should display AppBar with 설정 title', (tester) async {
@@ -158,6 +170,56 @@ void main() {
 
       expect(find.text('v1.5.0'), findsOneWidget);
       expect(find.text('v1.1.0'), findsNothing);
+    });
+
+    testWidgets('shows the read-post dimming toggle on by default', (
+      tester,
+    ) async {
+      when(() => mockRepository.getLatestRelease()).thenAnswer(
+        (_) async => const Right(
+          AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
+        ),
+      );
+
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('읽은 글 흐리게 표시'), findsOneWidget);
+      final sw = tester.widget<Switch>(find.byType(Switch));
+      expect(sw.value, true);
+    });
+
+    testWidgets('renders the new About tiles (licenses, source, feedback)', (
+      tester,
+    ) async {
+      when(() => mockRepository.getLatestRelease()).thenAnswer(
+        (_) async => const Right(
+          AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
+        ),
+      );
+
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('오픈소스 라이선스'), findsOneWidget);
+      expect(find.text('소스 코드'), findsOneWidget);
+      expect(find.text('피드백'), findsOneWidget);
+    });
+
+    testWidgets('renders the image cache tile showing the cache size', (
+      tester,
+    ) async {
+      when(() => mockRepository.getLatestRelease()).thenAnswer(
+        (_) async => const Right(
+          AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
+        ),
+      );
+
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('이미지 캐시'), findsOneWidget);
+      expect(find.textContaining('KB'), findsWidgets);
     });
 
     testWidgets('should display update banner in idle state', (tester) async {
@@ -329,6 +391,8 @@ void main() {
         container.read(updateProvider.notifier).checkForUpdate();
         await tester.pumpAndSettle();
 
+        await tester.ensureVisible(find.text('브라우저에서 열기'));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('브라우저에서 열기'));
         await tester.pumpAndSettle();
 

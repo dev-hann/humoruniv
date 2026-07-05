@@ -10,13 +10,13 @@ import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
+import 'package:humoruniv/presentation/providers/read_posts_provider.dart';
 import 'package:humoruniv/presentation/screens/image_viewer_screen.dart';
 import 'package:humoruniv/presentation/widgets/feed_comments_sheet.dart';
 
 class FeedCardItem extends ConsumerStatefulWidget {
-  const FeedCardItem({required this.post, this.isRead = false, super.key});
+  const FeedCardItem({required this.post, super.key});
   final BoardPost post;
-  final bool isRead;
 
   @override
   ConsumerState<FeedCardItem> createState() => _FeedCardItemState();
@@ -36,11 +36,25 @@ class _FeedCardItemState extends ConsumerState<FeedCardItem>
     );
     final hasImages = detail != null && detail.imageUrls.isNotEmpty;
     final hasComments = detail != null && detail.comments.isNotEmpty;
+
+    final readState = ref.watch(readPostsProvider);
+    final isRead = readState.isRead(widget.post.id);
+
+    // Once the post detail has loaded (prefetched when it scrolled into view),
+    // record it as read. Scheduled post-frame to avoid mutating provider state
+    // during build; idempotent so the guard skips repeats.
+    if (detail != null && !readState.ids.contains(widget.post.id)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ref.read(readPostsProvider.notifier).markRead(widget.post.id);
+      });
+    }
+
     return FeedCard(
       post: widget.post,
       detail: detail,
       detailLoading: asyncDetail.isLoading,
-      isRead: widget.isRead,
+      isRead: isRead,
       onImageTap: !hasImages
           ? null
           : (i) => Navigator.of(context).push(
@@ -76,7 +90,6 @@ class FeedList extends StatefulWidget {
     this.loadMoreError,
     this.onLoadMore,
     this.onRetryLoadMore,
-    this.readIds = const <int>{},
   });
   final List<BoardPost> posts;
   final bool isLoading;
@@ -88,7 +101,6 @@ class FeedList extends StatefulWidget {
   final Object? loadMoreError;
   final VoidCallback? onLoadMore;
   final VoidCallback? onRetryLoadMore;
-  final Set<int> readIds;
 
   @override
   State<FeedList> createState() => _FeedListState();
@@ -179,10 +191,7 @@ class _FeedListState extends State<FeedList> {
               return const SizedBox.shrink();
             }
             final post = widget.posts[index];
-            return FeedCardItem(
-              post: post,
-              isRead: widget.readIds.contains(post.id),
-            );
+            return FeedCardItem(post: post);
           },
         ),
         Positioned(

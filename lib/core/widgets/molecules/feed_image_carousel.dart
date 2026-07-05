@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:humoruniv/core/providers/feed_video_playback_provider.dart';
@@ -144,11 +145,14 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
   Widget _buildImagePage(int index) {
     return GestureDetector(
       onTap: widget.onImageTap == null ? null : () => widget.onImageTap!(index),
-      child: Image.network(
-        widget.imageUrls[index],
+      child: CachedNetworkImage(
+        imageUrl: widget.imageUrls[index],
         width: double.infinity,
         fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => Center(
+        placeholder: (_, __) => ColoredBox(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        ),
+        errorWidget: (_, __, ___) => Center(
           child: Icon(
             Icons.broken_image_outlined,
             size: AppSizes.iconLarge * 2,
@@ -172,10 +176,10 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
       fit: StackFit.expand,
       children: [
         if (video.thumbnailUrl != null)
-          Image.network(
-            video.thumbnailUrl!,
+          CachedNetworkImage(
+            imageUrl: video.thumbnailUrl!,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => ColoredBox(color: Colors.grey[900]!),
+            errorWidget: (_, __, ___) => ColoredBox(color: Colors.grey[900]!),
           )
         else
           ColoredBox(color: Colors.grey[900]!),

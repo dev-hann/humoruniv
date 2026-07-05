@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:humoruniv/core/themes/app_colors.dart';
@@ -232,38 +233,24 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
 
   Widget _imageFor(String url) {
     return widget.imageBuilder?.call(url) ??
-        Image.network(
-          url,
-          loadingBuilder: _loadingBuilder,
-          errorBuilder: _errorBuilder,
+        CachedNetworkImage(
+          imageUrl: url,
+          progressIndicatorBuilder: (_, __, progress) {
+            final value = progress.progress;
+            return Center(
+              child: CircularProgressIndicator(
+                value: value,
+                color: AppColors.imageViewerForeground,
+              ),
+            );
+          },
+          errorWidget: (_, __, ___) => const Center(
+            child: Icon(
+              Icons.broken_image_outlined,
+              color: AppColors.imageViewerForeground,
+              size: 48,
+            ),
+          ),
         );
-  }
-
-  Widget _loadingBuilder(
-    BuildContext context,
-    Widget child,
-    ImageChunkEvent? event,
-  ) {
-    if (event == null) return child;
-    return Center(
-      child: CircularProgressIndicator(
-        value: event.cumulativeBytesLoaded / (event.expectedTotalBytes ?? 1),
-        color: AppColors.imageViewerForeground,
-      ),
-    );
-  }
-
-  Widget _errorBuilder(
-    BuildContext context,
-    Object error,
-    StackTrace? stackTrace,
-  ) {
-    return const Center(
-      child: Icon(
-        Icons.broken_image_outlined,
-        color: AppColors.imageViewerForeground,
-        size: 48,
-      ),
-    );
   }
 }

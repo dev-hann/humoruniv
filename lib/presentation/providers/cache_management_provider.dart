@@ -1,0 +1,38 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humoruniv/di/injection.dart';
+import 'package:humoruniv/data/datasources/image_cache_service.dart';
+
+class CacheManagementState {
+  const CacheManagementState({this.sizeBytes, this.loading = false});
+  final int? sizeBytes;
+  final bool loading;
+
+  CacheManagementState copyWith({int? sizeBytes, bool? loading}) =>
+      CacheManagementState(
+        sizeBytes: sizeBytes ?? this.sizeBytes,
+        loading: loading ?? this.loading,
+      );
+}
+
+class CacheManagementNotifier extends StateNotifier<CacheManagementState> {
+  CacheManagementNotifier(this._service) : super(const CacheManagementState());
+  final ImageCacheService _service;
+
+  Future<void> loadSize() async {
+    state = state.copyWith(loading: true);
+    final size = await _service.getSizeBytes();
+    state = CacheManagementState(sizeBytes: size, loading: false);
+  }
+
+  Future<void> clear() async {
+    state = state.copyWith(loading: true);
+    await _service.clear();
+    final size = await _service.getSizeBytes();
+    state = CacheManagementState(sizeBytes: size, loading: false);
+  }
+}
+
+final cacheManagementProvider =
+    StateNotifierProvider<CacheManagementNotifier, CacheManagementState>(
+      (ref) => CacheManagementNotifier(sl<ImageCacheService>()),
+    );

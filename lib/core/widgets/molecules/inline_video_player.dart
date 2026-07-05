@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humoruniv/core/providers/feed_video_playback_provider.dart';
@@ -205,12 +206,12 @@ class _InlineVideoPlayerState extends ConsumerState<InlineVideoPlayer> {
                   ),
                 )
               else if (widget.block.thumbnailUrl != null)
-                Image.network(
-                  widget.block.thumbnailUrl!,
+                CachedNetworkImage(
+                  imageUrl: widget.block.thumbnailUrl!,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
-                  errorBuilder: (_, __, ___) => _buildLoading(),
+                  errorWidget: (_, __, ___) => _buildLoading(),
                 )
               else
                 _buildLoading(),

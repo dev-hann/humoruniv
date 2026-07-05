@@ -94,8 +94,10 @@ void main() {
       );
       navigatorKey.currentState!.push(
         MaterialPageRoute(
-          builder: (_) =>
-              const ImageViewerScreen(imageUrls: ['https://example.com/a.jpg']),
+          builder: (_) => ImageViewerScreen(
+            imageUrls: ['https://example.com/a.jpg'],
+            imageBuilder: (_) => const SizedBox.shrink(),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -120,8 +122,10 @@ void main() {
       );
       navigatorKey.currentState!.push(
         MaterialPageRoute(
-          builder: (_) =>
-              const ImageViewerScreen(imageUrls: ['https://example.com/a.jpg']),
+          builder: (_) => ImageViewerScreen(
+            imageUrls: ['https://example.com/a.jpg'],
+            imageBuilder: (_) => const SizedBox.shrink(),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -144,6 +148,7 @@ void main() {
               'https://example.com/a.jpg',
               'https://example.com/b.jpg',
             ],
+            imageBuilder: (_) => const SizedBox.shrink(),
           ),
         ),
       );
@@ -172,6 +177,7 @@ void main() {
               'https://example.com/b.jpg',
             ],
             initialIndex: 1,
+            imageBuilder: (_) => const SizedBox.shrink(),
           ),
         ),
       );
@@ -193,12 +199,13 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: ImageViewerScreen(
             imageUrls: [
               'https://example.com/a.jpg',
               'https://example.com/b.jpg',
             ],
+            imageBuilder: (_) => const SizedBox.shrink(),
           ),
         ),
       );
@@ -225,6 +232,7 @@ void main() {
                 'https://example.com/long.jpg': 0.5,
                 'https://example.com/normal.jpg': 2.0,
               },
+              imageBuilder: (_) => const SizedBox.shrink(),
             ),
           ),
         );
@@ -259,6 +267,7 @@ void main() {
                 'https://example.com/normal.jpg': 2.0,
                 'https://example.com/long.jpg': 0.5,
               },
+              imageBuilder: (_) => const SizedBox.shrink(),
             ),
           ),
         );

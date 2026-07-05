@@ -9,6 +9,8 @@ import 'package:humoruniv/data/datasources/github_remote_ds.dart';
 import 'package:humoruniv/data/datasources/github_remote_ds_impl.dart';
 import 'package:humoruniv/data/datasources/humoruniv_remote_ds.dart';
 import 'package:humoruniv/data/datasources/humoruniv_remote_ds_impl.dart';
+import 'package:humoruniv/data/datasources/image_cache_service.dart';
+import 'package:humoruniv/data/datasources/image_cache_service_impl.dart';
 import 'package:humoruniv/data/repositories/apk_install_repository_impl.dart';
 import 'package:humoruniv/data/repositories/post_repository_impl.dart';
 import 'package:humoruniv/data/repositories/update_repository_impl.dart';
@@ -69,6 +71,9 @@ Future<void> configureDependencies() async {
     ),
   );
   sl.registerLazySingleton<ApkInstallerService>(ApkInstallerServiceImpl.new);
+  sl.registerLazySingleton<ImageCacheService>(
+    () => const ImageCacheServiceImpl(),
+  );
   sl.registerLazySingleton<ApkInstallRepository>(
     () => ApkInstallRepositoryImpl(
       downloadDataSource: sl<ApkDownloadDataSource>(),

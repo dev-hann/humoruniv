@@ -4,27 +4,49 @@ import 'package:humoruniv/core/widgets/molecules/dark_mode_selector.dart';
 import 'package:humoruniv/core/widgets/molecules/settings_group.dart';
 import 'package:humoruniv/core/widgets/molecules/settings_tile.dart';
 import 'package:humoruniv/core/widgets/molecules/update_banner.dart';
+import 'package:humoruniv/presentation/providers/cache_management_provider.dart';
+import 'package:humoruniv/presentation/providers/read_posts_provider.dart';
 import 'package:humoruniv/presentation/providers/theme_provider.dart';
 import 'package:humoruniv/presentation/providers/update_provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingsScreen extends ConsumerWidget {
+const _repoUrl = 'https://github.com/dev-hann/humoruniv';
+
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load the current image cache size so the tile shows it on first paint.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(cacheManagementProvider.notifier).loadSize();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
     final updateState = ref.watch(updateProvider);
+    final readState = ref.watch(readPostsProvider);
+    final cacheState = ref.watch(cacheManagementProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('설정')),
       body: ListView(
         children: [
           SettingsGroup(
-            title: '화면 설정',
+            title: '화면',
             children: [
               SettingsTile(
+                leading: const Icon(Icons.dark_mode_outlined),
                 title: '다크 모드',
                 trailing: DarkModeSelector(
                   currentMode: themeMode,
@@ -33,10 +55,38 @@ class SettingsScreen extends ConsumerWidget {
                   },
                 ),
               ),
+              SettingsTile(
+                leading: const Icon(Icons.visibility_off_outlined),
+                title: '읽은 글 흐리게 표시',
+                subtitle: '읽은 글을 회색으로 표시합니다',
+                trailing: Switch(
+                  value: readState.dimEnabled,
+                  onChanged: (value) =>
+                      ref.read(readPostsProvider.notifier).setDimEnabled(value),
+                ),
+              ),
+              SettingsTile(
+                leading: const Icon(Icons.delete_sweep_outlined),
+                title: '읽은 기록 초기화',
+                subtitle: '지금까지 읽은 글의 표시를 지웁니다',
+                destructive: true,
+                onTap: () => _confirmClearReadHistory(context),
+              ),
             ],
           ),
           SettingsGroup(
-            title: '앱 정보',
+            title: '미디어 & 데이터',
+            children: [
+              SettingsTile(
+                leading: const Icon(Icons.storage_outlined),
+                title: '이미지 캐시',
+                subtitle: '캐시 용량 ${_formatBytes(cacheState.sizeBytes)}',
+                onTap: () => _confirmClearCache(context),
+              ),
+            ],
+          ),
+          SettingsGroup(
+            title: '정보',
             children: [
               FutureBuilder<PackageInfo>(
                 future: PackageInfo.fromPlatform(),
@@ -44,7 +94,11 @@ class SettingsScreen extends ConsumerWidget {
                   final version = snapshot.hasData
                       ? 'v${snapshot.data!.version}'
                       : '...';
-                  return SettingsTile(title: '버전', subtitle: version);
+                  return SettingsTile(
+                    leading: const Icon(Icons.info_outline),
+                    title: '버전',
+                    subtitle: version,
+                  );
                 },
               ),
               UpdateBanner(
@@ -62,7 +116,7 @@ class SettingsScreen extends ConsumerWidget {
                   } else {
                     final url = updateState.release?.htmlUrl;
                     if (url != null && url.isNotEmpty) {
-                      _openUpdateUrl(context, url);
+                      _openUpdateUrl(url);
                     }
                   }
                 },
@@ -81,6 +135,23 @@ class SettingsScreen extends ConsumerWidget {
                       .openInstallPermissionSettings();
                 },
               ),
+              SettingsTile(
+                leading: const Icon(Icons.description_outlined),
+                title: '오픈소스 라이선스',
+                onTap: () => _showLicenses(context),
+              ),
+              SettingsTile(
+                leading: const Icon(Icons.code_outlined),
+                title: '소스 코드',
+                subtitle: 'GitHub',
+                onTap: () => _launchUrl(_repoUrl),
+              ),
+              SettingsTile(
+                leading: const Icon(Icons.feedback_outlined),
+                title: '피드백',
+                subtitle: '버그 신고 · 의견',
+                onTap: () => _launchUrl('$_repoUrl/issues'),
+              ),
             ],
           ),
         ],
@@ -88,15 +159,101 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _openUpdateUrl(BuildContext context, String url) async {
+  String _formatBytes(int? bytes) {
+    if (bytes == null) return '계산 중…';
+    if (bytes <= 0) return '0 B';
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  void _confirmClearReadHistory(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('읽은 기록 초기화'),
+        content: const Text('지금까지 읽은 글의 기록이 모두 삭제됩니다. 피드에서 읽은 글 표시가 사라져요.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(readPostsProvider.notifier).clear();
+              _snackbar('읽은 기록을 초기화했어요');
+            },
+            child: const Text('초기화'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmClearCache(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('이미지 캐시 삭제'),
+        content: const Text('저장된 이미지 캐시를 모두 삭제합니다.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await ref.read(cacheManagementProvider.notifier).clear();
+              _snackbar('이미지 캐시를 삭제했어요');
+            },
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _snackbar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _showLicenses(BuildContext context) {
+    showLicensePage(
+      context: context,
+      applicationName: '웃긴대학',
+      applicationLegalese: '© dev-hann',
+    );
+  }
+
+  Future<void> _openUpdateUrl(String url) async {
     final uri = Uri.parse(url);
     final launched =
         await canLaunchUrl(uri) &&
         await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!launched && context.mounted) {
+    if (!launched && mounted) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('업데이트 페이지를 열 수 없습니다.')));
+    }
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    final launched =
+        await canLaunchUrl(uri) &&
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('링크를 열 수 없습니다.')));
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:humoruniv/core/themes/app_sizes.dart';
@@ -52,17 +53,12 @@ class FeedMedia extends StatelessWidget {
         ),
       );
     }
-    return Image.network(
-      imageUrl,
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
       fit: BoxFit.cover,
-      loadingBuilder: (context, child, progress) {
-        if (progress == null) return child;
-        return const SkeletonBox(
-          width: double.infinity,
-          height: double.infinity,
-        );
-      },
-      errorBuilder: (_, __, ___) => DecoratedBox(
+      progressIndicatorBuilder: (_, __, ___) =>
+          const SkeletonBox(width: double.infinity, height: double.infinity),
+      errorWidget: (_, __, ___) => DecoratedBox(
         decoration: BoxDecoration(color: colorScheme.surfaceContainerHighest),
         child: Icon(
           Icons.broken_image_outlined,

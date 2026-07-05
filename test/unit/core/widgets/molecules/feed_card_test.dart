@@ -181,7 +181,7 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.byType(Image).first);
+      await tester.tap(find.byType(FeedImageCarousel));
       expect(tapped, 0);
     });
 

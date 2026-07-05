@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:humoruniv/core/themes/app_radius.dart';
@@ -42,12 +43,12 @@ class Thumbnail extends StatelessWidget {
 
     return ClipRRect(
       borderRadius: AppRadius.borderRadiusSm,
-      child: Image.network(
-        imageUrl!,
+      child: CachedNetworkImage(
+        imageUrl: imageUrl!,
         width: _dimension,
         height: _dimension,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => SizedBox(
+        errorWidget: (_, __, ___) => SizedBox(
           width: _dimension,
           height: _dimension,
           child: DecoratedBox(
