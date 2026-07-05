@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:humoruniv/core/themes/app_colors.dart';
 import 'package:humoruniv/core/themes/app_radius.dart';
@@ -77,12 +78,18 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     for (final url in widget.imageUrls) {
       _resolveAspect(url);
     }
+    // Hide the status and navigation bars so the image fills the whole screen
+    // (otherwise the status bar overlays the top of the image). Restored in
+    // dispose. immersiveSticky lets the bars briefly reappear on edge swipe.
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 
   @override
   void dispose() {
     _transformController.dispose();
     _pageController.dispose();
+    // Restore the system UI mode used by the rest of the app.
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
@@ -186,7 +193,9 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
           body,
           if (multiple)
             Positioned(
-              bottom: AppSizes.imageViewerIndicatorBottom,
+              bottom:
+                  MediaQuery.paddingOf(context).bottom +
+                  AppSizes.imageViewerIndicatorBottom,
               left: 0,
               right: 0,
               child: Center(
