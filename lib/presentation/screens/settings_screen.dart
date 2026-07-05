@@ -5,7 +5,6 @@ import 'package:humoruniv/core/widgets/molecules/settings_group.dart';
 import 'package:humoruniv/core/widgets/molecules/settings_tile.dart';
 import 'package:humoruniv/core/widgets/molecules/update_banner.dart';
 import 'package:humoruniv/presentation/providers/cache_management_provider.dart';
-import 'package:humoruniv/presentation/providers/read_posts_provider.dart';
 import 'package:humoruniv/presentation/providers/theme_provider.dart';
 import 'package:humoruniv/presentation/providers/update_provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -35,7 +34,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
     final updateState = ref.watch(updateProvider);
-    final readState = ref.watch(readPostsProvider);
     final cacheState = ref.watch(cacheManagementProvider);
 
     return Scaffold(
@@ -54,23 +52,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ref.read(themeProvider.notifier).setThemeMode(option);
                   },
                 ),
-              ),
-              SettingsTile(
-                leading: const Icon(Icons.visibility_off_outlined),
-                title: '읽은 글 흐리게 표시',
-                subtitle: '읽은 글을 회색으로 표시합니다',
-                trailing: Switch(
-                  value: readState.dimEnabled,
-                  onChanged: (value) =>
-                      ref.read(readPostsProvider.notifier).setDimEnabled(value),
-                ),
-              ),
-              SettingsTile(
-                leading: const Icon(Icons.delete_sweep_outlined),
-                title: '읽은 기록 초기화',
-                subtitle: '지금까지 읽은 글의 표시를 지웁니다',
-                destructive: true,
-                onTap: () => _confirmClearReadHistory(context),
               ),
             ],
           ),
@@ -146,12 +127,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 subtitle: 'GitHub',
                 onTap: () => _launchUrl(_repoUrl),
               ),
-              SettingsTile(
-                leading: const Icon(Icons.feedback_outlined),
-                title: '피드백',
-                subtitle: '버그 신고 · 의견',
-                onTap: () => _launchUrl('$_repoUrl/issues'),
-              ),
             ],
           ),
         ],
@@ -165,33 +140,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-  }
-
-  void _confirmClearReadHistory(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('읽은 기록 초기화'),
-        content: const Text('지금까지 읽은 글의 기록이 모두 삭제됩니다. 피드에서 읽은 글 표시가 사라져요.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(ctx).colorScheme.error,
-            ),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              ref.read(readPostsProvider.notifier).clear();
-              _snackbar('읽은 기록을 초기화했어요');
-            },
-            child: const Text('초기화'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _confirmClearCache(BuildContext context) {

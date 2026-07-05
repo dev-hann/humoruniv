@@ -19,14 +19,12 @@ class FeedCard extends StatelessWidget {
     this.detailLoading = false,
     this.onImageTap,
     this.onCommentsTap,
-    this.isRead = false,
   });
   final BoardPost post;
   final PostDetail? detail;
   final bool detailLoading;
   final ValueChanged<int>? onImageTap;
   final VoidCallback? onCommentsTap;
-  final bool isRead;
 
   bool get _hasImages => detail != null && detail!.imageUrls.isNotEmpty;
 
@@ -128,9 +126,7 @@ class FeedCard extends StatelessWidget {
   }
 
   Widget _caption(TextTheme textTheme, ColorScheme colorScheme) {
-    final titleColor = isRead
-        ? colorScheme.onSurfaceVariant
-        : colorScheme.onSurface;
+    final titleColor = colorScheme.onSurface;
     final body = _bodyText;
     return Padding(
       padding: AppSpacing.edgeH16,

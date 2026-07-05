@@ -10,7 +10,6 @@ import 'package:humoruniv/core/widgets/states/skeleton_feed_card.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/domain/entities/board_post.dart';
 import 'package:humoruniv/presentation/providers/post_detail_provider.dart';
-import 'package:humoruniv/presentation/providers/read_posts_provider.dart';
 import 'package:humoruniv/presentation/screens/image_viewer_screen.dart';
 import 'package:humoruniv/presentation/widgets/feed_comments_sheet.dart';
 
@@ -37,24 +36,10 @@ class _FeedCardItemState extends ConsumerState<FeedCardItem>
     final hasImages = detail != null && detail.imageUrls.isNotEmpty;
     final hasComments = detail != null && detail.comments.isNotEmpty;
 
-    final readState = ref.watch(readPostsProvider);
-    final isRead = readState.isRead(widget.post.id);
-
-    // Once the post detail has loaded (prefetched when it scrolled into view),
-    // record it as read. Scheduled post-frame to avoid mutating provider state
-    // during build; idempotent so the guard skips repeats.
-    if (detail != null && !readState.ids.contains(widget.post.id)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        ref.read(readPostsProvider.notifier).markRead(widget.post.id);
-      });
-    }
-
     return FeedCard(
       post: widget.post,
       detail: detail,
       detailLoading: asyncDetail.isLoading,
-      isRead: isRead,
       onImageTap: !hasImages
           ? null
           : (i) => Navigator.of(context).push(

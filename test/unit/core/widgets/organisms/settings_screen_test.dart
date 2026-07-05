@@ -172,24 +172,7 @@ void main() {
       expect(find.text('v1.1.0'), findsNothing);
     });
 
-    testWidgets('shows the read-post dimming toggle on by default', (
-      tester,
-    ) async {
-      when(() => mockRepository.getLatestRelease()).thenAnswer(
-        (_) async => const Right(
-          AppRelease(version: '1.0.0', htmlUrl: 'https://example.com'),
-        ),
-      );
-
-      await tester.pumpWidget(buildApp());
-      await tester.pumpAndSettle();
-
-      expect(find.text('읽은 글 흐리게 표시'), findsOneWidget);
-      final sw = tester.widget<Switch>(find.byType(Switch));
-      expect(sw.value, true);
-    });
-
-    testWidgets('renders the new About tiles (licenses, source, feedback)', (
+    testWidgets('renders the new About tiles (licenses, source)', (
       tester,
     ) async {
       when(() => mockRepository.getLatestRelease()).thenAnswer(
@@ -203,7 +186,7 @@ void main() {
 
       expect(find.text('오픈소스 라이선스'), findsOneWidget);
       expect(find.text('소스 코드'), findsOneWidget);
-      expect(find.text('피드백'), findsOneWidget);
+      expect(find.text('피드백'), findsNothing);
     });
 
     testWidgets('renders the image cache tile showing the cache size', (
