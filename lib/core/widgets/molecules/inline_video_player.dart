@@ -7,6 +7,7 @@ import 'package:humoruniv/core/providers/feed_video_playback_provider.dart';
 import 'package:humoruniv/core/themes/app_colors.dart';
 import 'package:humoruniv/core/themes/app_durations.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
+import 'package:humoruniv/core/widgets/atoms/video_surface.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -191,20 +192,7 @@ class _InlineVideoPlayerState extends ConsumerState<InlineVideoPlayer> {
               if (_hasError)
                 _buildError()
               else if (_isInitialized)
-                ClipRect(
-                  child: SizedBox(
-                    width: _controller!.value.size.width,
-                    height: _controller!.value.size.height,
-                    child: FittedBox(
-                      fit: BoxFit.cover,
-                      child: SizedBox(
-                        width: _controller!.value.size.width,
-                        height: _controller!.value.size.height,
-                        child: VideoPlayer(_controller!),
-                      ),
-                    ),
-                  ),
-                )
+                VideoSurface(controller: _controller!)
               else if (widget.block.thumbnailUrl != null)
                 CachedNetworkImage(
                   imageUrl: widget.block.thumbnailUrl!,
@@ -555,20 +543,7 @@ class _FullscreenVideoPlayerState extends State<_FullscreenVideoPlayer> {
                       if (_hasError)
                         _buildError()
                       else if (_isInitialized)
-                        ClipRect(
-                          child: SizedBox(
-                            width: _controller!.value.size.width,
-                            height: _controller!.value.size.height,
-                            child: FittedBox(
-                              fit: BoxFit.cover,
-                              child: SizedBox(
-                                width: _controller!.value.size.width,
-                                height: _controller!.value.size.height,
-                                child: VideoPlayer(_controller!),
-                              ),
-                            ),
-                          ),
-                        )
+                        VideoSurface(controller: _controller!)
                       else
                         const Center(
                           child: CircularProgressIndicator(color: Colors.white),

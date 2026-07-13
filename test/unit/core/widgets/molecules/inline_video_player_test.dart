@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/providers/feed_video_playback_provider.dart';
+import 'package:humoruniv/core/widgets/atoms/video_surface.dart';
 import 'package:humoruniv/core/widgets/molecules/inline_video_player.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
+import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 Widget _wrapped(Widget child) => ProviderScope(
@@ -91,6 +93,28 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.byType(InlineVideoPlayer), findsOneWidget);
         expect(find.byIcon(Icons.fullscreen), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'video surface should fit contain so original content is never cropped',
+      (tester) async {
+        final controller = VideoPlayerController.networkUrl(
+          Uri.parse('https://example.com/video.mp4'),
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(body: VideoSurface(controller: controller)),
+          ),
+        );
+        await tester.pump();
+
+        final fitted = tester.widget<FittedBox>(find.byType(FittedBox));
+        expect(
+          fitted.fit,
+          BoxFit.contain,
+          reason: 'video must use contain, never cover, to avoid cropping',
+        );
       },
     );
   });
