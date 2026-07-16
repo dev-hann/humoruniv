@@ -47,6 +47,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ref.read(boardPostsProvider.notifier).fetchNextPage(),
             onRetryLoadMore: () =>
                 ref.read(boardPostsProvider.notifier).fetchNextPage(),
+            onRefresh: () => ref.invalidate(boardPostsProvider),
           ),
         ),
       ),

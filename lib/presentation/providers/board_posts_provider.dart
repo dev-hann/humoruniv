@@ -86,9 +86,13 @@ class BoardPostsNotifier extends AsyncNotifier<BoardPostsState> {
       },
       (data) {
         final prev = state.value ?? current;
+        final existingIds = prev.posts.map((p) => p.id).toSet();
+        final fresh = data.posts
+            .where((p) => !existingIds.contains(p.id))
+            .toList();
         state = AsyncData(
           prev.copyWith(
-            posts: [...prev.posts, ...data.posts],
+            posts: [...prev.posts, ...fresh],
             currentPage: data.currentPage,
             totalPage: data.totalPage,
             isLoadingMore: false,

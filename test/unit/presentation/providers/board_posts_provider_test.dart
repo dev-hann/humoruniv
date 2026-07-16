@@ -320,4 +320,90 @@ void main() {
     expect(state.loadMoreError, isNotNull);
     expect(state.isLoadingMore, isFalse);
   });
+
+  test(
+    'fetchNextPage should drop only already-present ids and keep new ones',
+    () async {
+      const page0 = BoardListResult(
+        posts: [
+          BoardPost(
+            id: 1,
+            title: 'Post 1',
+            url: '/board/read.html?table=pds&number=1',
+            author: 'user',
+            date: '2026-05-15',
+            recommendCount: 50,
+            notRecommendCount: 1,
+            commentCount: 10,
+            viewCount: 500,
+            thumbnailUrl: '',
+          ),
+        ],
+        currentPage: 0,
+        totalPage: 3,
+      );
+      const page1 = BoardListResult(
+        posts: [
+          BoardPost(
+            id: 1,
+            title: 'Post 1 dup',
+            url: '/board/read.html?table=pds&number=1',
+            author: 'user',
+            date: '2026-05-15',
+            recommendCount: 50,
+            notRecommendCount: 1,
+            commentCount: 10,
+            viewCount: 500,
+            thumbnailUrl: '',
+          ),
+          BoardPost(
+            id: 2,
+            title: 'Post 2 new',
+            url: '/board/read.html?table=pds&number=2',
+            author: 'user2',
+            date: '2026-05-16',
+            recommendCount: 30,
+            notRecommendCount: 0,
+            commentCount: 5,
+            viewCount: 200,
+            thumbnailUrl: '',
+          ),
+        ],
+        currentPage: 1,
+        totalPage: 3,
+      );
+      when(
+        () => mockRepository.getBoardPosts('pds', 0, SortOption.all),
+      ).thenAnswer((_) async => const Right(page0));
+      when(
+        () => mockRepository.getBoardPosts('pds', 1, SortOption.all),
+      ).thenAnswer((_) async => const Right(page1));
+
+      final container = ProviderContainer(
+        overrides: [
+          boardPostsParamsProvider.overrideWith(
+            (ref) => const BoardPostsParams(table: 'pds', sort: SortOption.all),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(boardPostsProvider.future);
+      await container.read(boardPostsProvider.notifier).fetchNextPage();
+
+      final state = container.read(boardPostsProvider).value!;
+      expect(
+        state.posts,
+        hasLength(2),
+        reason: 'duplicate id should be dropped, new id kept',
+      );
+      expect(state.posts.map((p) => p.id), [1, 2]);
+      expect(
+        state.currentPage,
+        1,
+        reason: 'page pointer must still advance to avoid refetch loop',
+      );
+      expect(state.hasMore, isTrue);
+    },
+  );
 }

@@ -75,6 +75,7 @@ class FeedList extends StatefulWidget {
     this.loadMoreError,
     this.onLoadMore,
     this.onRetryLoadMore,
+    this.onRefresh,
   });
   final List<BoardPost> posts;
   final bool isLoading;
@@ -86,6 +87,7 @@ class FeedList extends StatefulWidget {
   final Object? loadMoreError;
   final VoidCallback? onLoadMore;
   final VoidCallback? onRetryLoadMore;
+  final VoidCallback? onRefresh;
 
   @override
   State<FeedList> createState() => _FeedListState();
@@ -194,6 +196,7 @@ class _FeedListState extends State<FeedList> {
               if (_controller.hasClients) {
                 _controller.jumpTo(0);
               }
+              widget.onRefresh?.call();
             },
           ),
         ),

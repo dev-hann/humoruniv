@@ -227,6 +227,43 @@ void main() {
       expect(tester.widget<AnimatedOpacity>(feedOpacity()).opacity, 0.0);
     });
 
+    testWidgets('tapping scroll-to-top also triggers onRefresh callback', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      var refreshCalled = false;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides(),
+          child: MaterialApp(
+            home: Scaffold(
+              body: FeedList(
+                posts: manyPosts(),
+                onRefresh: () => refreshCalled = true,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.drag(feedScrollable(), const Offset(0, -700));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(ScrollToTopButton));
+      await tester.pumpAndSettle();
+
+      expect(refreshCalled, isTrue);
+      expect(
+        tester.state<ScrollableState>(feedScrollable()).position.pixels,
+        0,
+      );
+    });
+
     testWidgets(
       'scroll-to-top button is absent in loading/error/empty states',
       (tester) async {
