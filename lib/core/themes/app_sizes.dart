@@ -21,6 +21,7 @@ abstract final class AppSizes {
 
   static const double imagePlaceholderHeight = 200;
   static const double imageViewerIndicatorBottom = 32;
+  static const double imageViewerIndicatorHeight = 32;
 
   static const double feedMediaHeightRatio = 0.66;
   static const double feedMediaMinHeight = 420;

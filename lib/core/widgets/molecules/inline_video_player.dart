@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humoruniv/core/providers/feed_video_playback_provider.dart';
 import 'package:humoruniv/core/themes/app_colors.dart';
 import 'package:humoruniv/core/themes/app_durations.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
+import 'package:humoruniv/core/widgets/atoms/retryable_network_image.dart';
 import 'package:humoruniv/core/widgets/atoms/video_surface.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:video_player/video_player.dart';
@@ -194,12 +194,13 @@ class _InlineVideoPlayerState extends ConsumerState<InlineVideoPlayer> {
               else if (_isInitialized)
                 VideoSurface(controller: _controller!)
               else if (widget.block.thumbnailUrl != null)
-                CachedNetworkImage(
+                RetryableNetworkImage(
                   imageUrl: widget.block.thumbnailUrl!,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
-                  errorWidget: (_, __, ___) => _buildLoading(),
+                  placeholderColor: Colors.black,
+                  foregroundColor: AppColors.imageViewerForeground,
                 )
               else
                 _buildLoading(),

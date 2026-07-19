@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -7,6 +6,7 @@ import 'package:humoruniv/core/themes/app_radius.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/core/utils/long_image.dart';
+import 'package:humoruniv/core/widgets/atoms/retryable_network_image.dart';
 
 /// Full-screen image viewer.
 ///
@@ -223,10 +223,24 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   Widget _buildPage(int index) {
     final url = widget.imageUrls[index];
     if (_isLongImage(index)) {
+      // Reserve space below the image equal to the floating page indicator's
+      // footprint (system bottom inset + offset + indicator height) so the
+      // user can scroll the image's bottom edge above the overlay. Without
+      // this, the indicator obscures the last slice of a long comic.
+      final bottomReserve =
+          MediaQuery.paddingOf(context).bottom +
+          AppSizes.imageViewerIndicatorBottom +
+          AppSizes.imageViewerIndicatorHeight;
       return SingleChildScrollView(
         child: SizedBox(
           width: MediaQuery.sizeOf(context).width,
-          child: _imageFor(url),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _imageFor(url),
+              SizedBox(height: bottomReserve),
+            ],
+          ),
         ),
       );
     }
@@ -242,24 +256,10 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
 
   Widget _imageFor(String url) {
     return widget.imageBuilder?.call(url) ??
-        CachedNetworkImage(
+        RetryableNetworkImage(
           imageUrl: url,
-          progressIndicatorBuilder: (_, __, progress) {
-            final value = progress.progress;
-            return Center(
-              child: CircularProgressIndicator(
-                value: value,
-                color: AppColors.imageViewerForeground,
-              ),
-            );
-          },
-          errorWidget: (_, __, ___) => const Center(
-            child: Icon(
-              Icons.broken_image_outlined,
-              color: AppColors.imageViewerForeground,
-              size: 48,
-            ),
-          ),
+          placeholderColor: Colors.black,
+          foregroundColor: AppColors.imageViewerForeground,
         );
   }
 }

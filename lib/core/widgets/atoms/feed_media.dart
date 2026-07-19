@@ -1,9 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
-import 'package:humoruniv/core/widgets/atoms/skeleton_box.dart';
+import 'package:humoruniv/core/widgets/atoms/retryable_network_image.dart';
 
 class FeedMedia extends StatelessWidget {
   const FeedMedia({
@@ -20,7 +19,6 @@ class FeedMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final height = AppSizes.feedMediaHeight(
       screenHeight ?? MediaQuery.sizeOf(context).height,
     );
@@ -34,7 +32,7 @@ class FeedMedia extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            _content(context, colorScheme),
+            _content(context),
             if (additionalImageCount > 0) _multiBadge(context),
           ],
         ),
@@ -42,31 +40,20 @@ class FeedMedia extends StatelessWidget {
     );
   }
 
-  Widget _content(BuildContext context, ColorScheme colorScheme) {
+  Widget _content(BuildContext context) {
     if (imageUrl.isEmpty) {
       return DecoratedBox(
-        decoration: BoxDecoration(color: colorScheme.surfaceContainerHighest),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        ),
         child: Icon(
           Icons.image_outlined,
           size: AppSizes.iconLarge * 2,
-          color: colorScheme.onSurfaceVariant,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       );
     }
-    return CachedNetworkImage(
-      imageUrl: imageUrl,
-      fit: BoxFit.cover,
-      progressIndicatorBuilder: (_, __, ___) =>
-          const SkeletonBox(width: double.infinity, height: double.infinity),
-      errorWidget: (_, __, ___) => DecoratedBox(
-        decoration: BoxDecoration(color: colorScheme.surfaceContainerHighest),
-        child: Icon(
-          Icons.broken_image_outlined,
-          size: AppSizes.iconLarge * 2,
-          color: colorScheme.onSurfaceVariant,
-        ),
-      ),
-    );
+    return RetryableNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover);
   }
 
   Widget _multiBadge(BuildContext context) {

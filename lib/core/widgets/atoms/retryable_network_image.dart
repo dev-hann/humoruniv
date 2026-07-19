@@ -1,0 +1,173 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:humoruniv/core/widgets/atoms/retry_controller.dart';
+
+class RetryableNetworkImage extends StatefulWidget {
+  const RetryableNetworkImage({
+    required this.imageUrl,
+    this.fit,
+    this.width,
+    this.height,
+    this.maxAttempts = 3,
+    this.retryDelay = const Duration(milliseconds: 500),
+    this.errorIcon = Icons.refresh,
+    this.placeholderColor,
+    this.foregroundColor,
+    this.borderRadius,
+    this.controller,
+    super.key,
+  });
+
+  final String imageUrl;
+  final BoxFit? fit;
+  final double? width;
+  final double? height;
+  final int maxAttempts;
+  final Duration retryDelay;
+  final IconData errorIcon;
+  final Color? placeholderColor;
+  final Color? foregroundColor;
+  final BorderRadius? borderRadius;
+  final RetryController? controller;
+
+  @override
+  State<RetryableNetworkImage> createState() => _RetryableNetworkImageState();
+}
+
+class _RetryableNetworkImageState extends State<RetryableNetworkImage> {
+  final RetryController _ownedController = RetryController();
+
+  RetryController get _controller => widget.controller ?? _ownedController;
+
+  @override
+  void didUpdateWidget(covariant RetryableNetworkImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageUrl != widget.imageUrl) {
+      _controller.resetForUrl(widget.imageUrl);
+    }
+  }
+
+  @override
+  void dispose() {
+    _ownedController.dispose();
+    super.dispose();
+  }
+
+  void _onFailureDetected() {
+    if (!mounted) return;
+    final prevExhausted = _controller.isExhausted;
+    _controller.recordFailure();
+    if (_controller.isExhausted != prevExhausted || _controller.canAutoRetry) {
+      setState(() {});
+    }
+  }
+
+  void _onManualRetry() {
+    _controller.manualRetry();
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final background =
+        widget.placeholderColor ?? colorScheme.surfaceContainerHighest;
+    final foreground = widget.foregroundColor ?? colorScheme.onSurfaceVariant;
+
+    final Widget content;
+    if (_controller.isExhausted) {
+      content = _RetryErrorView(
+        icon: widget.errorIcon,
+        foreground: foreground,
+        background: background,
+        showHint: true,
+        onTap: _onManualRetry,
+      );
+    } else {
+      content = CachedNetworkImage(
+        key: ValueKey('${widget.imageUrl}#${_controller.attempt}'),
+        imageUrl: widget.imageUrl,
+        fit: widget.fit,
+        width: widget.width,
+        height: widget.height,
+        errorWidget: (_, __, ___) => _FailureMarker(
+          onFailure: _onFailureDetected,
+          child: const SizedBox.shrink(),
+        ),
+      );
+    }
+
+    if (widget.borderRadius != null) {
+      return ClipRRect(borderRadius: widget.borderRadius!, child: content);
+    }
+    return content;
+  }
+}
+
+class _FailureMarker extends StatefulWidget {
+  const _FailureMarker({required this.onFailure, required this.child});
+
+  final VoidCallback onFailure;
+  final Widget child;
+
+  @override
+  State<_FailureMarker> createState() => _FailureMarkerState();
+}
+
+class _FailureMarkerState extends State<_FailureMarker> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.onFailure();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
+
+class _RetryErrorView extends StatelessWidget {
+  const _RetryErrorView({
+    required this.icon,
+    required this.foreground,
+    required this.background,
+    required this.showHint,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color foreground;
+  final Color background;
+  final bool showHint;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: background,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: foreground),
+              if (showHint) ...[
+                const SizedBox(height: 4),
+                Text(
+                  '탭하여 재시도',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelSmall?.copyWith(color: foreground),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

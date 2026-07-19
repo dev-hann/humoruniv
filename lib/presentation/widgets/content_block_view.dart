@@ -1,7 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:humoruniv/core/themes/app_colors.dart';
-import 'package:humoruniv/core/themes/app_spacing.dart';
+import 'package:humoruniv/core/widgets/atoms/retryable_network_image.dart';
 import 'package:humoruniv/core/widgets/molecules/inline_video_player.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:humoruniv/presentation/screens/image_viewer_screen.dart';
@@ -68,29 +67,10 @@ class _CompactImageThumbnail extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 200),
-            child: CachedNetworkImage(
+            child: RetryableNetworkImage(
               imageUrl: block.url,
               fit: BoxFit.cover,
               width: double.infinity,
-              progressIndicatorBuilder: (_, __, progress) {
-                return Container(
-                  height: 200,
-                  color: AppColors.imagePlaceholder,
-                  child: Center(
-                    child: CircularProgressIndicator(value: progress.progress),
-                  ),
-                );
-              },
-              errorWidget: (_, __, ___) => Container(
-                height: 60,
-                color: AppColors.imagePlaceholder,
-                child: Center(
-                  child: Icon(
-                    Icons.broken_image,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                ),
-              ),
             ),
           ),
         ),
@@ -128,11 +108,10 @@ class _CompactVideoThumbnail extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 if (block.thumbnailUrl != null)
-                  CachedNetworkImage(
+                  RetryableNetworkImage(
                     imageUrl: block.thumbnailUrl!,
                     fit: BoxFit.cover,
                     width: double.infinity,
-                    errorWidget: (_, __, ___) => _buildPlaceholder(),
                   )
                 else
                   _buildPlaceholder(),

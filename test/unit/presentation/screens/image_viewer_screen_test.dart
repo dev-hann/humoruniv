@@ -56,6 +56,41 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsNothing);
     });
 
+    testWidgets(
+      'long image page reserves bottom scroll space so the indicator does '
+      'not obscure the bottom of the image',
+      (tester) async {
+        // Default test viewport is 800x600; with extendBodyBehindAppBar the
+        // body fills it, so viewport height = 600. A 2000-tall long image
+        // without any bottom reserve would have maxScrollExtent = 1400.
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ImageViewerScreen(
+              imageUrls: ['https://example.com/long.jpg'],
+              knownAspects: {'https://example.com/long.jpg': 0.5},
+              imageBuilder: (_) => Container(height: 2000, color: Colors.red),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final scrollable = tester.state<ScrollableState>(
+          find.descendant(
+            of: find.byType(SingleChildScrollView),
+            matching: find.byType(Scrollable),
+          ),
+        );
+
+        expect(
+          scrollable.position.maxScrollExtent,
+          greaterThan(1400),
+          reason:
+              'long image page must add bottom reserve so its bottom can be '
+              'scrolled above the floating page indicator',
+        );
+      },
+    );
+
     testWidgets('renders vertical SingleChildScrollView for a long image '
         'instead of InteractiveViewer', (tester) async {
       // aspect 0.5 (tall) < viewportAspect 1.33 → long image.
