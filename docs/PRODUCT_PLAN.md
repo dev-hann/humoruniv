@@ -137,7 +137,7 @@ Navigation rules:
 
 ### ImageViewerScreen — Phase: P0
 
-- Fullscreen, black background, status bar hidden.
+- Fullscreen, black background. Status bar visible; SafeArea applied.
 - Left/right swipe between images in the post.
 - Pinch to zoom, double-tap to reset.
 - Position indicator: "3 / 12".

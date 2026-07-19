@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:humoruniv/core/themes/app_colors.dart';
 import 'package:humoruniv/core/themes/app_radius.dart';
@@ -78,18 +77,12 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     for (final url in widget.imageUrls) {
       _resolveAspect(url);
     }
-    // Hide the status and navigation bars so the image fills the whole screen
-    // (otherwise the status bar overlays the top of the image). Restored in
-    // dispose. immersiveSticky lets the bars briefly reappear on edge swipe.
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 
   @override
   void dispose() {
     _transformController.dispose();
     _pageController.dispose();
-    // Restore the system UI mode used by the rest of the app.
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
@@ -179,43 +172,42 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
 
     return Scaffold(
       backgroundColor: Colors.black,
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: AppColors.imageViewerForeground),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Stack(
-        children: [
-          body,
-          if (multiple)
-            Positioned(
-              bottom:
-                  MediaQuery.paddingOf(context).bottom +
-                  AppSizes.imageViewerIndicatorBottom,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  padding: AppSpacing.edgeH12V6,
-                  decoration: const BoxDecoration(
-                    color: AppColors.imageViewerOverlay,
-                    borderRadius: AppRadius.borderRadiusXl,
-                  ),
-                  child: Text(
-                    '${_currentIndex + 1} / ${widget.imageUrls.length}',
-                    style: const TextStyle(
-                      color: AppColors.imageViewerForeground,
-                      fontSize: 16,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            body,
+            if (multiple)
+              Positioned(
+                bottom: AppSizes.imageViewerIndicatorBottom,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding: AppSpacing.edgeH12V6,
+                    decoration: const BoxDecoration(
+                      color: AppColors.imageViewerOverlay,
+                      borderRadius: AppRadius.borderRadiusXl,
+                    ),
+                    child: Text(
+                      '${_currentIndex + 1} / ${widget.imageUrls.length}',
+                      style: const TextStyle(
+                        color: AppColors.imageViewerForeground,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -224,11 +216,10 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     final url = widget.imageUrls[index];
     if (_isLongImage(index)) {
       // Reserve space below the image equal to the floating page indicator's
-      // footprint (system bottom inset + offset + indicator height) so the
-      // user can scroll the image's bottom edge above the overlay. Without
-      // this, the indicator obscures the last slice of a long comic.
+      // footprint (offset + indicator height) so the user can scroll the
+      // image's bottom edge above the overlay. SafeArea already consumes the
+      // system bottom inset, so we only need the indicator's own footprint.
       final bottomReserve =
-          MediaQuery.paddingOf(context).bottom +
           AppSizes.imageViewerIndicatorBottom +
           AppSizes.imageViewerIndicatorHeight;
       return SingleChildScrollView(
