@@ -24,11 +24,9 @@ class SettingsGroup extends StatelessWidget {
             ),
             child: Text(title, style: Theme.of(context).textTheme.titleSmall),
           ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainer,
-              borderRadius: AppRadius.borderRadiusLg,
-            ),
+          Material(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: AppRadius.borderRadiusLg,
             child: Column(children: _buildChildrenWithDividers()),
           ),
         ],
