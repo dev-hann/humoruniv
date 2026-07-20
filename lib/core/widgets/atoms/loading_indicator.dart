@@ -7,7 +7,7 @@ class LoadingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.p16),
       child: Center(
         child: SizedBox(
           width: 24,
@@ -34,7 +34,7 @@ class LoadMoreError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.p12),
       child: Center(
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -52,7 +52,7 @@ class LoadMoreError extends StatelessWidget {
               ),
             ),
             AppSpacing.sbW8,
-            TextButton(onPressed: onRetry, child: const Text('다시 시도')),
+            FilledButton.tonal(onPressed: onRetry, child: const Text('다시 시도')),
           ],
         ),
       ),

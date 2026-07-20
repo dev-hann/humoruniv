@@ -12,6 +12,8 @@ import 'package:humoruniv/domain/entities/content_block.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+const Duration _kControlsHideDelay = Duration(seconds: 3);
+
 class InlineVideoPlayer extends ConsumerStatefulWidget {
   const InlineVideoPlayer({
     required this.block,
@@ -104,7 +106,7 @@ class _InlineVideoPlayerState extends ConsumerState<InlineVideoPlayer> {
 
   void _startHideTimer() {
     _hideTimer?.cancel();
-    _hideTimer = Timer(const Duration(seconds: 3), () {
+    _hideTimer = Timer(_kControlsHideDelay, () {
       if (mounted &&
           _isInitialized &&
           _controller != null &&
@@ -466,7 +468,7 @@ class _FullscreenVideoPlayerState extends State<_FullscreenVideoPlayer> {
 
   void _startHideTimer() {
     _hideTimer?.cancel();
-    _hideTimer = Timer(const Duration(seconds: 3), () {
+    _hideTimer = Timer(_kControlsHideDelay, () {
       if (mounted &&
           _isInitialized &&
           _controller != null &&

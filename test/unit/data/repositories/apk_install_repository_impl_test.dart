@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/data/datasources/apk_download_data_source.dart';
 import 'package:humoruniv/data/datasources/apk_installer_service.dart';
 import 'package:humoruniv/data/repositories/apk_install_repository_impl.dart';
-import 'package:humoruniv/domain/entities/download_progress.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockApkInstallerService extends Mock implements ApkInstallerService {}

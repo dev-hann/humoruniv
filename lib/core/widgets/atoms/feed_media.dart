@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:humoruniv/core/themes/app_colors.dart';
+import 'package:humoruniv/core/themes/app_radius.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/core/widgets/atoms/retryable_network_image.dart';
@@ -26,15 +28,19 @@ class FeedMedia extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: double.infinity,
-        height: height,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            _content(context),
-            if (additionalImageCount > 0) _multiBadge(context),
-          ],
+      child: Semantics(
+        label: '미디어 — 탭하여 전체 화면으로 보기',
+        button: true,
+        child: SizedBox(
+          width: double.infinity,
+          height: height,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              _content(context),
+              if (additionalImageCount > 0) _multiBadge(context),
+            ],
+          ),
         ),
       ),
     );
@@ -61,18 +67,15 @@ class FeedMedia extends StatelessWidget {
       top: AppSpacing.p8,
       right: AppSpacing.p8,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.p8,
-          vertical: AppSpacing.p4,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.black54,
-          borderRadius: BorderRadius.circular(12),
+        padding: AppSpacing.edgeH8V4,
+        decoration: const BoxDecoration(
+          color: AppColors.imageViewerOverlay,
+          borderRadius: AppRadius.borderRadiusLg,
         ),
         child: Text(
           '+$additionalImageCount',
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: Colors.white,
+            color: AppColors.imageViewerForeground,
             fontWeight: FontWeight.w700,
           ),
         ),

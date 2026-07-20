@@ -28,38 +28,42 @@ class TextPostCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: double.infinity,
-        height: height,
-        child: ColoredBox(
-          color: colorScheme.primary,
-          child: Padding(
-            padding: AppSpacing.edgeAll16,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: textTheme.headlineSmall?.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (secondary != null) ...[
-                  AppSpacing.sbH8,
+      child: Semantics(
+        label: '게시글 — 탭하여 전체 화면으로 보기',
+        button: true,
+        child: SizedBox(
+          width: double.infinity,
+          height: height,
+          child: ColoredBox(
+            color: colorScheme.primary,
+            child: Padding(
+              padding: AppSpacing.edgeAll16,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    secondary!,
-                    style: textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onPrimary.withOpacity(0.92),
+                    title,
+                    style: textTheme.headlineSmall?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.w600,
                     ),
-                    maxLines: 2,
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (secondary != null) ...[
+                    AppSpacing.sbH8,
+                    Text(
+                      secondary!,
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onPrimary.withValues(alpha: 0.92),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),

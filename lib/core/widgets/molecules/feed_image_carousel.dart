@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:humoruniv/core/providers/feed_video_playback_provider.dart';
+import 'package:humoruniv/core/themes/app_colors.dart';
+import 'package:humoruniv/core/themes/app_durations.dart';
+import 'package:humoruniv/core/themes/app_radius.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
+import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/core/widgets/atoms/retryable_network_image.dart';
 import 'package:humoruniv/core/widgets/molecules/inline_video_player.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
@@ -27,7 +31,11 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
   final PageController _controller = PageController();
   int _page = 0;
   int? _expandedVideoIndex;
-  static final Map<String, double> _aspectCache = {};
+
+  /// Process-lifetime LRU cache of measured image aspect ratios so the
+  /// carousel can size itself correctly before images finish loading.
+  /// Bounded to avoid unbounded growth as the user scrolls the feed.
+  static final _AspectCache _aspectCache = _AspectCache(maxEntries: 200);
 
   int get _totalCount => widget.imageUrls.length + widget.videoBlocks.length;
 
@@ -93,7 +101,7 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
     final height = (screenW / aspect).clamp(120.0, AppSizes.feedMediaMaxHeight);
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+      duration: AppDurations.medium,
       width: double.infinity,
       height: height,
       child: Stack(
@@ -115,22 +123,19 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
           ),
           if (multiple)
             Positioned(
-              top: 8,
-              right: 8,
+              top: AppSpacing.p8,
+              right: AppSpacing.p8,
               child: IgnorePointer(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(12),
+                  padding: AppSpacing.edgeH8V4,
+                  decoration: const BoxDecoration(
+                    color: AppColors.imageViewerOverlay,
+                    borderRadius: AppRadius.borderRadiusLg,
                   ),
                   child: Text(
                     '${_page + 1}/$total',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Colors.white,
+                      color: AppColors.imageViewerForeground,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -170,10 +175,10 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
           RetryableNetworkImage(
             imageUrl: video.thumbnailUrl!,
             fit: BoxFit.cover,
-            placeholderColor: Colors.grey[900]!,
+            placeholderColor: AppColors.mediaSurface,
           )
         else
-          ColoredBox(color: Colors.grey[900]!),
+          const ColoredBox(color: AppColors.mediaSurface),
         Center(
           child: Semantics(
             label: '재생',
@@ -184,12 +189,12 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: const BoxDecoration(
-                  color: Colors.black54,
+                  color: AppColors.imageViewerOverlay,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.play_arrow,
-                  color: Colors.white,
+                  color: AppColors.imageViewerForeground,
                   size: 40,
                 ),
               ),
@@ -198,5 +203,31 @@ class _FeedImageCarouselState extends State<FeedImageCarousel> {
         ),
       ],
     );
+  }
+}
+
+/// Simple bounded LRU map: removes the least recently accessed entry when
+/// [maxEntries] is exceeded. Sufficient for the aspect cache where we only
+/// need [containsKey]/read/write.
+class _AspectCache {
+  _AspectCache({required this.maxEntries});
+  final int maxEntries;
+  final Map<String, double> _map = <String, double>{};
+
+  bool containsKey(String key) => _map.containsKey(key);
+
+  double? operator [](String key) {
+    final value = _map.remove(key);
+    if (value == null) return null;
+    _map[key] = value;
+    return value;
+  }
+
+  void operator []=(String key, double value) {
+    _map.remove(key);
+    _map[key] = value;
+    if (_map.length > maxEntries) {
+      _map.remove(_map.keys.first);
+    }
   }
 }

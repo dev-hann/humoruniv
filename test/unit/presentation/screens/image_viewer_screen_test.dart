@@ -26,7 +26,7 @@ void main() {
         ),
       );
       await tester.pump();
-      expect(find.text('1 / 2'), findsOneWidget);
+      expect(find.text('1/2'), findsOneWidget);
     });
 
     testWidgets('renders a PageView for paging between images', (tester) async {
@@ -128,7 +128,7 @@ void main() {
         ),
       );
       navigatorKey.currentState!.push(
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (_) => ImageViewerScreen(
             imageUrls: ['https://example.com/a.jpg'],
             imageBuilder: (_) => const SizedBox.shrink(),
@@ -156,7 +156,7 @@ void main() {
         ),
       );
       navigatorKey.currentState!.push(
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (_) => ImageViewerScreen(
             imageUrls: ['https://example.com/a.jpg'],
             imageBuilder: (_) => const SizedBox.shrink(),
@@ -189,13 +189,13 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('1 / 2'), findsOneWidget);
+      expect(find.text('1/2'), findsOneWidget);
 
       await tester.tapAt(const Offset(700, 300));
       await tester.pumpAndSettle();
 
       expect(
-        find.text('2 / 2'),
+        find.text('2/2'),
         findsOneWidget,
         reason: 'tap on the right third should advance',
       );
@@ -218,13 +218,13 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('2 / 2'), findsOneWidget);
+      expect(find.text('2/2'), findsOneWidget);
 
       await tester.tapAt(const Offset(100, 300));
       await tester.pumpAndSettle();
 
       expect(
-        find.text('1 / 2'),
+        find.text('1/2'),
         findsOneWidget,
         reason: 'tap on the left third should go back',
       );
@@ -249,7 +249,7 @@ void main() {
       await tester.tapAt(const Offset(400, 300));
       await tester.pumpAndSettle();
 
-      expect(find.text('1 / 2'), findsOneWidget);
+      expect(find.text('1/2'), findsOneWidget);
     });
 
     testWidgets(
@@ -273,14 +273,14 @@ void main() {
         );
         await tester.pump();
 
-        expect(find.text('1 / 2'), findsOneWidget);
+        expect(find.text('1/2'), findsOneWidget);
 
         // Swipe left (negative dx) to advance to the next page.
         await tester.fling(find.byType(PageView), const Offset(-300, 0), 2000);
         await tester.pumpAndSettle();
 
         expect(
-          find.text('2 / 2'),
+          find.text('2/2'),
           findsOneWidget,
           reason: 'paging from a long image page should reach the next page',
         );
@@ -308,13 +308,13 @@ void main() {
         );
         await tester.pump();
 
-        expect(find.text('1 / 2'), findsOneWidget);
+        expect(find.text('1/2'), findsOneWidget);
 
         await tester.fling(find.byType(PageView), const Offset(-300, 0), 2000);
         await tester.pumpAndSettle();
 
         expect(
-          find.text('2 / 2'),
+          find.text('2/2'),
           findsOneWidget,
           reason: 'paging onto a long image page should still advance',
         );
@@ -349,13 +349,13 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('1 / 2'), findsOneWidget);
+      expect(find.text('1/2'), findsOneWidget);
 
       await tester.fling(find.byType(PageView), const Offset(-400, 0), 2000);
       await tester.pumpAndSettle();
 
       expect(
-        find.text('2 / 2'),
+        find.text('2/2'),
         findsOneWidget,
         reason: 'paging from a tall scrollable long-image page must work',
       );
@@ -387,7 +387,7 @@ void main() {
         );
         await tester.pump();
 
-        expect(find.text('1 / 2'), findsOneWidget);
+        expect(find.text('1/2'), findsOneWidget);
 
         // Mostly-horizontal swipe with a small vertical component, like a real
         // finger.
@@ -399,7 +399,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          find.text('2 / 2'),
+          find.text('2/2'),
           findsOneWidget,
           reason: 'a mostly-horizontal swipe must page, not dismiss',
         );
@@ -429,14 +429,14 @@ void main() {
         );
         await tester.pump();
 
-        expect(find.text('2 / 2'), findsOneWidget);
+        expect(find.text('2/2'), findsOneWidget);
 
         // Swipe right (back to page 0) with a small vertical component.
         await tester.fling(find.byType(PageView), const Offset(400, -40), 2000);
         await tester.pumpAndSettle();
 
         expect(
-          find.text('1 / 2'),
+          find.text('1/2'),
           findsOneWidget,
           reason: 'a mostly-horizontal swipe back must page from a long image',
         );

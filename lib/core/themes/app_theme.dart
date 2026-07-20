@@ -12,7 +12,7 @@ abstract final class AppTheme {
       blendLevel: 7,
       subThemesData: const FlexSubThemesData(
         blendOnLevel: 10,
-        useTextTheme: true,
+        useMaterial3Typography: true,
         useM2StyleDividerInM3: true,
         alignedDropdown: true,
         useInputDecoratorThemeInDialogs: true,
@@ -30,7 +30,7 @@ abstract final class AppTheme {
       blendLevel: 13,
       subThemesData: const FlexSubThemesData(
         blendOnLevel: 20,
-        useTextTheme: true,
+        useMaterial3Typography: true,
         useM2StyleDividerInM3: true,
         alignedDropdown: true,
         useInputDecoratorThemeInDialogs: true,

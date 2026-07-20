@@ -176,34 +176,38 @@ class FeedCard extends StatelessWidget {
     return GestureDetector(
       onTap: onCommentsTap,
       behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: AppSpacing.edgeH16V8,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '댓글 ${detail!.commentCount}개 모두 보기',
-              style: textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+      child: Semantics(
+        label: '댓글 미리보기 — 탭하여 모든 댓글 보기',
+        button: true,
+        child: Padding(
+          padding: AppSpacing.edgeH16V8,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '댓글 ${detail!.commentCount}개 모두 보기',
+                style: textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            AppSpacing.sbH4,
-            RichText(
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: '${first.author} ',
-                    style: textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
+              AppSpacing.sbH4,
+              RichText(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '${first.author} ',
+                      style: textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  TextSpan(text: first.content, style: textTheme.labelSmall),
-                ],
+                    TextSpan(text: first.content, style: textTheme.labelSmall),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -264,19 +268,23 @@ class _ExpandableTextState extends State<_ExpandableText> {
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () => setState(() => _expanded = !_expanded),
-                child: Container(
-                  alignment: Alignment.centerLeft,
-                  constraints: const BoxConstraints(
-                    minHeight: AppSizes.minTouchTarget,
-                    minWidth: AppSizes.minTouchTarget,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Text(
-                      _expanded ? '접기' : '더보기',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w600,
+                child: Semantics(
+                  label: _expanded ? '접기' : '더보기',
+                  button: true,
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    constraints: const BoxConstraints(
+                      minHeight: AppSizes.minTouchTarget,
+                      minWidth: AppSizes.minTouchTarget,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        _expanded ? '접기' : '더보기',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),

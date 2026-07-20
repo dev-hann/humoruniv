@@ -42,8 +42,8 @@ class _FeedCardItemState extends ConsumerState<FeedCardItem>
       detailLoading: asyncDetail.isLoading,
       onImageTap: !hasImages
           ? null
-          : (i) => Navigator.of(context).push(
-              MaterialPageRoute(
+          : (i) => Navigator.of(context).push<void>(
+              MaterialPageRoute<void>(
                 builder: (_) => ImageViewerScreen(
                   imageUrls: detail.imageUrls,
                   initialIndex: i,
@@ -189,7 +189,7 @@ class _FeedListState extends State<FeedList> {
         ),
         Positioned(
           right: AppSpacing.p16,
-          bottom: AppSpacing.p16,
+          bottom: AppSpacing.p16 + MediaQuery.paddingOf(context).bottom,
           child: ScrollToTopButton(
             visible: _showScrollTop,
             onTap: () {

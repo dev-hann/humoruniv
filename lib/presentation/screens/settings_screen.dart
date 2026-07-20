@@ -38,98 +38,100 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('설정')),
-      body: ListView(
-        children: [
-          SettingsGroup(
-            title: '화면',
-            children: [
-              SettingsTile(
-                leading: const Icon(Icons.dark_mode_outlined),
-                title: '다크 모드',
-                trailing: DarkModeSelector(
-                  currentMode: themeMode,
-                  onChanged: (option) {
-                    ref.read(themeProvider.notifier).setThemeMode(option);
+      body: SafeArea(
+        child: ListView(
+          children: [
+            SettingsGroup(
+              title: '화면',
+              children: [
+                SettingsTile(
+                  leading: const Icon(Icons.dark_mode_outlined),
+                  title: '다크 모드',
+                  trailing: DarkModeSelector(
+                    currentMode: themeMode,
+                    onChanged: (option) {
+                      ref.read(themeProvider.notifier).setThemeMode(option);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SettingsGroup(
+              title: '미디어 & 데이터',
+              children: [
+                SettingsTile(
+                  leading: const Icon(Icons.storage_outlined),
+                  title: '이미지 캐시',
+                  subtitle: '캐시 용량 ${_formatBytes(cacheState.sizeBytes)}',
+                  onTap: () => _confirmClearCache(context),
+                ),
+              ],
+            ),
+            SettingsGroup(
+              title: '정보',
+              children: [
+                FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) {
+                    final version = snapshot.hasData
+                        ? 'v${snapshot.data!.version}'
+                        : '...';
+                    return SettingsTile(
+                      leading: const Icon(Icons.info_outline),
+                      title: '버전',
+                      subtitle: version,
+                    );
                   },
                 ),
-              ),
-            ],
-          ),
-          SettingsGroup(
-            title: '미디어 & 데이터',
-            children: [
-              SettingsTile(
-                leading: const Icon(Icons.storage_outlined),
-                title: '이미지 캐시',
-                subtitle: '캐시 용량 ${_formatBytes(cacheState.sizeBytes)}',
-                onTap: () => _confirmClearCache(context),
-              ),
-            ],
-          ),
-          SettingsGroup(
-            title: '정보',
-            children: [
-              FutureBuilder<PackageInfo>(
-                future: PackageInfo.fromPlatform(),
-                builder: (context, snapshot) {
-                  final version = snapshot.hasData
-                      ? 'v${snapshot.data!.version}'
-                      : '...';
-                  return SettingsTile(
-                    leading: const Icon(Icons.info_outline),
-                    title: '버전',
-                    subtitle: version,
-                  );
-                },
-              ),
-              UpdateBanner(
-                status: updateState.status,
-                newVersion: updateState.release?.version,
-                downloadProgress: updateState.downloadProgress,
-                hasApkDownloadUrl: updateState.release?.downloadUrl != null,
-                onCheck: () {
-                  ref.read(updateProvider.notifier).checkForUpdate();
-                },
-                onUpdate: () {
-                  final notifier = ref.read(updateProvider.notifier);
-                  if (updateState.release?.downloadUrl != null) {
-                    notifier.downloadUpdate();
-                  } else {
-                    final url = updateState.release?.htmlUrl;
-                    if (url != null && url.isNotEmpty) {
-                      _openUpdateUrl(url);
+                UpdateBanner(
+                  status: updateState.status,
+                  newVersion: updateState.release?.version,
+                  downloadProgress: updateState.downloadProgress,
+                  hasApkDownloadUrl: updateState.release?.downloadUrl != null,
+                  onCheck: () {
+                    ref.read(updateProvider.notifier).checkForUpdate();
+                  },
+                  onUpdate: () {
+                    final notifier = ref.read(updateProvider.notifier);
+                    if (updateState.release?.downloadUrl != null) {
+                      notifier.downloadUpdate();
+                    } else {
+                      final url = updateState.release?.htmlUrl;
+                      if (url != null && url.isNotEmpty) {
+                        _openUpdateUrl(url);
+                      }
                     }
-                  }
-                },
-                onCancelDownload: () {
-                  ref.read(updateProvider.notifier).cancelDownload();
-                },
-                onInstall: () {
-                  ref.read(updateProvider.notifier).launchInstaller();
-                },
-                onRetryDownload: () {
-                  ref.read(updateProvider.notifier).downloadUpdate();
-                },
-                onOpenPermissionSettings: () {
-                  ref
-                      .read(updateProvider.notifier)
-                      .openInstallPermissionSettings();
-                },
-              ),
-              SettingsTile(
-                leading: const Icon(Icons.description_outlined),
-                title: '오픈소스 라이선스',
-                onTap: () => _showLicenses(context),
-              ),
-              SettingsTile(
-                leading: const Icon(Icons.code_outlined),
-                title: '소스 코드',
-                subtitle: 'GitHub',
-                onTap: () => _launchUrl(_repoUrl),
-              ),
-            ],
-          ),
-        ],
+                  },
+                  onCancelDownload: () {
+                    ref.read(updateProvider.notifier).cancelDownload();
+                  },
+                  onInstall: () {
+                    ref.read(updateProvider.notifier).launchInstaller();
+                  },
+                  onRetryDownload: () {
+                    ref.read(updateProvider.notifier).downloadUpdate();
+                  },
+                  onOpenPermissionSettings: () {
+                    ref
+                        .read(updateProvider.notifier)
+                        .openInstallPermissionSettings();
+                  },
+                ),
+                SettingsTile(
+                  leading: const Icon(Icons.description_outlined),
+                  title: '오픈소스 라이선스',
+                  onTap: () => _showLicenses(context),
+                ),
+                SettingsTile(
+                  leading: const Icon(Icons.code_outlined),
+                  title: '소스 코드',
+                  subtitle: 'GitHub',
+                  onTap: () => _launchUrl(_repoUrl),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

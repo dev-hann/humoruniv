@@ -1,9 +1,67 @@
 import 'package:fake_async/fake_async.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humoruniv/core/widgets/atoms/retry_controller.dart';
 
 void main() {
   group('RetryController', () {
+    group('ChangeNotifier integration', () {
+      test('is a Listenable (ChangeNotifier)', () {
+        final c = RetryController();
+        addTearDown(c.dispose);
+        expect(c, isA<Listenable>());
+        expect(c, isA<ChangeNotifier>());
+      });
+
+      test('notifies listeners when auto-retry timer fires', () {
+        fakeAsync((async) {
+          var notifications = 0;
+          final c = RetryController(
+            maxAttempts: 3,
+            retryDelay: const Duration(milliseconds: 100),
+          );
+          addTearDown(c.dispose);
+          c.addListener(() => notifications++);
+
+          c.recordFailure();
+          expect(notifications, 0, reason: 'no notification on schedule');
+
+          async.elapse(const Duration(milliseconds: 100));
+
+          expect(
+            notifications,
+            greaterThan(0),
+            reason:
+                'listeners must be notified when timer fires so '
+                'widgets can rebuild',
+          );
+          expect(c.attempt, 1);
+          expect(c.hasError, isFalse);
+        });
+      });
+
+      test('notifies once on exhaustion (so widgets can show retry hint)', () {
+        fakeAsync((async) {
+          var notifications = 0;
+          final c = RetryController(maxAttempts: 1);
+          addTearDown(c.dispose);
+          c.addListener(() => notifications++);
+
+          c.recordFailure();
+          expect(
+            notifications,
+            1,
+            reason: 'notifies once on exhaustion so widgets can rebuild',
+          );
+
+          async.elapse(const Duration(seconds: 5));
+
+          expect(notifications, 1, reason: 'no further retries scheduled');
+          expect(c.isExhausted, isTrue);
+        });
+      });
+    });
+
     group('initial state', () {
       test('maxAttempts defaults to 3', () {
         final c = RetryController();
@@ -106,20 +164,25 @@ void main() {
         });
       });
 
-      test('onRetry callback receives new attempt number', () {
+      test('ChangeNotifier notifies on retry with new attempt number', () {
         fakeAsync((async) {
-          final attempts = <int>[];
+          var notifications = 0;
+          var lastSeenAttempt = 0;
           final c = RetryController(
             maxAttempts: 3,
             retryDelay: const Duration(milliseconds: 100),
-            onRetry: attempts.add,
           );
           addTearDown(c.dispose);
+          c.addListener(() {
+            notifications++;
+            lastSeenAttempt = c.attempt;
+          });
 
           c.recordFailure();
           async.elapse(const Duration(milliseconds: 100));
 
-          expect(attempts, [1]);
+          expect(notifications, 1);
+          expect(lastSeenAttempt, 1);
         });
       });
 
@@ -148,22 +211,34 @@ void main() {
         });
       });
 
-      test('exhausted controller does NOT schedule another retry', () {
+      test('exhausted controller notifies but does NOT retry further', () {
         fakeAsync((async) {
-          var retryCalls = 0;
+          var notifications = 0;
           final c = RetryController(
             maxAttempts: 3,
             retryDelay: const Duration(milliseconds: 100),
-            onRetry: (_) => retryCalls++,
           );
           addTearDown(c.dispose);
+          c.addListener(() => notifications++);
 
-          for (var i = 0; i < 5; i++) {
+          // First two failures schedule retries that fire and advance attempt.
+          c.recordFailure();
+          async.elapse(const Duration(milliseconds: 100));
+          c.recordFailure();
+          async.elapse(const Duration(milliseconds: 100));
+          // Now attempt == 2 (maxAttempts - 1). Further failures exhaust.
+          final notificationsBeforeExhaustion = notifications;
+
+          for (var i = 0; i < 3; i++) {
             c.recordFailure();
             async.elapse(const Duration(milliseconds: 100));
           }
 
-          expect(retryCalls, 2);
+          expect(
+            notifications,
+            notificationsBeforeExhaustion + 3,
+            reason: 'each exhausted recordFailure notifies once',
+          );
           expect(c.attempt, 2);
           expect(c.isExhausted, isTrue);
         });
@@ -192,20 +267,24 @@ void main() {
 
       test('cancels pending auto-retry timer', () {
         fakeAsync((async) {
-          var retryCalls = 0;
+          var notifications = 0;
           final c = RetryController(
             maxAttempts: 3,
             retryDelay: const Duration(milliseconds: 500),
-            onRetry: (_) => retryCalls++,
           );
           addTearDown(c.dispose);
+          c.addListener(() => notifications++);
 
           c.recordFailure();
           c.manualRetry();
 
           async.elapse(const Duration(seconds: 5));
 
-          expect(retryCalls, 0);
+          expect(
+            notifications,
+            lessThan(2),
+            reason: 'timer cancelled; only manualRetry notification fires',
+          );
           expect(c.attempt, 0);
           expect(c.hasError, isFalse);
         });
@@ -221,7 +300,7 @@ void main() {
           c.recordFailure();
           expect(c.isExhausted, isTrue);
 
-          c.resetForUrl('new-url');
+          c.resetForUrl('new-url', currentUrl: 'old-url');
 
           expect(c.attempt, 0);
           expect(c.hasError, isFalse);
@@ -229,7 +308,7 @@ void main() {
         });
       });
 
-      test('no-op when URL is unchanged (empty default)', () {
+      test('no-op when URL is unchanged', () {
         fakeAsync((async) {
           final c = RetryController(
             maxAttempts: 3,
@@ -241,7 +320,7 @@ void main() {
           async.elapse(const Duration(milliseconds: 100));
           expect(c.attempt, 1);
 
-          c.resetForUrl('');
+          c.resetForUrl('same', currentUrl: 'same');
 
           expect(c.attempt, 1);
         });
@@ -251,19 +330,19 @@ void main() {
     group('dispose', () {
       test('cancels pending timer', () {
         fakeAsync((async) {
-          var retryCalls = 0;
+          var notifications = 0;
           final c = RetryController(
             maxAttempts: 3,
             retryDelay: const Duration(milliseconds: 500),
-            onRetry: (_) => retryCalls++,
           );
+          c.addListener(() => notifications++);
 
           c.recordFailure();
           c.dispose();
 
           async.elapse(const Duration(seconds: 5));
 
-          expect(retryCalls, 0);
+          expect(notifications, 0);
         });
       });
     });

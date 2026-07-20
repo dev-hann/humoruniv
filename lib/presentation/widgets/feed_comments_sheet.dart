@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:humoruniv/core/themes/app_radius.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/domain/entities/comment.dart';
 import 'package:humoruniv/presentation/widgets/comment_tile.dart';
@@ -12,6 +13,13 @@ class FeedCommentsSheet extends StatelessWidget {
   });
   final List<Comment> comments;
   final int count;
+
+  static const _handleWidth = 36.0;
+  static const _handleHeight = 4.0;
+  static const _handleAlpha = 0.4;
+  static const _dividerAlpha = 0.12;
+  static const _separatorAlpha = 0.08;
+  static const _sheetHeightRatio = 0.85;
 
   List<Comment> get _sorted {
     final list = [...comments];
@@ -27,24 +35,26 @@ class FeedCommentsSheet extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final sorted = _sorted;
+    final dividerColor = colorScheme.outline;
     return SafeArea(
       child: Column(
         children: [
           Container(
-            width: 36,
-            height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 8),
+            width: _handleWidth,
+            height: _handleHeight,
+            margin: const EdgeInsets.symmetric(vertical: AppSpacing.p8),
             decoration: BoxDecoration(
-              color: colorScheme.outline.withOpacity(0.4),
-              borderRadius: BorderRadius.circular(2),
+              color: dividerColor.withValues(alpha: _handleAlpha),
+              borderRadius: BorderRadius.circular(_handleHeight / 2),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: AppSpacing.edgeH8V4,
             child: Row(
               children: [
                 IconButton(
                   icon: const Icon(Icons.close),
+                  tooltip: '닫기',
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 Text(
@@ -56,14 +66,17 @@ class FeedCommentsSheet extends StatelessWidget {
               ],
             ),
           ),
-          Divider(height: 1, color: colorScheme.outline.withOpacity(0.12)),
+          Divider(
+            height: 1,
+            color: dividerColor.withValues(alpha: _dividerAlpha),
+          ),
           Expanded(
             child: ListView.separated(
               padding: AppSpacing.edgeH16V8,
               itemCount: sorted.length,
               separatorBuilder: (_, __) => Divider(
                 height: 1,
-                color: colorScheme.outline.withOpacity(0.08),
+                color: dividerColor.withValues(alpha: _separatorAlpha),
               ),
               itemBuilder: (context, index) =>
                   CommentTile(comment: sorted[index]),
@@ -80,15 +93,17 @@ void showFeedCommentsSheet(
   List<Comment> comments,
   int count,
 ) {
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Theme.of(context).colorScheme.surface,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
     ),
     builder: (_) => SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.85,
+      height:
+          MediaQuery.sizeOf(context).height *
+          FeedCommentsSheet._sheetHeightRatio,
       child: FeedCommentsSheet(comments: comments, count: count),
     ),
   );

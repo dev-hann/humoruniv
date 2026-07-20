@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'package:humoruniv/core/themes/app_radius.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/domain/entities/comment.dart';
 import 'package:humoruniv/presentation/widgets/content_block_view.dart';
@@ -12,16 +14,19 @@ class CommentTile extends StatelessWidget {
     final allImageUrls = comment.imageUrls;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppSpacing.p12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (comment.isBest)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.p6,
+                vertical: AppSpacing.p2,
+              ),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: AppRadius.borderRadiusSm,
               ),
               child: Text(
                 'BEST',
@@ -48,7 +53,7 @@ class CommentTile extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          AppSpacing.sbH4,
           Text(comment.content, style: Theme.of(context).textTheme.bodyMedium),
           ...comment.mediaBlocks.map(
             (block) =>
@@ -57,7 +62,10 @@ class CommentTile extends StatelessWidget {
           if (comment.replies.isNotEmpty)
             ...comment.replies.map(
               (reply) => Padding(
-                padding: const EdgeInsets.only(left: 16, top: 8),
+                padding: const EdgeInsets.only(
+                  left: AppSpacing.p16,
+                  top: AppSpacing.p8,
+                ),
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border(
@@ -67,7 +75,7 @@ class CommentTile extends StatelessWidget {
                       ),
                     ),
                   ),
-                  padding: const EdgeInsets.only(left: 8),
+                  padding: const EdgeInsets.only(left: AppSpacing.p8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -84,7 +92,7 @@ class CommentTile extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      AppSpacing.sbH4,
                       Text(
                         reply.content,
                         style: Theme.of(context).textTheme.bodySmall,

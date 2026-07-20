@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:humoruniv/core/themes/app_colors.dart';
+import 'package:humoruniv/core/themes/app_radius.dart';
+import 'package:humoruniv/core/themes/app_sizes.dart';
+import 'package:humoruniv/core/themes/app_spacing.dart';
 import 'package:humoruniv/core/widgets/atoms/retryable_network_image.dart';
 import 'package:humoruniv/core/widgets/molecules/inline_video_player.dart';
 import 'package:humoruniv/domain/entities/content_block.dart';
@@ -49,8 +53,9 @@ class _CompactImageThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.p8),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           final idx = allImageUrls.indexOf(block.url);
           Navigator.push<void>(
@@ -63,15 +68,15 @@ class _CompactImageThumbnail extends StatelessWidget {
             ),
           );
         },
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 200),
-            child: RetryableNetworkImage(
-              imageUrl: block.url,
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxHeight: AppSizes.imagePlaceholderHeight,
+          ),
+          child: RetryableNetworkImage(
+            imageUrl: block.url,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            borderRadius: AppRadius.borderRadiusMd,
           ),
         ),
       ),
@@ -86,49 +91,51 @@ class _CompactVideoThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.p8),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           Navigator.push<void>(
             context,
             MaterialPageRoute<void>(
               builder: (_) => Scaffold(
-                backgroundColor: Colors.black,
-                appBar: AppBar(backgroundColor: Colors.black),
+                backgroundColor: AppColors.mediaSurface,
+                appBar: AppBar(backgroundColor: AppColors.mediaSurface),
                 body: Center(child: InlineVideoPlayer(block: block)),
               ),
             ),
           );
         },
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 200),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                if (block.thumbnailUrl != null)
-                  RetryableNetworkImage(
-                    imageUrl: block.thumbnailUrl!,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                  )
-                else
-                  _buildPlaceholder(),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.4),
-                    shape: BoxShape.circle,
-                  ),
-                  padding: const EdgeInsets.all(8),
-                  child: const Icon(
-                    Icons.play_arrow,
-                    size: 32,
-                    color: Colors.white,
-                  ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxHeight: AppSizes.imagePlaceholderHeight,
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              if (block.thumbnailUrl != null)
+                RetryableNetworkImage(
+                  imageUrl: block.thumbnailUrl!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  borderRadius: AppRadius.borderRadiusMd,
+                  placeholderColor: AppColors.imagePlaceholder,
+                )
+              else
+                _buildPlaceholder(),
+              Container(
+                decoration: const BoxDecoration(
+                  color: AppColors.imageViewerOverlay,
+                  shape: BoxShape.circle,
                 ),
-              ],
-            ),
+                padding: const EdgeInsets.all(AppSpacing.p8),
+                child: const Icon(
+                  Icons.play_arrow,
+                  size: AppSizes.iconLarge,
+                  color: AppColors.imageViewerForeground,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -140,7 +147,11 @@ class _CompactVideoThumbnail extends StatelessWidget {
       height: 120,
       color: AppColors.imagePlaceholder,
       child: const Center(
-        child: Icon(Icons.videocam, color: Colors.white54, size: 32),
+        child: Icon(
+          Icons.videocam,
+          color: AppColors.imageViewerForegroundMuted,
+          size: AppSizes.iconLarge,
+        ),
       ),
     );
   }

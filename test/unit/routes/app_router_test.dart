@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:humoruniv/core/errors/failures.dart';
 import 'package:humoruniv/di/injection.dart' as di;
 import 'package:humoruniv/domain/entities/app_release.dart';
 import 'package:humoruniv/domain/entities/board_list_result.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:humoruniv/core/themes/app_colors.dart';
+import 'package:humoruniv/core/themes/app_durations.dart';
 import 'package:humoruniv/core/themes/app_radius.dart';
 import 'package:humoruniv/core/themes/app_sizes.dart';
 import 'package:humoruniv/core/themes/app_spacing.dart';
@@ -142,8 +143,8 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     if (index < 0 || index >= widget.imageUrls.length) return;
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOut,
+      duration: AppDurations.medium,
+      curve: AppCurves.decelerate,
     );
   }
 
@@ -171,11 +172,12 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.imageViewerBackground,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.imageViewerBackground,
         elevation: 0,
         leading: IconButton(
+          tooltip: '닫기',
           icon: const Icon(Icons.close, color: AppColors.imageViewerForeground),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -197,10 +199,10 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                       borderRadius: AppRadius.borderRadiusXl,
                     ),
                     child: Text(
-                      '${_currentIndex + 1} / ${widget.imageUrls.length}',
-                      style: const TextStyle(
+                      '${_currentIndex + 1}/${widget.imageUrls.length}',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: AppColors.imageViewerForeground,
-                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),

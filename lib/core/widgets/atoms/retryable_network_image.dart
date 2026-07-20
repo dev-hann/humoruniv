@@ -35,36 +35,67 @@ class RetryableNetworkImage extends StatefulWidget {
 }
 
 class _RetryableNetworkImageState extends State<RetryableNetworkImage> {
-  final RetryController _ownedController = RetryController();
+  RetryController? _ownedController;
+  late RetryController _controller;
+  late int _lastSeenAttempt;
 
-  RetryController get _controller => widget.controller ?? _ownedController;
+  RetryController get _effectiveController {
+    if (widget.controller != null) return widget.controller!;
+    _ownedController ??= RetryController(
+      maxAttempts: widget.maxAttempts,
+      retryDelay: widget.retryDelay,
+    );
+    return _ownedController!;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = _effectiveController;
+    _lastSeenAttempt = _controller.attempt;
+    _controller.addListener(_onControllerChanged);
+  }
 
   @override
   void didUpdateWidget(covariant RetryableNetworkImage oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final newController = _effectiveController;
+    if (!identical(newController, _controller)) {
+      _controller.removeListener(_onControllerChanged);
+      _controller = newController;
+      _lastSeenAttempt = _controller.attempt;
+      _controller.addListener(_onControllerChanged);
+    }
     if (oldWidget.imageUrl != widget.imageUrl) {
-      _controller.resetForUrl(widget.imageUrl);
+      _controller.resetForUrl(widget.imageUrl, currentUrl: oldWidget.imageUrl);
+      _lastSeenAttempt = _controller.attempt;
     }
   }
 
   @override
   void dispose() {
-    _ownedController.dispose();
+    _controller.removeListener(_onControllerChanged);
+    _ownedController?.dispose();
     super.dispose();
   }
 
-  void _onFailureDetected() {
+  void _onControllerChanged() {
     if (!mounted) return;
-    final prevExhausted = _controller.isExhausted;
-    _controller.recordFailure();
-    if (_controller.isExhausted != prevExhausted || _controller.canAutoRetry) {
+    if (_controller.attempt != _lastSeenAttempt ||
+        _controller.isExhausted ||
+        !_controller.hasError) {
+      _lastSeenAttempt = _controller.attempt;
       setState(() {});
     }
   }
 
+  void _onFailureDetected() {
+    if (!mounted) return;
+    _controller.recordFailure();
+  }
+
   void _onManualRetry() {
     _controller.manualRetry();
-    setState(() {});
   }
 
   @override

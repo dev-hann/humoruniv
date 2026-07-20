@@ -6,6 +6,13 @@ abstract final class AppColors {
   static const Color imageViewerForeground = Colors.white;
   static const Color imageViewerForegroundMuted = Colors.white54;
 
+  /// Solid black used as the surface behind videos and image overlays where
+  /// letterboxing is desired (letterboxed media reads as black to the eye).
+  static const Color mediaSurface = Colors.black;
+
+  /// Muted placeholder background shown behind unloaded media in the feed.
+  /// Always light grey regardless of theme so the placeholder is visible in
+  /// both light and dark mode (matches typical image-loading UX).
   static const Color imagePlaceholder = Color(0xFFE0E0E0);
 
   static const Color _recTierLow = Color(0xFF9E9E9E);
